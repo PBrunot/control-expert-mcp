@@ -6,9 +6,14 @@
 
 Connect MCP clients to a local **EcoStruxure Control Expert** (formerly **Unity Pro**) installation. Inspect, create, edit, and build PLC projects through Schneider Electric's Unity Developer's Edition (UDE) COM automation API.
 
+This is an **experiment**, forked from the earlier [apexsotjo-blip/control-expert-mcp project on GitHub](https://github.com/apexsotjo-blip/control-expert-mcp). It explores LLM-assisted PLC programming and debugging; the benchmark results are exploratory.
+
+[Install from PyPI](https://pypi.org/project/control-expert-mcp/) · [Benchmark overview image](https://github.com/PBrunot/control-expert-mcp/blob/main/benchmarks/archive/overview.png) · [Benchmark methods and commands](benchmarks/README.md)
+
 ```text
 MCP client ── stdio ──> control-expert-mcp ── COM ──> Control Expert
-                                         └─ Modbus TCP ──> PLC / simulator (opt-in)
+                                         ├─ OFS OPC DA ──> PLC Simulator (opt-in, preferred)
+                                         └─ Modbus TCP ──> PLC (opt-in)
 ```
 
 Inspired by [tiaportal-mcp](https://github.com/heilingbrunner/tiaportal-mcp). This project uses the Control Expert UDE broker (`PSBroker.PServerBroker`) through `pywin32`.
@@ -42,7 +47,7 @@ Inspired by [tiaportal-mcp](https://github.com/heilingbrunner/tiaportal-mcp). Th
 - **Communications:** manage DTMs, device addresses, M580 Modbus scan requests, CPU Ethernet services, and Premium/Quantum logical networks.
 - **Validation:** check exchange XML against installed schemas, analyze and build projects, and retrieve build diagnostics.
 - **Documentation:** search locally converted vendor manuals and retrieve topics with source citations, without opening Control Expert.
-- **Monitoring and commissioning:** open animation tables and, when explicitly enabled, connect to a PLC or simulator and read or write located tags over Modbus TCP.
+- **Monitoring and commissioning:** open animation tables and, after explicit session setup, read/write symbolic variables through OFS OPC DA, including exposed unlocated variables and DFB members. Modbus TCP remains available for located tags.
 
 Availability depends on the installed Control Expert version, license, hardware catalog, and DTM libraries.
 
@@ -60,7 +65,19 @@ Run the server on the **same machine as Control Expert**. DCOM remoting is not c
 
 ## Quick start
 
-Run these commands in PowerShell:
+### Install from PyPI (recommended)
+
+On the Windows machine with Control Expert installed, run:
+
+```powershell
+py -3.11 -m pip install --upgrade control-expert-mcp
+```
+
+No Git checkout is required. Configure your MCP client to launch `control-expert-mcp` with no arguments, as shown below. The installed console command starts the stdio server; the MCP client normally manages that process. If the client cannot find the command on its PATH, use the absolute path to the installed executable, or to the same Python interpreter with arguments `["-m", "control_expert_mcp"]`.
+
+### Install from source
+
+For development, clone the repository and install into a virtual environment:
 
 ```powershell
 git clone https://github.com/PBrunot/control-expert-mcp.git
@@ -69,7 +86,7 @@ py -3.11 -m venv .venv
 .venv\Scripts\python.exe -m pip install -e .
 ```
 
-Configure your MCP client with the absolute path to `.venv\Scripts\python.exe` and arguments `["-m", "control_expert_mcp"]`, using an example below.
+For a source installation, configure your MCP client with the absolute path to `.venv\Scripts\python.exe` and arguments `["-m", "control_expert_mcp"]`.
 
 To launch the stdio server manually:
 
@@ -81,7 +98,7 @@ The installed `control-expert-mcp` console command is equivalent. This is a stdi
 
 ## MCP client configuration
 
-Replace `C:\path\to\control-expert-mcp` with your checkout path. Keep online access disabled for initial setup.
+These examples use the PyPI-installed console command. Keep online access disabled for initial setup. The files in `samples/` also show absolute Python paths for source installations.
 
 ### Claude Desktop
 
@@ -91,8 +108,8 @@ Add this entry to `%APPDATA%\Claude\claude_desktop_config.json`. A copy is avail
 {
   "mcpServers": {
     "control-expert": {
-      "command": "C:\\path\\to\\control-expert-mcp\\.venv\\Scripts\\python.exe",
-      "args": ["-m", "control_expert_mcp"],
+      "command": "control-expert-mcp",
+      "args": [],
       "env": {
         "CE_MCP_ENABLE_ONLINE": "0"
       }
@@ -104,7 +121,7 @@ Add this entry to `%APPDATA%\Claude\claude_desktop_config.json`. A copy is avail
 ### Claude Code
 
 ```powershell
-claude mcp add control-expert -- C:\path\to\control-expert-mcp\.venv\Scripts\python.exe -m control_expert_mcp
+claude mcp add control-expert -- control-expert-mcp
 ```
 
 Online access remains disabled unless the server inherits an enabling environment variable.
@@ -118,8 +135,8 @@ Add the server to `.vscode/mcp.json`. See [samples/vscode-mcp.json](samples/vsco
   "servers": {
     "control-expert": {
       "type": "stdio",
-      "command": "C:\\path\\to\\control-expert-mcp\\.venv\\Scripts\\python.exe",
-      "args": ["-m", "control_expert_mcp"],
+      "command": "control-expert-mcp",
+      "args": [],
       "env": {
         "CE_MCP_ENABLE_ONLINE": "0"
       }
