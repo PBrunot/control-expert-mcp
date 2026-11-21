@@ -124,15 +124,16 @@ def request_parameters(config: dict) -> dict:
     return adapter(config).parameters(config["model"])
 
 
-async def workflow(mcp, task: str, config: dict, provider, evidence, result: dict):
+async def workflow(mcp, task: str, config: dict, provider, evidence, result: dict, *, prompt: str | None = None):
     """Mutate result incrementally so failures preserve partial usage and counts."""
     instructions, schemas = mcp.adapter(task)
-    history = [{"role": "user", "content": PROMPTS[task]}]
+    user_prompt = PROMPTS[task] if prompt is None else prompt
+    history = [{"role": "user", "content": user_prompt}]
     usage = Usage()
     result.update(tool_calls=0, tool_errors=0, repair_cycles=0, api_retries=0, transport_retries=0,
                   model_requests=0, returned_models=[], request_ids=[], final_response="")
     evidence.events.emit("model_context", instructions_ref=evidence.blob(instructions),
-        schemas_ref=evidence.blob(schemas), prompt_ref=evidence.blob(PROMPTS[task]),
+        schemas_ref=evidence.blob(schemas), prompt_ref=evidence.blob(user_prompt),
         prompt_resource_policy="No automatic prompts/resources; embedded reference tools available")
     started = perf_counter()
     failed_build = False

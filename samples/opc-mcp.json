@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "control-expert": {
+      "command": "C:\\path\\to\\control-expert-mcp\\.venv\\Scripts\\python.exe",
+      "args": ["-m", "control_expert_mcp"],
+      "env": {
+        "CE_MCP_ENABLE_ONLINE": "1",
+        "CE_MCP_OPC_PYTHON": "C:\\path\\to\\32-bit-python\\python.exe"
+      }
+    }
+  }
+}

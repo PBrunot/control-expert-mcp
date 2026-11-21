@@ -134,7 +134,8 @@ Set environment variables in the MCP client's server configuration so they reach
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
-| `CE_MCP_ENABLE_ONLINE` | Disabled | Set to `1` to register `plc_*`, `modbus_*`, `read_tags`, and `write_tags`. Restart the server after changing it. |
+| `CE_MCP_ENABLE_ONLINE` | Disabled | Set to `1` to register `plc_*`, `opc_*`, `modbus_*`, `read_tags`, and `write_tags`. Session setup and user approval are still required. Restart after changing it. |
+| `CE_MCP_OPC_PYTHON` | Server Python | Python executable matching the installed OPC Automation DLL bitness, with `pywin32` installed. Usually a separate 32-bit Python for OFS. |
 | `CE_MCP_SCHEMA_DIR` | Auto-discovered | Override the path to Control Expert's installed `SrcXmlSchema` directory for XML validation. |
 | `CE_MCP_MANUALS_DIR` | Repository-relative `manuals/ce-16.4` | Path to a converted and indexed local manual corpus. Set an absolute path for packaged installations. |
 
@@ -190,8 +191,10 @@ Tools are registered in [server.py](src/control_expert_mcp/server.py). The clien
 | Animation tables and UI | `list_animation_tables`, `create_animation_table`, `delete_animation_table`, `show_ui`, `open_animation_table` |
 | Simulator process | `start_simulator`, `stop_simulator` |
 | Local manuals | `get_documentation_status`, `search_manuals`, `get_manual_topic` |
+| Live session setup (always available) | `get_live_access_setup`, `configure_live_access` |
 | PLC connection **(opt-in)** | `plc_setup_connection`, `plc_connect`, `plc_disconnect`, `plc_state`, `plc_transfer`, `plc_command` |
-| Live values **(opt-in)** | `modbus_connect`, `modbus_disconnect`, `modbus_status`, `read_tags`, `write_tags` |
+| Symbolic live values **(opt-in, preferred)** | `opc_connect`, `opc_disconnect`, `opc_status`, `opc_browse`, `opc_read_tags`, `opc_write_tags` |
+| Modbus live values **(opt-in)** | `modbus_connect`, `modbus_disconnect`, `modbus_status`, `read_tags`, `write_tags` |
 
 DTM scan-request configuration uses the master/CPU dataset's `ManagedModbusRequestList`. Follow the template in `set_master_dtm_dataset` and the `add_modbus_device` prompt, including GUID and numbering rules. `place_fb_in_ladder` generates pin geometry for project DFBs; `use_fb_in_ladder` provides a template-based fallback for elementary blocks or exact GUI geometry.
 
@@ -206,13 +209,28 @@ The server includes reusable MCP prompts in [prompts.py](src/control_expert_mcp/
 | `fb_in_ladder` | Place a function block in Ladder and bind its pins. |
 | `add_modbus_device` | Add a Modbus TCP slave DTM and configure a scan request. |
 | `commission_simulator` | Build, start the simulator, connect, transfer, and run, including the first-transfer limitation. |
+| `setup_live_access` | Obtain session consent, prefer OPC, record the OFS alias, and separately approve closed-loop operation. |
+| `test_logic_opc` | Browse and debug symbolic variables, including exposed unlocated variables and DFB/array members, through OFS. |
 | `test_logic_live` | Test located values over Modbus, including mirrors for unlocated DFB internals. |
 | `consult_installed_manuals` | Prepare, search, retrieve, and cite local documentation. |
 | `benchmark_training_project` | Run the offline benchmark training workflow. |
 
 ## PLC and simulator access
 
-Set `CE_MCP_ENABLE_ONLINE=1` in the server environment and restart it to expose online tools. Use the `commission_simulator` prompt for the complete procedure.
+Set `CE_MCP_ENABLE_ONLINE=1` in the server environment and restart it to expose online tools. This only makes the tools available; every server process starts with live access blocked.
+
+On connection, the LLM is instructed to call `get_live_access_setup` and collect the user's choices: offline or live access, OPC (preferred) or Modbus, and the OFS device alias for OPC. Before closed-loop writes or PLC control, the user must explicitly approve that mode and confirm OFS is available and running for OPC. `configure_live_access` records these answers; the server enforces them before connecting, reading, writing, transferring, or issuing PLC commands. There is no automatic protocol fallback. Configuration lasts for the server process; restarting requires setup again. Changing setup disconnects existing connections. Cleanup and status calls remain available. MCP instructions guide the conversation; client support determines how the questions are displayed.
+
+For example, **after** the user approves OPC connections, confirms the alias and running OFS, and approves closed-loop tests:
+
+```text
+configure_live_access(allow_live_connection=true, protocol="opc",
+    ofs_alias="Dev_Alias_2", opc_server_confirmed_running=true, allow_closed_loop=true)
+```
+
+Use `allow_closed_loop=false` for read-only sessions. To revoke live access, call `configure_live_access(allow_live_connection=false)`. Tool arguments attest to answers obtained by the client; the server cannot independently authenticate a conversational user confirmation.
+
+Use the `commission_simulator` prompt for the complete commissioning procedure.
 
 The commissioning sequence is:
 
@@ -225,11 +243,48 @@ The commissioning sequence is:
 > [!IMPORTANT]
 > A fresh simulator with no station loaded (`no_conf`) can reject API downloads with **“Family check failed.”** Seed it once through the Control Expert GUI: PLC → Simulation Mode → Connect → Transfer, using a project of the matching controller family. The station persists while `sim.exe` runs. Subsequent API downloads require the controller to be stopped.
 
+### Symbolic live values through OFS OPC DA
+
+The expected testing environment is a running **OFS server connected to PLC Simulator**. The default test device alias is **`Dev_Alias_2`**, configured for `MBT:127.0.0.1/U` (M580), with dictionary use (`UsingDataDic`) and unlocated support (`UnlocatedSupport`) enabled. Confirm this alias and that OFS is available/running during session setup; another alias may be explicitly selected.
+
+The UDE COM API exposes the project database. OFS provides symbolic live access using the application's built/downloaded data dictionary. In Control Expert **Project Settings → General → PLC embedded data**, enable **Data dictionary** and clear **Only HMI variables** so the dictionary includes **non-HMI variables** with write access. **Keep other variables in Read Only** is insufficient for closed-loop tests that write non-HMI inputs. Include DFB/PU private variables if those internals are needed. Build the application with these settings and download that build to PLC Simulator. Changing settings without rebuilding/downloading does not update the running application's dictionary. If the running application already exposes the required symbols, no rebuild or transfer is needed. Only exposed symbols and scalar members can be accessed; browse DFB and array branches to discover exact IDs.
+
+The installed `OPC.Automation` DLL and its Python host must have matching bitness. A 64-bit MCP server can use a separate 32-bit Python with `pywin32` through `CE_MCP_OPC_PYTHON`. For a normal installed 32-bit Python, install its dependency using `<32-bit-python.exe> -m pip install pywin32`. The helper script is shipped as Python source with this package; it does not require MCP installed in the helper interpreter. COM objects stay on the helper's single STA thread. No registry changes or UDE write token are needed.
+
+See [samples/opc-mcp.json](samples/opc-mcp.json) for a client configuration. Device choice and permission are collected by session setup, rather than preapproved in the environment.
+
+After completing setup:
+
+```text
+opc_connect()
+opc_browse()
+opc_browse(branches=["Dev_Alias_2"])
+opc_browse(branches=["Dev_Alias_2", "Forming_motor"])
+opc_read_tags(tags=["Start", "Material_A", "Forming_motor.running_left"])
+opc_disconnect()
+```
+
+Use the configured alias for short names or exact browsed `alias!symbol` IDs belonging to that device. Browse results are paginated with `next_offset`; `flat=true` follows server semantics and may omit nested DFB members. Reads request the device, return quality/timestamp/type/access metadata, and exclude bad/uncertain samples from `values`. `opc_write_tags(values={"name": value})` uses canonical scalar types; booleans must be JSON booleans and integers must fit their type. Write success acknowledges the request; PLC logic may overwrite values. Observe outputs separately and restore test inputs. A timeout disconnects the helper and is never automatically retried, especially for writes.
+
+Validation on 2026-11-21 used Control Expert 16.4, M580 `BME P58 3040` version `03.20`, OFS 3.63, and the running `samples/demo_ControlExpert_M580.STU` simulator application. Alias `Dev_Alias_2` used the PLC dictionary with unlocated support enabled. A 64-bit MCP Python called the installed 32-bit Automation wrapper through a 32-bit Python 3.11.9 helper with pywin32 312. Browsing found DFB members; device reads had quality `192` (good). Writing unlocated `Measured_temp` from `0` to `1` produced `Cmeasured_temp=1.0` and `Temp_ok=false`; restoring `0` restored both derived values. No logic change, build, or download was needed. This validates the tested symbols and configuration, not every project variable or OFS release.
+
+Reproduce only after confirming the same demo is running and approving reversible tests, with the two environment variables above set:
+
+```powershell
+.venv\Scripts\python.exe tools\test_opc.py
+.venv\Scripts\python.exe tools\test_mcp_runtime.py
+.venv\Scripts\python.exe tools\check_opc.py --alias Dev_Alias_2 --allow-live --confirm-ofs-running --exercise-demo --report tmp\opc-validation.json
+```
+
+Omit `--exercise-demo` to browse without writing. The report stays local. Restoration is attempted in a `finally` step and failures are reported explicitly; process termination or loss of communication can prevent restoration.
+
+For LLM evaluation, use the separate [`ce-bench opc` benchmark](benchmarks/README.md#live-opc-readwrite-benchmark). It builds a simple program with unlocated non-HMI BOOL/INT/REAL inputs, tests model-driven symbolic reads/writes, and independently verifies the running simulator's calculated outputs. The existing offline benchmark remains offline.
+
 ### Live values over Modbus TCP
 
-The UDE COM API exposes the offline project database, not live tag values. This server uses Modbus TCP for live reads and writes. Animation tables can display values in the GUI.
+Select Modbus explicitly in session setup when using a standard Modbus TCP endpoint. Animation tables can also display values in the GUI.
 
-Example MCP tool calls against a simulator:
+Example MCP tool calls against a Modbus endpoint after setup:
 
 ```text
 modbus_connect(host="127.0.0.1", port=502)
@@ -241,7 +296,7 @@ modbus_disconnect()
 - Only **located `%M` / `%MW` tags** are reachable. Mirror unlocated DFB internals such as `Pump1.Running` to located variables in the program first.
 - Use global variable names or explicit addresses, optionally with a type: `%M3`, `%MW86`, `%MW2:REAL`, `%MW70:UDINT`, or `%MW10.2` for a word bit.
 - 32-bit `REAL` / `DINT` values use Schneider's low-word-first order by default. Set `word_order="high_first"` when required by the target.
-- The validated simulator endpoint is `127.0.0.1:502`.
+- Prefer OFS for simulator access; a simulator address accepting OFS traffic does not establish support for this Modbus client.
 
 ## Searchable local manuals
 

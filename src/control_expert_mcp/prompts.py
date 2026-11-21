@@ -20,6 +20,41 @@ from __future__ import annotations
 
 def register_prompts(mcp) -> None:
     @mcp.prompt()
+    def benchmark_opc_live() -> str:
+        """Evaluate model reads/writes using the simple OFS/PLC Simulator fixture."""
+        return (
+            "Use ce-bench opc with benchmarks/opc.example.json. Expected setup: OFS "
+            "connected to PLC Simulator, default alias Dev_Alias_2. Prepare the original "
+            "OPC_Bench fixture offline; it must be built with Data dictionary enabled and "
+            "Only HMI variables cleared so non-HMI variables are writable. Deploy and run "
+            "only with operator authorization, preserving the original simulator application. "
+            "Obtain explicit live/closed-loop permission and confirmation OFS is running. "
+            "First validate with no API requests, then run one paid smoke case, then the "
+            "official configured-provider cases. Models may only write the three inputs; "
+            "the independent judge reads device results and verifies input restoration. "
+            "Archive official runs and regenerate ce-bench visualize plus metadata; "
+            "scripted validation and smoke runs are separate from official results. "
+            "The original Feeder suite remains offline."
+        )
+
+    @mcp.prompt()
+    def setup_live_access() -> str:
+        """Collect user choices at connection time; start offline and prefer OPC."""
+        return (
+            "First call get_live_access_setup. Ask the user: allow a live connection or "
+            "stay offline; use OPC (preferred) or Modbus; for OPC, what is the OFS device "
+            "alias (test default Dev_Alias_2)? Expect OFS connected to PLC Simulator. "
+            "Before closed-loop operation, ask for explicit write/control approval "
+            "and confirmation that OFS is available and running. Record the answers with "
+            "configure_live_access. Read-only access uses allow_closed_loop=false. Never "
+            "treat CE_MCP_ENABLE_ONLINE=1, a discovered server, or an LLM preference as "
+            "user approval. If online tools are disabled, explain the environment flag "
+            "and restart requirement. Configuration lasts for the server process and "
+            "changing it disconnects existing live sessions. Never fall back to another "
+            "protocol automatically. After OPC setup, use test_logic_opc."
+        )
+
+    @mcp.prompt()
     def benchmark_training_project() -> str:
         """Work on a disposable Feeder training project under the local benchmark."""
         return (
@@ -80,6 +115,7 @@ def register_prompts(mcp) -> None:
         """Bring the open project up and running on the Control Expert PLC simulator."""
         return (
             "Goal: get the currently open project running on the Control Expert simulator.\n\n"
+            "0. Complete setup_live_access with user-approved live and closed-loop access.\n"
             "1. build_project — must reach build_state 'built_ok' before any transfer "
             "(fix errors from the 'output' field and rebuild).\n"
             "2. start_simulator — launches sim.exe (loopback).\n"
@@ -100,11 +136,51 @@ def register_prompts(mcp) -> None:
         )
 
     @mcp.prompt()
+    def test_logic_opc() -> str:
+        """Browse, drive and debug symbolic variables through OFS OPC DA."""
+        return (
+            "Goal: debug the running simulator/project with symbolic OFS OPC DA access.\n\n"
+            "0. Complete setup_live_access. Use only the protocol and alias the user "
+            "approved. Closed-loop tests require their explicit approval and confirmation "
+            "that OFS is available and running.\n"
+            "1. Start MCP with CE_MCP_ENABLE_ONLINE=1. Install pywin32 into a Python "
+            "matching the OPC Automation DLL bitness; set CE_MCP_OPC_PYTHON to its executable "
+            "(the usual OFS OPC.Automation wrapper is 32-bit, MCP can remain 64-bit).\n"
+            "2. Expect OFS connected to PLC Simulator; default test alias Dev_Alias_2 "
+            "uses MBT:127.0.0.1/U. In Control Expert Project Settings > General > PLC "
+            "embedded data, enable Data dictionary and clear Only HMI variables to include "
+            "non-HMI variables with write access. Keep other variables in Read Only does "
+            "not permit these input writes. Include private DFB/PU variables if needed. Build and "
+            "download to the simulator. OFS must have the simulator alias configured with "
+            "UsingDataDic and UnlocatedSupport. Existing running applications need no "
+            "rebuild if the required symbols are already visible.\n"
+            "3. opc_connect(); opc_browse() discovers aliases. Browse the returned alias "
+            "and nested DFB/array branches; follow next_offset. Preserve exact item_id "
+            "strings. flat=True is server-dependent and may omit nested DFB members.\n"
+            "4. opc_connect uses the configured, user-confirmed alias for short names. Compare "
+            "opc_browse results with list_variables on the correct project. OPC access "
+            "itself does not need open_project or a UDE write token.\n"
+            "5. opc_read_tags(['Start', 'Sec', 'Material_A']) records device values, quality, "
+            "timestamp and canonical type. Only good-quality samples enter values. Unlocated "
+            "scalars and exposed DFB/array members do not need %MW mirrors. Missing symbols "
+            "require checking dictionary inclusion, OFS alias and application consistency.\n"
+            "6. Inspect the program before choosing an input; record its original value. "
+            "Use opc_write_tags with typed JSON values, then opc_read_tags on inputs and "
+            "outputs to verify behavior. A successful write is an acknowledgement, not a "
+            "force: cyclic logic may overwrite it. Restore test inputs in a finally step "
+            "and verify restoration. Do not replay a timed-out write automatically.\n"
+            "7. opc_disconnect releases only this client's OPC session. Modbus read_tags/"
+            "write_tags remain separate and only support located addresses."
+        )
+
+    @mcp.prompt()
     def test_logic_live(instance: str = "Pump1", task: str = "MAST") -> str:
         """Live-test a DFB instance by writing inputs and reading outputs over Modbus TCP."""
         return (
             f"Goal: drive and observe the '{instance}' logic live on the running PLC/simulator.\n\n"
-            "Live values travel over Modbus TCP (the UDE/COM API has NO live tag access). "
+            "For OFS symbolic access, prefer the test_logic_opc prompt: exposed unlocated "
+            "variables need no mirrors. This legacy workflow uses Modbus TCP on an endpoint "
+            "that provides it (the UDE project API has NO live tag access). "
             "First make sure the project is RUNNING on the target — see the "
             "commission_simulator prompt.\n\n"
             "KEY CONSTRAINT: Modbus only reaches LOCATED tags (%M / %MW). A DFB instance's "

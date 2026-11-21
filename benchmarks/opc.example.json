@@ -1,0 +1,23 @@
+{
+  "provider": {"name": "openai"},
+  "model": {"id": "REPLACE_WITH_EXACT_MODEL_SNAPSHOT", "identity": "pinned", "reasoning_effort": "medium", "max_output_tokens": 6000},
+  "cpu": {"part_number": "BME P58 3040", "version": "03.20"},
+  "ce_version": "16.4",
+  "fixture": "../tools/lang_refs/OPC_Bench.xml",
+  "workspace": ".local/opc",
+  "results": "results",
+  "tool_timeout": 45,
+  "request_timeout": 180,
+  "workflow_timeout": 300,
+  "max_turns": 15,
+  "max_tool_calls": 30,
+  "conditions": {
+    "OPC": {
+      "command": "E:\\GitHub\\control-expert-mcp\\.venv\\Scripts\\python.exe",
+      "args": ["-m", "control_expert_mcp"],
+      "cwd": "..",
+      "env": {"CE_MCP_OPC_PYTHON": "C:\\path\\to\\32-bit-python\\python.exe"},
+      "documentation": false
+    }
+  }
+}

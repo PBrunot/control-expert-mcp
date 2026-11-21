@@ -83,10 +83,35 @@ class MCPRuntimeTests(unittest.IsolatedAsyncioTestCase):
                                            env={**os.environ, "CE_MCP_ENABLE_ONLINE": "1"})
         async with stdio_client(parameters) as (read, write):
             async with ClientSession(read, write) as session:
-                await session.initialize()
+                initialized = await session.initialize()
+                self.assertIn("get_live_access_setup", initialized.instructions)
                 tools = {tool.name for tool in (await session.list_tools()).tools}
                 self.assertIn("plc_connect", tools)
                 self.assertIn("read_tags", tools)
+                self.assertIn("opc_connect", tools)
+                self.assertIn("configure_live_access", tools)
+                self.assertIn("get_live_access_setup", tools)
+                status = await session.call_tool("get_live_access_setup", {})
+                self.assertFalse(json.loads(status.content[0].text)["allow_live_connection"])
+                blocked = await session.call_tool("opc_connect", {})
+                self.assertTrue(blocked.is_error)
+                self.assertIn("configure_live_access", blocked.content[0].text)
+                rejected = await session.call_tool("configure_live_access", {
+                    "allow_live_connection": True, "ofs_alias": "Demo", "allow_closed_loop": True})
+                self.assertTrue(rejected.is_error)
+                self.assertIn("confirm OFS", rejected.content[0].text)
+                accepted = await session.call_tool("configure_live_access", {
+                    "allow_live_connection": True, "ofs_alias": "Demo"})
+                self.assertFalse(accepted.is_error)
+                for name, args in (("modbus_connect", {"host": "127.0.0.1"}),
+                                   ("opc_connect", {"alias": "Other"}),
+                                   ("opc_write_tags", {"values": {"x": 1}})):
+                    blocked = await session.call_tool(name, args)
+                    self.assertTrue(blocked.is_error)
+                revoked = await session.call_tool("configure_live_access", {"allow_live_connection": False})
+                self.assertFalse(revoked.is_error)
+                blocked = await session.call_tool("opc_read_tags", {"tags": ["x"]})
+                self.assertTrue(blocked.is_error)
 
 
 class ModbusCompatibilityTests(unittest.TestCase):

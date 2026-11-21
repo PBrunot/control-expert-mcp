@@ -17,6 +17,8 @@ HELPERS = {
     "index_ce_help.py", "test_documentation.py", "test_diagnostics.py",
     "test_benchmark.py", "benchmark_fake_server.py",
     "test_benchmark_archive.py", "test_benchmark_alarms.py",
+    "test_opc.py", "check_opc.py",
+    "test_opc_benchmark.py",
 }
 
 
@@ -60,6 +62,7 @@ def check_sdist(path: Path, expected_modules: set[str]) -> None:
         "README.md", "pyproject.toml", "MANIFEST.in", "PKG-INFO", "setup.cfg", "LICENSE",
         "benchmarks/example.json", "benchmarks/README.md", "benchmarks/CHECKPOINT.md",
         "benchmarks/deepseek.example.json",
+        "benchmarks/opc.example.json", "tools/lang_refs/OPC_Bench.xml",
         "tools/lang_refs/ST_2_Feeder.xml",
         *("tools/" + name for name in HELPERS),
         *(p.relative_to(ROOT).as_posix() for p in (ROOT / "samples").glob("*.json")),

@@ -74,6 +74,9 @@ class MCP:
         self.tools = []
         self.tainted = False
 
+    def server_environment(self) -> dict:
+        return environment(self.condition)
+
     async def bounded(self, operation, name: str):
         try:
             return await asyncio.wait_for(operation, self.config["tool_timeout"])
@@ -87,7 +90,7 @@ class MCP:
         try:
             parameters = StdioServerParameters(command=self.condition["command"],
                 args=self.condition.get("args", []), cwd=self.condition["cwd"],
-                env=environment(self.condition))
+                env=self.server_environment())
             started = perf_counter()
             streams = await self.stack.enter_async_context(stdio_client(parameters))
             self.session = await self.stack.enter_async_context(ClientSession(*streams))

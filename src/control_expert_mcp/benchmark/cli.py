@@ -60,8 +60,13 @@ async def doctor(config: dict) -> dict:
 
 
 def main(argv=None) -> int:
+    arguments = list(sys.argv[1:] if argv is None else argv)
+    if arguments and arguments[0] == "opc":
+        from .opc import main as opc_main
+        return opc_main(arguments[1:])
     parser = argparse.ArgumentParser(description=__doc__)
     subs = parser.add_subparsers(dest="command", required=True)
+    subs.add_parser("opc", help="Opt-in live OFS/PLC Simulator LLM benchmark")
     for name in ("doctor", "prepare", "validate", "run", "resume", "recover"):
         sub = subs.add_parser(name)
         sub.add_argument("--config", required=True)

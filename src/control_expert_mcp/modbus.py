@@ -14,9 +14,8 @@ Scope and gotchas:
   * 32-bit word order is Schneider-native LOW WORD FIRST by default (the lower
     %MW holds the least-significant 16 bits). Override with word_order if a
     given server differs.
-  * Works against the Control Expert SIMULATOR too: it exposes a Modbus TCP
-    server on 127.0.0.1:502 (the endpoint a Vijeo Designer I/O scanner reaches),
-    as well as a real CPU or any Modbus-TCP endpoint.
+  * Requires a standard Modbus-TCP endpoint. Prefer OFS OPC DA for symbolic
+    simulator access, including unlocated variables; see opc.py.
 
 Addressing: %M{i} -> coil i; %MW{i} -> holding register i;
 %MW{i}.{j} -> bit j of register i; %MD/%MF -> 32-bit at words i, i+1.

@@ -19,6 +19,8 @@ from mcp.server.mcpserver.exceptions import ResourceNotFoundError, ToolError
 
 from .bridge import CEError, ControlExpertBridge
 from .modbus import ModbusClient, ModbusError, parse_address
+from .opc import OpcClient, OpcError
+from .live_access import LiveAccessPolicy
 from .prompts import register_prompts
 from . import schema as ce_schema
 from . import documentation
@@ -36,21 +38,23 @@ class ControlExpertMCPServer(MCPServer):
 
     def tool(self, *args, **kwargs):
         register = super().tool(*args, **kwargs)
-        expected = (CEError, ModbusError, ce_schema.SchemaError, ValueError)
+        expected = (CEError, ModbusError, OpcError, ce_schema.SchemaError, ValueError)
 
         def decorate(function):
             if iscoroutinefunction(function):
                 @wraps(function)
                 async def checked(*args, **kwargs):
                     try:
-                        return await function(*args, **kwargs)
+                        with live_policy.guard(function.__name__):
+                            return await function(*args, **kwargs)
                     except expected as exc:
                         raise ToolError(str(exc)) from None
             else:
                 @wraps(function)
                 def checked(*args, **kwargs):
                     try:
-                        return function(*args, **kwargs)
+                        with live_policy.guard(function.__name__):
+                            return function(*args, **kwargs)
                     except expected as exc:
                         raise ToolError(str(exc)) from None
             return register(checked)
@@ -62,6 +66,16 @@ mcp = ControlExpertMCPServer(
     "Control Expert",
     version=version("control-expert-mcp"),
     instructions=(
+        "ON CONNECTION: call get_live_access_setup before any live work. Ask the user "
+        "whether to allow a live connection, which protocol to use (prefer OPC), and "
+        "the OFS device alias. Before enabling closed-loop writes/PLC control, obtain "
+        "explicit user approval and, for OPC, user confirmation that OFS is available "
+        "and running. Call configure_live_access with those answers. Environment "
+        "opt-in only exposes tools; it is not session consent. Stay offline until "
+        "setup is completed; never silently fall back to Modbus.\n\n"
+        "Expected test setup: OFS connected to PLC Simulator, default alias Dev_Alias_2 "
+        "(confirm with the user). Build and download with Data dictionary enabled and "
+        "Only HMI variables cleared, so non-HMI variables support symbolic reads/writes.\n\n"
         "Automates a local EcoStruxure Control Expert (Unity Pro) installation. "
         "Typical flow: open_project (or new_project) -> inspect with "
         "get_project_structure / list_variables / read_section -> edit -> "
@@ -74,22 +88,60 @@ mcp = ControlExpertMCPServer(
         "get_language_reference(language) and mirror its validated example via "
         "import_xml(kind='section'). SFC is the right choice for stepwise "
         "sequences (steps + transitions + ST actions).\n\n"
-        "Live testing: online tools (plc_*, modbus_*) need CE_MCP_ENABLE_ONLINE=1. "
+        "Live testing: online tools (plc_*, opc_*, modbus_*) need CE_MCP_ENABLE_ONLINE=1. "
         "To run a project on the simulator, see the commission_simulator prompt (a "
         "fresh sim needs a one-time manual transfer from the CE GUI to seed the CPU "
         "family — 'Family check failed' otherwise). Reading/writing LIVE values is "
-        "done over Modbus TCP (modbus_connect/read_tags/write_tags), not the COM API; "
-        "only LOCATED %M/%MW tags are reachable, so mirror unlocated DFB internals to "
-        "%MW first (see the test_logic_live prompt). Invoke a guided prompt instead of "
+        "available symbolically through OFS OPC DA (opc_connect/opc_browse/opc_read_tags/"
+        "opc_write_tags), including exposed unlocated variables and DFB members. "
+        "See test_logic_opc for data dictionary and 32-bit wrapper setup. "
+        "Modbus TCP remains available for located %M/%MW tags. Invoke a guided prompt instead of "
         "rediscovering these flows."
     ),
 )
 
 ce = ControlExpertBridge()
 mb = ModbusClient()
+opc = OpcClient()
 register_prompts(mcp)
 
 ONLINE_ENABLED = os.environ.get("CE_MCP_ENABLE_ONLINE", "").strip() in ("1", "true", "yes")
+live_policy = LiveAccessPolicy(ONLINE_ENABLED)
+
+
+@mcp.tool()
+def get_live_access_setup() -> dict:
+    """First-call setup/status, available even offline. Ask the user whether
+    live connections are allowed, OPC (preferred) or Modbus, and the OFS device
+    alias. Closed-loop writes/control need explicit approval; OPC also needs
+    user confirmation that OFS is available and running. Never infer answers
+    from discovery or environment variables. Choices last for this server process."""
+    return live_policy.status()
+
+
+@mcp.tool()
+def configure_live_access(allow_live_connection: bool, protocol: str = "opc",
+                          ofs_alias: str = "", opc_server_confirmed_running: bool = False,
+                          allow_closed_loop: bool = False) -> dict:
+    """Record the user's explicit setup answers, never an LLM-inferred approval.
+    Defaults to offline/read-only and prefers OPC. OPC live access needs the
+    user-confirmed alias. Closed-loop OPC requires user confirmation that OFS
+    is available/running as well as allow_closed_loop=true. Changing setup
+    disconnects existing live sessions. No settings persist across restarts.
+    CE_MCP_ENABLE_ONLINE=1 is a separate administrator prerequisite."""
+    with live_policy.lock:
+        config = live_policy.validate(allow_live_connection, protocol, ofs_alias,
+                                      opc_server_confirmed_running, allow_closed_loop)
+        # Revoke first; cleanup failures must never leave permission enabled.
+        live_policy.config = live_policy.validate(False)
+        live_policy.configured = False
+        opc.disconnect()
+        mb.disconnect()
+        if ce._app is not None and ce.plc_state().get("connected"):
+            ce.plc_disconnect()
+        live_policy.config = config
+        live_policy.configured = True
+        return live_policy.status()
 
 
 def _default_type_for(address: str) -> str:
@@ -1038,20 +1090,72 @@ if ONLINE_ENABLED:
         starting or stopping a live controller affects the physical process."""
         return ce.plc_command(command)
 
+    # ------------------------------------- symbolic live values over OPC DA
+
+    @mcp.tool()
+    def opc_connect(progid: str = "Schneider-Aut.OFS.2", alias: str = "",
+                    automation_progid: str = "OPC.Automation") -> dict:
+        """Connect to a local OFS OPC DA server. alias prefixes unqualified tags
+        as 'alias!name'; use opc_browse to discover the actual alias and items.
+        Unlocated variables require the built/downloaded PLC data dictionary.
+        CE_MCP_OPC_PYTHON selects Python matching the Automation DLL bitness
+        (usually 32-bit) with pywin32 installed. No UDE project session required."""
+        configured_alias = live_policy.config["ofs_alias"]
+        if alias and alias != configured_alias:
+            raise ValueError("alias differs from the user-confirmed OFS alias; repeat configure_live_access")
+        return opc.connect(progid, configured_alias, automation_progid)
+
+    @mcp.tool()
+    def opc_disconnect() -> dict:
+        """Release this client's OPC session and helper process."""
+        return opc.disconnect()
+
+    @mcp.tool()
+    def opc_status() -> dict:
+        """Read OPC server state, version, configured alias and helper bitness."""
+        return opc.status()
+
+    @mcp.tool()
+    def opc_browse(branches: list[str] | None = None, flat: bool = False,
+                   offset: int = 0, max_results: int = 200) -> dict:
+        """Browse the OPC namespace. Start with branches=[], then pass returned
+        branch names as a path, e.g. ['Dev_Alias_2', 'Forming_motor']. Item IDs
+        are server-resolved; preserve spelling. flat requests server-supported
+        flattening (OFS may still require browsing DFB/array branches). Follow
+        next_offset for pagination. max_results is between 1 and 5000."""
+        return opc.browse(branches or [], flat, offset, max_results)
+
+    @mcp.tool()
+    def opc_read_tags(tags: list[str]) -> dict:
+        """Read symbolic OPC items directly from the device. Use exact browsed
+        IDs or names relative to opc_connect's alias. Returns good-quality
+        values, samples with raw quality/timestamp/type/access rights, and
+        per-item errors. Bad/uncertain samples never enter values. No %MW
+        mirror or IEC word-order decoding is required."""
+        return opc.read(tags)
+
+    @mcp.tool()
+    def opc_write_tags(values: dict) -> dict:
+        """Write scalar OPC items on the running target using server canonical
+        types. BOOL/EBOOL require JSON booleans; integers must fit their type.
+        Returns written acknowledgements and per-item errors; read back inputs
+        and observe outputs separately because PLC logic may overwrite a value.
+        Writes affect the process; validate on a simulator or supervised bench."""
+        return opc.write(values)
+
     # ------------------------------------- live values over Modbus TCP
 
     @mcp.tool()
     def modbus_connect(host: str, port: int = 502, unit: int = 1, word_order: str = "low_first") -> dict:
         """Open a Modbus TCP link to a Modicon CPU's embedded server for live
         read/write of LOCATED tags (%M / %MW) while the PLC runs — the channel
-        SCADA uses, and the only way this server reads/writes live values (the
-        UDE/COM API cannot).
+        SCADA uses. Use opc_* for symbolic OFS access to unlocated variables.
 
         Only located tags work: unlocated DFB internals (e.g. Pump1.Running)
         must be mirrored to a %MW/%M address in the program first. word_order is
         for 32-bit REAL/DINT: 'low_first' (Schneider default) or 'high_first'.
-        Works against the SIMULATOR (host='127.0.0.1', the endpoint a Vijeo
-        Designer I/O scanner reaches) as well as a real CPU IP; port 502."""
+        Requires an endpoint exposing standard Modbus TCP on the selected port.
+        Prefer OFS OPC DA for the Control Expert simulator."""
         return mb.connect(host, port, unit, word_order)
 
     @mcp.tool()

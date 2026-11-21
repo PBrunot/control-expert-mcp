@@ -7,6 +7,62 @@ system prompt or orchestration. A ChatGPT subscription does not supply API acces
 or an API key. Only `run` and `resume` can send paid requests; tests, `doctor`,
 `prepare`, `validate`, `compare`, and `run --dry-run` never call a provider.
 
+## Live OPC read/write benchmark
+
+`ce-bench opc` is a separate, opt-in suite. The original Feeder suite below
+always forces online access off. This suite expects **OFS connected to PLC
+Simulator**, default alias **`Dev_Alias_2`**, device **`MBT:127.0.0.1/U`**. The
+operator must confirm OFS is available/running and approve live connections and
+closed-loop tests explicitly. `CE_MCP_OPC_PYTHON` must point to a Python with
+pywin32 matching the installed Automation wrapper bitness (usually 32-bit).
+
+The application must be **built and downloaded with Data dictionary enabled
+and Only HMI variables cleared**, including **non-HMI variables with write
+access**. Keeping non-HMI variables read-only does not meet this requirement.
+Enable OFS dictionary use and unlocated support. The fixture deliberately uses
+unlocated, non-HMI BOOL/INT/REAL variables; no Modbus addresses or mirrors.
+
+`tools/lang_refs/OPC_Bench.xml` is an original simple ST fixture: when enabled,
+`Output = INT_TO_REAL(Input) * Gain`; otherwise output is zero. `Positive`
+reports output > 0; `Tick` advances every scan. Only Enable/Input/Gain are
+model-writable. Seeded positive, negative and disabled cases require the model
+to discover/read variables, write every requested input, then read inputs and
+outputs with good quality. Independent OPC device reads verify inputs, outputs
+and scan-counter movement. A correct final answer or write acknowledgement
+alone cannot pass. Model tool policy prevents writing calculated outputs.
+
+```powershell
+Copy-Item benchmarks\opc.example.json benchmarks\.local\opc-openai.json
+# Edit model/provider, paths and CE_MCP_OPC_PYTHON. JSON paths are relative to config.
+ce-bench opc prepare --config benchmarks\.local\opc-openai.json
+# Open the printed native fixture in Control Expert, build/download it explicitly
+# to PLC Simulator and RUN. Preserve the original simulator application first.
+
+# No API requests; validates all live cases through the real MCP/OPC path:
+ce-bench opc validate --config benchmarks\.local\opc-openai.json --allow-live --confirm-ofs-running --allow-closed-loop
+
+# Single paid smoke case before an official campaign:
+ce-bench opc run --config benchmarks\.local\opc-openai.json --allow-live --confirm-ofs-running --allow-closed-loop --case positive --repeats 1
+
+# Official run: all three cases; repeat separately for the DeepSeek config.
+ce-bench opc run --config benchmarks\.local\opc-openai.json --allow-live --confirm-ofs-running --allow-closed-loop --repeats 1
+ce-bench archive --results benchmarks/results --run-id PRINTED_RUN_ID --archive benchmarks/archive
+ce-bench visualize --archive benchmarks/archive --output benchmarks/archive/overview.png
+```
+
+Use `--alias` to confirm a non-default alias. `run --dry-run` makes no live
+connection or API request. `prepare` builds an offline native fixture with
+dictionary settings checked, but never downloads it. `validate` is scripted
+feasibility validation and cannot be archived as LLM performance. Only `run`
+calls a provider; credentials, Responses parameters, connection-only retry
+policy, usage reporting and model identity rules match the existing adapters.
+Live cases use a fresh MCP process and model conversation. The judge records
+initial inputs and attempts restoration in finally, verifies calculated outputs
+after restoration, and records failures. Interruption or communication loss can
+prevent restoration; inspect `outcome.json`. Archive publication requires verified
+restoration. Raw evidence stays ignored; sanitized archives mark this suite as
+live simulator execution and are displayed separately from offline checks.
+
 ## Setup and commands (PowerShell)
 
 From the existing checkout:

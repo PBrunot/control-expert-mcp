@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<STExchangeFile>
+  <fileHeader company="control-expert-mcp" product="Control Expert V16.4" dateTime="date_and_time#2026-11-21-14:0:0" content="Structured source file" DTDVersion="41"/>
+  <contentHeader name="OPC live benchmark" version="1.0.0" dateTime="date_and_time#2026-11-21-14:0:0"/>
+  <program>
+    <identProgram name="OPC_Bench" type="section" task="MAST"/>
+    <STSource><![CDATA[
+IF OPCBench_Enable THEN
+    OPCBench_Output := INT_TO_REAL(OPCBench_Input) * OPCBench_Gain;
+ELSE
+    OPCBench_Output := 0.0;
+END_IF;
+OPCBench_Positive := OPCBench_Output > 0.0;
+IF OPCBench_Tick >= 1000000 THEN
+    OPCBench_Tick := 0;
+ELSE
+    OPCBench_Tick := OPCBench_Tick + 1;
+END_IF;
+]]></STSource>
+  </program>
+  <dataBlock>
+    <variables name="OPCBench_Enable" typeName="BOOL"><variableInit value="false"/></variables>
+    <variables name="OPCBench_Input" typeName="INT"><variableInit value="0"/></variables>
+    <variables name="OPCBench_Gain" typeName="REAL"><variableInit value="1.0"/></variables>
+    <variables name="OPCBench_Output" typeName="REAL"/>
+    <variables name="OPCBench_Positive" typeName="BOOL"/>
+    <variables name="OPCBench_Tick" typeName="DINT"/>
+  </dataBlock>
+</STExchangeFile>
