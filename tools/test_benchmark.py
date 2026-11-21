@@ -19,7 +19,7 @@ from control_expert_mcp.benchmark.report import aggregate, compare, distribution
 from control_expert_mcp.benchmark.runner import (campaign, clean_build, contexts, make_schedule,
     prepare, prepared, run_case)
 from control_expert_mcp.benchmark.tasks import (BROKEN_IDENTIFIER, PROMPTS, broken_source,
-    declarations, inspect_grade, normalize, source, static_grade, threshold_source)
+    alarm_source, declarations, inspect_grade, normalize, source, static_grade, threshold_source)
 from control_expert_mcp.benchmark.transport import Evidence, MCP, visible_payload
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -79,6 +79,8 @@ class Provider:
                 st = threshold_source(st)
             elif task == "temperature":
                 st = st.replace("cmeasured_temp=setpoint_temp", "ABS(cmeasured_temp-setpoint_temp)<=2.0")
+            elif task == "alarms":
+                st = alarm_source(st)
             else:
                 st = st.replace(BROKEN_IDENTIFIER, "Measured_temp")
             name, args = "write_st_logic", {"task": "MAST", "section": "Feeder", "st_source": st}
@@ -131,6 +133,34 @@ class CoreTests(unittest.TestCase):
         assignment = {**GOLD, "initialization_expression": "wrong_target := material_a_value+material_b_value"}
         self.assertFalse(inspect_grade(json.dumps(assignment))["answer_pass"])
 
+    def test_temperature_bound_grouping(self):
+        st = source(FIXTURE.read_text(encoding="utf-8-sig"))
+        def grade(predicate, suffix=""):
+            return static_grade("temperature", st,
+                st.replace("cmeasured_temp=setpoint_temp", predicate) + suffix)
+
+        for predicate in (
+            "(cmeasured_temp >= (setpoint_temp - 2.0)) AND (cmeasured_temp <= (setpoint_temp + 2.0))",
+            "(cmeasured_temp <= ((setpoint_temp + 2.0))) AND (cmeasured_temp >= ((setpoint_temp - 2.0)))",
+            "cmeasured_temp >= (setpoint_temp - 2) AND cmeasured_temp <= (setpoint_temp + 2)",
+        ):
+            with self.subTest(predicate=predicate):
+                result = grade(predicate)
+                self.assertEqual(result["static_behavior"], "pass")
+                self.assertEqual(result["rubric"], "feeder-temperature-2")
+                self.assertEqual(result["runtime_behavior"], "unverified")
+                self.assertEqual(grade(predicate, "Sec:=true;")["scope"], "unverified")
+        valid = "(cmeasured_temp >= (setpoint_temp - 2.0)) AND (cmeasured_temp <= (setpoint_temp + 2.0))"
+        for predicate in (
+            valid.replace(">=", ">"), valid.replace("<=", "<"),
+            valid.replace("AND", "OR"), valid.replace("2.0", "3.0"),
+            valid.replace("setpoint_temp - 2.0", "setpoint_temp + 2.0"),
+            valid.replace("setpoint_temp + 2.0", "setpoint_temp + 2.01"),
+            valid.replace("setpoint_temp + 2.0", "setpoint_temp + 2.0 * 3.0"),
+        ):
+            with self.subTest(predicate=predicate):
+                self.assertEqual(grade(predicate)["static_behavior"], "unverified")
+
     def test_usage_subsets_unknowns_and_errors(self):
         usage = Usage()
         self.assertIsNone(usage.result()["tokens"]["total_tokens"])
@@ -165,7 +195,7 @@ class CoreTests(unittest.TestCase):
 
     def test_schedule_environment_build_and_aggregation(self):
         schedule = make_schedule(["A", "B"], 5, 17)
-        self.assertEqual(len(schedule), 40)
+        self.assertEqual(len(schedule), 5 * 2 * len(PROMPTS))
         self.assertEqual(schedule, make_schedule(["A", "B"], 5, 17))
         self.assertNotEqual(schedule, make_schedule(["A", "B"], 5, 18))
         with patch.dict(os.environ, {"CE_MCP_ENABLE_ONLINE": "1", "OPENAI_API_KEY": "never-log"}):
@@ -216,7 +246,7 @@ class RuntimeTests(unittest.IsolatedAsyncioTestCase):
             Provider.requests = []
             directory = await campaign(settings, ["A", "B"], 1, 19, provider_factory=Provider)
             summaries = [read_json(path) for path in directory.glob("*/attempt-*/summary.json")]
-            self.assertEqual(len(summaries), 8)
+            self.assertEqual(len(summaries), 2 * len(PROMPTS))
             self.assertTrue(all(row["success"] for row in summaries),
                             [(row["case_id"], row["status"], row["failure_reason"], row["validation"]) for row in summaries if not row["success"]])
             self.assertEqual(sum("type" in item and item["type"] == "reasoning" for item in Provider.requests[1]["input"]), 1)
@@ -296,6 +326,74 @@ class RuntimeTests(unittest.IsolatedAsyncioTestCase):
                 await workflow(mcp, "inspect", settings, provider, ev, result)
             self.assertIsNone(result["usage"]["tokens"]["total_tokens"])
             self.assertFalse((Path(settings["workspace"]) / "TAINTED.json").exists())
+
+    async def test_connection_retries_preserve_requests_and_do_not_replay_writes(self):
+        import httpx
+        from openai import APIConnectionError
+        for provider_name in ("openai", "deepseek"):
+            with self.subTest(provider=provider_name), tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                settings = config(root)
+                settings["provider"] = {"name": provider_name}
+                settings["model"]["reasoning_effort"] = "high"
+                ev = Evidence(root, Events(root / "events.jsonl"))
+                mcp = SimpleNamespace(adapter=lambda task: ("instructions", []),
+                    dispatch=AsyncMock(return_value={"structured_content": {"written": True}}))
+                def connection_error():
+                    return APIConnectionError(request=httpx.Request("POST", "https://example.invalid/responses"))
+                responses = iter([connection_error(), Response([{"type": "function_call", "call_id": "write-once",
+                    "name": "write_st_logic", "arguments": "{}"}]), connection_error(), Response([])])
+                requests = []
+                async def create(**request):
+                    requests.append(copy.deepcopy(request))
+                    response = next(responses)
+                    if isinstance(response, Exception):
+                        raise response
+                    return response
+                provider = SimpleNamespace(responses=SimpleNamespace(create=create))
+                result = {}
+                with patch("control_expert_mcp.benchmark.provider.asyncio.sleep", new_callable=AsyncMock) as sleep:
+                    await workflow(mcp, "alarms", settings, provider, ev, result)
+                self.assertEqual(result["status"], "completed")
+                self.assertEqual(result["api_retries"], 2)
+                self.assertEqual(result["model_requests"], 4)
+                self.assertEqual(requests[0], requests[1])
+                self.assertEqual(requests[2], requests[3])
+                self.assertEqual(len(requests[2]["input"]), 3)
+                mcp.dispatch.assert_awaited_once()
+                self.assertEqual(result["tool_calls"], 1)
+                self.assertEqual(sleep.await_count, 2)
+                self.assertIsNone(result["usage"]["tokens"]["total_tokens"])
+                self.assertEqual(result["usage"]["known_partial_tokens"]["total_tokens"], 28)
+                events = [json.loads(line) for line in ev.events.path.read_text().splitlines()]
+                self.assertEqual(sum(e["kind"] == "model_request_retry" for e in events), 2)
+
+    async def test_connection_retry_limit_and_non_connection_errors(self):
+        import httpx
+        from openai import APIConnectionError
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            settings = config(root)
+            ev = Evidence(root, Events(root / "events.jsonl"))
+            mcp = SimpleNamespace(adapter=lambda task: ("instructions", []), dispatch=AsyncMock())
+            create = AsyncMock(side_effect=APIConnectionError(
+                request=httpx.Request("POST", "https://example.invalid/responses")))
+            provider = SimpleNamespace(responses=SimpleNamespace(create=create))
+            result = {}
+            with patch("control_expert_mcp.benchmark.provider.asyncio.sleep", new_callable=AsyncMock) as sleep:
+                with self.assertRaises(APIConnectionError):
+                    await workflow(mcp, "inspect", settings, provider, ev, result)
+            self.assertEqual(create.await_count, 3)
+            self.assertEqual(result["api_retries"], 2)
+            self.assertEqual(sleep.await_args_list, [unittest.mock.call(1.0), unittest.mock.call(2.0)])
+            self.assertEqual(result["usage"]["requests"], 3)
+            mcp.dispatch.assert_not_awaited()
+            create.reset_mock(side_effect=True)
+            create.side_effect = ValueError("non-connection failure")
+            with self.assertRaises(ValueError):
+                await workflow(mcp, "inspect", settings, provider, ev, result)
+            self.assertEqual(create.await_count, 1)
+            self.assertEqual(result["api_retries"], 0)
 
 
 if __name__ == "__main__":

@@ -11,6 +11,24 @@ from time import perf_counter
 from .core import encode
 from .tasks import PROMPTS
 
+CONNECTION_RETRY_DELAYS = (1.0, 2.0)
+
+
+def connection_retry_policy() -> dict:
+    """Describe the explicit API-only retry policy for campaign provenance."""
+    return {"error": "APIConnectionError", "max_retries": len(CONNECTION_RETRY_DELAYS),
+            "backoff_seconds": list(CONNECTION_RETRY_DELAYS), "sdk_retries": 0,
+            "mcp_retries": 0}
+
+
+def retryable_connection_error(error: BaseException) -> bool:
+    """Keep the provider SDK optional for offline commands and tests."""
+    try:
+        from openai import APIConnectionError
+    except ImportError:
+        return False
+    return isinstance(error, APIConnectionError)
+
 
 class Usage:
     FIELDS = ("input_tokens", "output_tokens", "total_tokens", "cached_input_tokens", "reasoning_tokens")
@@ -123,19 +141,31 @@ async def workflow(mcp, task: str, config: dict, provider, evidence, result: dic
             for turn in range(config["max_turns"]):
                 request = {**request_parameters(config), "instructions": instructions,
                            "tools": schemas, "input": history}
-                evidence.events.emit("model_request", turn=turn,
-                    parameters_ref=evidence.blob({k: v for k, v in request.items() if k not in {"input", "tools", "instructions"}}),
-                    input_refs=[evidence.blob(item) for item in history])
-                request_started = perf_counter()
-                result["model_requests"] += 1
-                try:
-                    response = await asyncio.wait_for(provider.responses.create(**request), config["request_timeout"])
-                except BaseException as exc:
-                    usage.add(None)
-                    evidence.events.emit("model_request_failure", elapsed=perf_counter() - request_started,
-                        error=type(exc).__name__, status_code=getattr(exc, "status_code", None),
-                        request_id=getattr(exc, "request_id", None))
-                    raise
+                for attempt in range(len(CONNECTION_RETRY_DELAYS) + 1):
+                    # Resend the identical API request only. History and MCP writes
+                    # are advanced once, after a successfully received response.
+                    evidence.events.emit("model_request", turn=turn, connection_attempt=attempt,
+                        parameters_ref=evidence.blob({k: v for k, v in request.items() if k not in {"input", "tools", "instructions"}}),
+                        input_refs=[evidence.blob(item) for item in history])
+                    request_started = perf_counter()
+                    result["model_requests"] += 1
+                    result["api_retries"] += int(attempt > 0)
+                    try:
+                        response = await asyncio.wait_for(provider.responses.create(**request), config["request_timeout"])
+                        break
+                    except BaseException as exc:
+                        usage.add(None)
+                        retry = retryable_connection_error(exc) and attempt < len(CONNECTION_RETRY_DELAYS)
+                        evidence.events.emit("model_request_failure", turn=turn, connection_attempt=attempt,
+                            elapsed=perf_counter() - request_started, will_retry=retry,
+                            error=type(exc).__name__, status_code=getattr(exc, "status_code", None),
+                            request_id=getattr(exc, "request_id", None))
+                        if not retry:
+                            raise
+                        delay = CONNECTION_RETRY_DELAYS[attempt]
+                        evidence.events.emit("model_request_retry", turn=turn,
+                            next_connection_attempt=attempt + 1, backoff_seconds=delay)
+                        await asyncio.sleep(delay)
                 raw = response.model_dump(mode="json", exclude_none=True)
                 result["final_response"] = "\n".join(
                     block["text"] for item in raw.get("output", []) if item["type"] == "message"

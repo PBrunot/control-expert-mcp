@@ -34,6 +34,7 @@ def aggregate(rows: list) -> dict:
             "known_partial_tokens": {key: sum(r.get("usage", {}).get("known_partial_tokens", {}).get(key, 0) for r in rows)
                                      for key in ("input_tokens", "output_tokens", "total_tokens")},
             "tool_errors": sum(r.get("tool_errors", 0) for r in rows),
+            "api_retries": sum(r.get("api_retries", 0) for r in rows),
             "repair_cycles": sum(r.get("repair_cycles", 0) for r in rows),
             "statuses": {status: sum(r["status"] == status for r in rows) for status in sorted({r["status"] for r in rows})}}
 
@@ -73,7 +74,7 @@ def compare(results: Path, output: Path, rubric: str | None = None) -> dict:
                         from .provider import Usage
                         import json
                         usage = Usage()
-                        requested = 0
+                        requested, retries = 0, 0
                         for line in path.read_text(encoding="utf-8").splitlines():
                             try:
                                 event = json.loads(line)
@@ -86,9 +87,11 @@ def compare(results: Path, output: Path, rubric: str | None = None) -> dict:
                                 usage.add(None)
                             elif event["kind"] == "model_request":
                                 requested += 1
+                                retries += int(event.get("connection_attempt", 0) > 0)
                         for _ in range(max(0, requested - usage.requests)):
                             usage.add(None)
                         partial["usage"] = usage.result()
+                        partial["api_retries"] = retries
                     groups[plan["fingerprint"]].append(partial)
                     interrupted.append(str(attempt))
             if summaries:

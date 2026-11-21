@@ -142,6 +142,7 @@ def load_config(path: str) -> dict:
 
 def snapshot(config: dict) -> dict:
     from .tasks import PROMPTS, RUBRIC_VERSION, ORIENTATION
+    from .provider import connection_retry_policy
     deps = {}
     for name in ("control-expert-mcp", "mcp", "openai", "pywin32"):
         try:
@@ -162,7 +163,7 @@ def snapshot(config: dict) -> dict:
             "machine": {"hostname": platform.node(), "platform": platform.platform(),
                         "python": platform.python_version(), "processor": platform.processor()},
             "servers": servers, "prompts": PROMPTS, "orientation": ORIENTATION,
-            "rubric_version": RUBRIC_VERSION}
+            "rubric_version": RUBRIC_VERSION, "provider_retry_policy": connection_retry_policy()}
 
 
 def server_runtime(condition: dict) -> dict:

@@ -92,7 +92,7 @@ then requires actual compiler error evidence before and after reopening.
 Unsupported catalog entries fail through the server with actionable tool evidence.
 Each preparation gets its own directory; old outputs are retained.
 
-`validate` checks canonical threshold, temperature and repair solutions through
+`validate` checks canonical threshold, temperature, repair and alarm solutions through
 real MCP build/save/reopen/rebuild cycles without a model. This checks training
 fixture feasibility, not API-provider behavior. Generated native projects,
 exports and evidence stay under the ignored workspace.
@@ -105,6 +105,42 @@ This isolated section has **no upstream process simulation**: Mixing_done,
 Forming, Sec, materials and temperatures require external stimulus. The harness
 does not invent a ticking Sec assignment. Threshold changes are training tasks,
 not claims that Schneider's original demo is defective.
+
+### Demo-derived alarm extension
+
+The fifth task, `alarms`, uses a separate native copy of the same Feeder project.
+Its original 15 declarations and executable statements are preserved; only this
+copy predeclares `Start_process`, `Temp_fault_1` and `Temp_fault_2` as EBOOLs.
+The names and 200/400 temperature trip points come from Stefan Probst's
+[`LD_1_Heating.xml`](../tools/lang_refs/LD_1_Heating.xml); the associated
+[`IL_0_Alarming.xml`](../tools/lang_refs/IL_0_Alarming.xml) feeds these flags into
+`ALRM_DIA` instances. These are demo examples, not an original automated test suite.
+
+The training addition appends logic after all existing Feeder statements. While
+enabled, low trips at <=200 and clears at >=205; high trips at >=400 and clears
+at <=395. Both flags retain their previous states in their respective deadbands.
+Disabling clears both, including on the next scan after either alarm trips.
+The 5-degree hysteresis and disable/reset contract are new benchmark requirements,
+not behavior attributed to the original author. No `ALRM_DIA` instances, simulation
+inputs, timers or new model-authored declarations are needed.
+
+Rubric `feeder-alarms-1` accepts a restricted ST grammar: nested IF/ELSIF/ELSE,
+Boolean assignments, AND/OR/NOT, parentheses and numeric comparisons of
+`Cmeasured_temp` with constants. Only the two fault flags may be assigned.
+It preserves the complete original statement-token prefix and all declarations.
+The evaluator partitions the entire INT domain [-32768,32767] at every candidate
+and specification comparison constant, checks boundary neighbors and every
+enable/prior-flag combination, and reports a counterexample for a wrong supported
+transition. Without arithmetic or calls, comparison truth values are constant in
+each remaining interval; this covers the full input domain without pretending to
+execute a PLC. Unsupported syntax stays unverified. Regression tests include
+heating/cooling sequences, retained alarms, disable/re-enable, exact boundaries,
+INT extremes, changed thresholds and off-target writes.
+
+Run `prepare` again when upgrading from four tasks: old manifests lack the alarm
+baseline. One A/B repetition now schedules ten cases (five repetitions: fifty).
+Older eight-case campaigns remain separate and show no alarm measurement in the
+archive graphics. Their success rates must not be pooled with the expanded suite.
 
 ## Conditions and model context
 
@@ -166,6 +202,11 @@ a claim that they are incorrect. This intentionally narrow static proof/check is
 not PLC execution. `runtime_behavior` is always `unverified` in this release;
 reports separate build, scope, static acceptance and runtime verification.
 
+Temperature rubric `feeder-temperature-2` also accepts redundant parentheses
+around the exact `Setpoint_temp +/- 2.0` bounds (including nested grouping).
+Boolean/comparison grouping and all other arithmetic remain unchanged; exclusive
+bounds, OR, wrong tolerances and unrelated edits remain unverified.
+
 No simulator execution mode is implemented. Any later runtime experiment needs
 explicit simulator isolation, the first-transfer CPU-family GUI seeding procedure,
 and located `%M`/`%MW` tags (the fixture's unlocated variables are not Modbus-readable).
@@ -183,7 +224,14 @@ project source/manual excerpts.
 
 Usage accumulates provider input/output/total fields across every request. Cached
 input and reasoning details are subsets, never added to total. Missing usage is
-null; known partial totals are separate. API/transport retries are disabled. Model
+null; known partial totals are separate. `APIConnectionError` (including SDK connection
+timeouts) retries the identical API request up to twice, after 1 and 2 seconds,
+within the workflow timeout. Every attempt, error and delay is recorded; failed
+requests retain unknown usage even when a retry succeeds. Responses/history and
+MCP calls advance only after a received response, so writes are never replayed.
+SDK-internal and MCP transport retries remain disabled. HTTP errors, malformed
+responses, cancellation and harness timeouts are not retried. The policy is
+fingerprinted and archived; retry time remains in workflow time. Model
 repair cycles count writes following a failed model build. Wall time, request
 elapsed time and MCP round-trip latency are recorded separately; MCP latency is
 not pure COM time and remaining wall time is not labeled model thinking time.

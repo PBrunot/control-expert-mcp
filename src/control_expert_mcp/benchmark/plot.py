@@ -55,7 +55,7 @@ def visualize_archive(archive: Path, output: Path, scoring: str = "latest") -> P
     import matplotlib.pyplot as plt
     import numpy as np
 
-    preferred = ["inspect", "threshold", "temperature", "repair"]
+    preferred = ["inspect", "threshold", "temperature", "repair", "alarms"]
     task_names = {task for row in rows for task in row["tasks"]}
     tasks = [task for task in preferred if task in task_names] + sorted(task_names - set(preferred))
     height = 5.2 + .85 * len(rows)
@@ -64,7 +64,9 @@ def visualize_archive(archive: Path, output: Path, scoring: str = "latest") -> P
         fig = plt.figure(figsize=(17, height), dpi=150)
         grid = fig.add_gridspec(2, 3, height_ratios=[max(2, .68 * len(rows)), 1.65],
                                left=.31, right=.97, top=.74, bottom=.19, hspace=.85, wspace=.3)
-        labels = [f"{row['provider']} / {row['model']}\n{row['source'][:12]} · {row['condition']} · {row['scoring']}" for row in rows]
+        labels = [f"{row['provider']} / {row['model']}\n{row['source'][:12]} · {row['condition']}\n"
+                  + row['scoring'].replace('feeder-temperature-', 'temperature-').replace('feeder-alarms-', 'alarms-')
+                  for row in rows]
         specs = [("Accepted / attempts", "RdYlGn", "acceptance"),
                  ("Median workflow · seconds", "Blues", "time"),
                  ("Median provider tokens · thousands", "Purples", "tokens")]

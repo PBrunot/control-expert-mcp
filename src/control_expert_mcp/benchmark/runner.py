@@ -14,7 +14,8 @@ import uuid
 from .core import Events, ce_lock, digest, read_json, snapshot, write_json
 from .provider import client_factory, workflow
 from .tasks import (BROKEN_IDENTIFIER, PROMPTS, broken_source, declarations,
-                    inspect_grade, normalize, source, static_grade, threshold_source)
+                    alarm_fixture, alarm_source, inspect_grade, normalize, source,
+                    static_grade, threshold_source)
 from .transport import Evidence, MCP
 
 
@@ -85,9 +86,28 @@ async def prepare(config: dict, condition_name: str) -> Path:
             if clean_build(require_error) or BROKEN_IDENTIFIER.lower() not in str(require_error).lower():
                 raise RuntimeError("Reopened broken fixture did not reproduce compiler error")
             await mcp.checked("close_project", save=False)
+            # Separate extension fixture: the original four tasks keep their exact
+            # 15 declarations; only alarms receives the three predeclared EBOOLs.
+            extended_xml = alarm_fixture(fixture_xml)
+            await mcp.checked("new_project", cpu_part_number=config["cpu"]["part_number"],
+                              cpu_version=config["cpu"]["version"])
+            await mcp.checked("import_xml", kind="section", task="MAST", xml_content=extended_xml)
+            require_build(await mcp.checked("build_project", rebuild_all=True))
+            alarm_baseline = directory / "alarms-baseline.stu"
+            await mcp.checked("save_project", path=str(alarm_baseline))
+            await mcp.checked("close_project", save=False)
+            await mcp.checked("open_project", path=str(alarm_baseline))
+            require_build(await mcp.checked("build_project", rebuild_all=True))
+            alarm_variables = await artifact(mcp, "variables")
+            alarm_imported = source((await mcp.checked("read_section", task="MAST", section="Feeder"))["xml"])
+            if declarations(alarm_variables) != declarations(extended_xml) or normalize(alarm_imported) != normalize(original):
+                raise RuntimeError("Alarm baseline source/declarations differ from extension fixture")
+            await mcp.checked("close_project", save=False)
     manifest = {"fixture_sha256": digest(Path(config["fixture"]).read_bytes()), "cpu": config["cpu"],
         "baseline": str(baseline), "baseline_sha256": digest(baseline.read_bytes()),
         "broken": str(broken_path), "broken_sha256": digest(broken_path.read_bytes()),
+        "alarms_baseline": str(alarm_baseline), "alarms_baseline_sha256": digest(alarm_baseline.read_bytes()),
+        "alarms_variables": alarm_variables,
         "source": original, "variables": variables, "status": status,
         "baseline_build": baseline_build, "broken_build": broken_build,
         "created_at": datetime.now(timezone.utc).isoformat()}
@@ -100,10 +120,19 @@ def prepared(config: dict) -> dict:
     manifest = read_json(Path(read_json(Path(config["workspace"]) / "prepared.json")["manifest"]))
     if manifest["fixture_sha256"] != digest(Path(config["fixture"]).read_bytes()) or manifest["cpu"] != config["cpu"]:
         raise ValueError("Fixture/CPU changed; prepare a new baseline")
-    for key in ("baseline", "broken"):
+    for key in ("baseline", "broken", "alarms_baseline"):
+        if key not in manifest:
+            raise ValueError("Prepared fixtures predate alarm task; run prepare again")
         if digest(Path(manifest[key]).read_bytes()) != manifest[key + "_sha256"]:
             raise ValueError("Prepared project changed; prepare again")
     return manifest
+
+
+def task_fixture(manifest: dict, task: str) -> tuple[str, dict]:
+    """Choose isolated input and expected declarations for one task."""
+    if task == "alarms":
+        return manifest["alarms_baseline"], {**manifest, "variables": manifest["alarms_variables"]}
+    return manifest["broken" if task == "repair" else "baseline"], manifest
 
 
 async def validate_fixtures(config: dict, condition_name: str) -> Path:
@@ -114,13 +143,16 @@ async def validate_fixtures(config: dict, condition_name: str) -> Path:
     checks = {}
     with ce_lock(Path(config["workspace"])):
         async with MCP(config["conditions"][condition_name], config, evidence) as mcp:
-            for task in ("threshold", "temperature", "repair"):
+            for task in ("threshold", "temperature", "repair", "alarms"):
                 output = directory / (task + ".stu")
-                shutil.copyfile(manifest["broken" if task == "repair" else "baseline"], output)
+                input_path, expected_manifest = task_fixture(manifest, task)
+                shutil.copyfile(input_path, output)
                 await mcp.checked("open_project", path=str(output))
                 await verify_version(mcp, config)
                 original = manifest["source"]
                 candidate = threshold_source(original) if task == "threshold" else original
+                if task == "alarms":
+                    candidate = alarm_source(original)
                 if task == "temperature":
                     import re
                     candidate, count = re.subn(r"(?i)cmeasured_temp\s*=\s*setpoint_temp",
@@ -139,7 +171,7 @@ async def validate_fixtures(config: dict, condition_name: str) -> Path:
                 require_build(after)
                 grade = static_grade(task, original, source(section["xml"]))
                 grade.update(before_save_build=before, reopened_build=after,
-                             declarations_pass=declarations(variables) == declarations(manifest["variables"]))
+                             declarations_pass=declarations(variables) == declarations(expected_manifest["variables"]))
                 if grade["static_behavior"] != "pass" or not grade["declarations_pass"]:
                     raise RuntimeError("Canonical training change not independently verified")
                 (directory / (task + ".xml")).write_text(section["xml"], encoding="utf-8")
@@ -214,7 +246,8 @@ async def run_case(config, case, manifest, directory, fingerprint, provider_fact
               "model_identity": config["model"].get("identity", "pinned"), "validation": {"success": False}}
     started = perf_counter()
     output = directory / "project.stu"
-    shutil.copyfile(manifest["broken" if case["task"] == "repair" else "baseline"], output)
+    input_path, manifest = task_fixture(manifest, case["task"])
+    shutil.copyfile(input_path, output)
     try:
         async with MCP(config["conditions"][case["condition"]], config, evidence) as mcp:
             result.update(startup_seconds=mcp.startup_seconds, discovery_seconds=mcp.discovery_seconds)
@@ -270,7 +303,7 @@ async def campaign(config: dict, conditions: list[str], repeats: int, seed: int,
         provider_factory = client_factory(config)
     manifest = prepared(config)
     current = snapshot(config)
-    current["prepared"] = {k: manifest[k] for k in ("baseline_sha256", "broken_sha256", "status")}
+    current["prepared"] = {k: manifest[k] for k in ("baseline_sha256", "broken_sha256", "alarms_baseline_sha256", "status")}
     fingerprint = digest(current)
     root = Path(config["results"])
     if run_id is None:

@@ -5,6 +5,8 @@ import json
 import re
 import xml.etree.ElementTree as ET
 
+from .alarms import CANONICAL, alarm_grade
+
 RUBRIC_VERSION = "feeder-2"
 ORIENTATION = (
     "Work only on the already-open disposable training project, MAST/Feeder. "
@@ -38,6 +40,19 @@ PROMPTS = {
         "The training project contains exactly one injected compile error. Diagnose and "
         "repair the incorrect identifier without changing intended behavior or declaring "
         "a new variable to hide the error. Build and save. Return the diagnosis and fix."
+    ),
+    "alarms": (
+        "Training extension inspired by the demo's Heating/Alarming sections: append "
+        "temperature alarm logic after all existing Feeder statements, preserving every "
+        "original executable statement and its order, including INT_TO_REAL and Temp_ok. "
+        "Start_process, Temp_fault_1 and Temp_fault_2 are already declared EBOOLs. "
+        "When Start_process is false, clear both flags. When true: low alarm Temp_fault_1 "
+        "trips at Cmeasured_temp <= 200.0, clears at >= 205.0 and otherwise retains its "
+        "previous state; high alarm Temp_fault_2 trips at >= 400.0, clears at <= 395.0 "
+        "and otherwise retains its previous state. Use explicit assignments and IF logic "
+        "or equivalent Boolean expressions; do not add declarations, timers, function "
+        "blocks or change other behavior. Build and save. Explain the boundaries and "
+        "state retention. This is an offline training extension, not live alarm deployment."
     ),
 }
 BROKEN_IDENTIFIER = "CE_BENCH_UNDEFINED_TEMP_7F93"
@@ -81,6 +96,25 @@ def declarations(xml: str) -> list:
     return sorted([value(node) for node in ET.fromstring(xml).iter("variables")], key=str)
 
 
+def alarm_fixture(xml: str) -> str:
+    """Extend the demo extract with its original alarm/enable EBOOL names."""
+    root = ET.fromstring(xml)
+    block = root.find("dataBlock")
+    if block is None:
+        raise ValueError("Expected fixture declarations")
+    existing = {node.get("name", "").lower() for node in block.findall("variables")}
+    for name in ("Start_process", "Temp_fault_1", "Temp_fault_2"):
+        if name.lower() in existing:
+            raise ValueError("Alarm training declarations already exist")
+        ET.SubElement(block, "variables", name=name, typeName="EBOOL")
+    return ET.tostring(root, encoding="unicode")
+
+
+def alarm_source(baseline: str) -> str:
+    """Canonical appended hysteresis extension, never shown to the model."""
+    return baseline + "\n" + CANONICAL
+
+
 def inspect_grade(answer: str) -> dict:
     try:
         data = json.loads(answer)
@@ -109,6 +143,8 @@ def inspect_grade(answer: str) -> dict:
 
 def static_grade(task: str, baseline: str, actual: str) -> dict:
     """Prove a documented syntactic subset; never pretend to execute PLC code."""
+    if task == "alarms":
+        return alarm_grade(baseline, actual)
     expected = normalize(threshold_source(baseline) if task == "threshold" else baseline)
     candidate = normalize(actual)
     result = {"scope": "unverified", "static_behavior": "unverified", "runtime_behavior": "unverified",
@@ -140,7 +176,16 @@ def static_grade(task: str, baseline: str, actual: str) -> dict:
         return result
     result["scope"] = "pass"
     # Deliberately small accepted family. Other valid ST stays unverified.
+    result["rubric"] = "feeder-temperature-2"
     pred = predicate.replace("2.0", "2")
+    # Grouping an already recognized bound cannot change its arithmetic. Remove
+    # only these exact operands, preserving Boolean/comparison grouping and all
+    # other expressions so unsupported or incorrect predicates stay unverified.
+    while True:
+        ungrouped = re.sub(r"\((setpoint_temp[+-]2)\)", r"\1", pred)
+        if ungrouped == pred:
+            break
+        pred = ungrouped
     recognized = {
         "abs(cmeasured_temp-setpoint_temp)<=2",
         "abs(setpoint_temp-cmeasured_temp)<=2",

@@ -9,3 +9,4 @@ Regenerate from this archive with `ce-bench visualize --archive benchmarks/archi
 | Run | Provider | Model | Measured source | Original accepted | Regraded accepted | Complete |
 |---|---|---|---|---|---|---|
 | [20261121T100834Z-be7edc84](20261121T100834Z-be7edc84/report.md) | deepseek | deepseek-flash | d94539a9068a | 6/8 | feeder-2: 8/8 | True |
+| [20261121T112555Z-608e42da](20261121T112555Z-608e42da/report.md) | openai | gpt-5.5-2026-04-23 | 2cb614de3a26 | 9/10 | none | True |

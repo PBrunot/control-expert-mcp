@@ -20,7 +20,7 @@ def summarize_validation(value: dict) -> dict:
     result = {key: value[key] for key in (
         "rubric", "answer_pass", "scope", "static_behavior", "runtime_behavior", "compile_pass",
         "declarations_pass", "model_built", "model_saved", "success", "obtained_source_through_mcp",
-        "evaluator_seconds") if key in value}
+        "evaluator_seconds", "partition_cases", "int_domain") if key in value}
     build = value.get("build", {})
     if build:
         capture = build.get("diagnostics_capture", {})
@@ -33,7 +33,7 @@ def summarize_validation(value: dict) -> dict:
 
 def interrupted_attempt(attempt: Path, case: dict, fingerprint: str) -> dict:
     usage = Usage()
-    requested, tool_calls, errors = 0, 0, 0
+    requested, tool_calls, errors, retries = 0, 0, 0, 0
     events = attempt / "events.jsonl"
     if events.exists():
         for line in events.read_text(encoding="utf-8").splitlines():
@@ -48,6 +48,7 @@ def interrupted_attempt(attempt: Path, case: dict, fingerprint: str) -> dict:
                 usage.add(None)
             elif event["kind"] == "model_request":
                 requested += 1
+                retries += int(event.get("connection_attempt", 0) > 0)
             elif event["kind"] == "mcp_call" and event.get("phase") == "workflow":
                 tool_calls += 1
                 errors += int(event.get("is_error", False))
@@ -55,7 +56,7 @@ def interrupted_attempt(attempt: Path, case: dict, fingerprint: str) -> dict:
         usage.add(None)
     return {**case, "fingerprint": fingerprint, "status": "interrupted", "success": False,
             "durable_completed": False, "model_requests": requested, "usage": usage.result(),
-            "tool_calls": tool_calls, "tool_errors": errors}
+            "tool_calls": tool_calls, "tool_errors": errors, "api_retries": retries}
 
 
 def interaction_metrics(attempt: Path) -> dict:
@@ -165,6 +166,7 @@ def archive_run(results: Path, run_id: str, destination: Path, *, allow_incomple
         "fixture_sha256": snapshot["fixture_sha256"], "rubric_version": snapshot["rubric_version"],
         "prompt_sha256": {task: digest(prompt) for task, prompt in snapshot["prompts"].items()},
         "orientation_sha256": digest(snapshot["orientation"]), "contexts": plan.get("contexts"),
+        "provider_retry_policy": snapshot.get("provider_retry_policy"),
         "seed": plan["seed"], "schedule": plan["schedule"], "cases": rows, "conditions": groups,
         "paired_differences": {key: distribution(values) for key, values in differences.items()},
         "limitations": ["Small repetition counts are exploratory, not statistically strong comparisons.",
