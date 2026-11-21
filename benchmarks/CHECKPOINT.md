@@ -36,12 +36,14 @@ Threshold, inclusive ABS temperature tolerance and repair all built before savin
 and after reopening; exported scope/declarations passed static checks. This was
 direct scripted MCP validation, not a model run or simulator execution.
 
-Offline suite: `python -m unittest discover -s tools -p "test_*.py" -v` passed
-36 tests (one existing platform/capability skip), both in the editable checkout
-and an isolated installed wheel environment. Logs: `tmp/benchmark-full-tests.log`
-and `tmp/benchmark-wheel-tests.log`. Syntax and `pip check` passed. Built wheel
-and sdist in `tmp/benchmark-dist`; strict twine checks and
-`tools/check_distribution.py --dist-dir tmp/benchmark-dist` passed. DeepSeek
+Final offline suite: `python -m unittest discover -s tools -p "test_*.py" -v`
+passed 40 tests (one existing platform/capability skip), in both the editable
+checkout (37.612 s) and an isolated installed wheel (34.016 s), including archive
+privacy/immutability, regrade evidence and multi-model/version plot-data tests.
+Logs: `tmp/benchmark-final-tests.log` and `tmp/benchmark-final-wheel-tests.log`.
+Syntax and `pip check` passed. Final wheel/sdist in `tmp/benchmark-final-dist`:
+strict twine and `tools/check_distribution.py` passed (27 wheel files / 52 sdist
+files, generated archive/native projects/credentials excluded). DeepSeek
 keyless dry-run generated the 40-case seeded schedule without a provider request.
 
 Real paid command, explicitly requested by the user:
@@ -55,9 +57,25 @@ Campaign `20261121T100834Z-be7edc84` completed all eight cases. All six edit/rep
 cases passed saved-artifact/declaration/static checks and real evaluator rebuilds.
 Both inspection answers gave the correct initialization assignment, but rubric
 `feeder-1` rejected optional assignment/function-expression forms. Original summaries are
-preserved (6/8 accepted); a planned explicit `feeder-2` regrade will accept that
-equivalent representation without changing the required facts or calling an API.
+preserved (6/8 accepted); explicit `feeder-2` regrading accepted both equivalent
+representations, giving 8/8 without changing required facts or calling an API.
 No model failure should be inferred from this overly strict formatting check.
+Provider-reported totals: 425,260 tokens, 59 API requests, 68 tool calls, zero
+tool errors. Summed measured workflows: 150.67 seconds; setup/evaluation are separate.
+
+The user requested a GitHub archive and graphical overview. Sanitized original
+scores, explicit regrades, timing/token/tool metrics, source proof and checksums
+are in `benchmarks/archive/20261121T100834Z-be7edc84/`. `overview.png` is generated
+only from archived JSON; `overview.metadata.json` binds it to source-data hashes.
+The generator supports multiple campaigns/models/revisions without pooling them.
+Current archive: one model (`deepseek-flash` alias), one measured revision, A/B,
+one repetition per task. Do not infer a significant documentation advantage.
+
+Measured Python bytes were verified before subsequent code changes against
+commit `d94539a9068ae11474460caeb9c3224462138d7f` (Git CRLF/LF normalized). The
+original dirty-revision fingerprint remains recorded. Archive publishing code,
+rubric v2, plotting and regression tests were added afterwards on
+`feat/control-expert-benchmark`. No change to `main` or raw-evidence publication.
 
 Local ignored `benchmarks/local.json` selects DeepSeek and the ignored repository
 `.secrets` credential file. `deepseek-flash` is explicitly marked a mutable alias,
@@ -70,6 +88,8 @@ experiment; opaque server wrappers have unknown source metadata; mutable provide
 aliases cannot guarantee unchanged weights. Core comparison uses cold fresh MCP
 servers, serial operations, and fresh conversations per case.
 
-Next: preserve a commit matching the measured Python source, add the Git-safe
-archive and explicit inspection regrade, rerun offline/distribution checks, then
-push the requested implementation/results archive on a new feature branch.
+Delivery branch: `feat/control-expert-benchmark`, with implementation, sanitized
+archive data, PNG and provenance metadata committed together for the explicitly
+requested GitHub push. Future runs:
+`ce-bench run`, then `archive` and `visualize`; commit archive data/image/metadata
+together. Use `regrade` only explicitly and retain all original scores.

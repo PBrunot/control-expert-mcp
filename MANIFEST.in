@@ -10,6 +10,7 @@ include tools/requirements-help.txt
 include tools/test_export_ce_help.py
 include tools/test_mcp_runtime.py
 include tools/test_benchmark.py
+include tools/test_benchmark_archive.py
 include tools/benchmark_fake_server.py
 include tools/lang_refs/ST_2_Feeder.xml
 include benchmarks/example.json

@@ -128,6 +128,8 @@ class CoreTests(unittest.TestCase):
         self.assertTrue(inspect_grade(json.dumps(GOLD))["answer_pass"])
         self.assertFalse(inspect_grade(json.dumps({**GOLD, "full_condition": "feeder_state>=2"}))["answer_pass"])
         self.assertFalse(inspect_grade("not JSON")["answer_pass"])
+        assignment = {**GOLD, "initialization_expression": "wrong_target := material_a_value+material_b_value"}
+        self.assertFalse(inspect_grade(json.dumps(assignment))["answer_pass"])
 
     def test_usage_subsets_unknowns_and_errors(self):
         usage = Usage()

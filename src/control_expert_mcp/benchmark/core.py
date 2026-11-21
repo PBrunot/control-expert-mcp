@@ -108,6 +108,8 @@ def load_config(path: str) -> dict:
     for key in ("workspace", "results", "fixture"):
         config[key] = str((base / config[key]).resolve())
     for name, condition in config["conditions"].items():
+        if not re.fullmatch(r"[A-Za-z0-9_-]+", name):
+            raise ValueError("Condition names must contain only letters, digits, underscores or hyphens")
         condition["cwd"] = str((base / condition["cwd"]).resolve())
         if condition.get("documentation") not in (True, False):
             raise ValueError(f"{name}: explicit documentation boolean required")

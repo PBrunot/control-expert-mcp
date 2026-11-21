@@ -239,6 +239,8 @@ async def run_case(config, case, manifest, directory, fingerprint, provider_fact
                     result.get("final_response", ""), [json.loads(line) for line in events.path.read_text(encoding="utf-8").splitlines()])
     except Exception as exc:
         result["failure_reason"] = type(exc).__name__
+        if result["status"] == "completed":
+            result["status"] = "evaluation_timeout" if isinstance(exc, TimeoutError) else "evaluation_failure"
         events.emit("case_exception", error=type(exc).__name__, status=result["status"])
     result["total_seconds"] = perf_counter() - started
     result["success"] = result["status"] == "completed" and result["validation"].get("success", False)

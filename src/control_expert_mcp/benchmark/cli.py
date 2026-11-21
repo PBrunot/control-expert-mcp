@@ -12,6 +12,8 @@ import sys
 from .core import Events, ce_lock, guard_directory, load_config, read_json, snapshot, write_json
 from .report import compare
 from .provider import adapter
+from .archive import archive_run
+from .regrade import regrade_inspection
 from .runner import campaign, make_schedule, prepare, prepared, validate_fixtures
 from .transport import Evidence, MCP
 
@@ -78,11 +80,34 @@ def main(argv=None) -> int:
     sub = subs.add_parser("compare")
     sub.add_argument("--results", type=Path, required=True)
     sub.add_argument("--output", type=Path, required=True)
+    sub.add_argument("--rubric", default=None, help="Explicit saved regrade view; original evidence is retained")
+    sub = subs.add_parser("regrade")
+    sub.add_argument("--results", type=Path, required=True)
+    sub.add_argument("--run-id", required=True)
+    sub = subs.add_parser("archive")
+    sub.add_argument("--results", type=Path, required=True)
+    sub.add_argument("--run-id", required=True)
+    sub.add_argument("--archive", type=Path, default=Path("benchmarks/archive"))
+    sub.add_argument("--allow-incomplete", action="store_true")
+    sub = subs.add_parser("visualize")
+    sub.add_argument("--archive", type=Path, default=Path("benchmarks/archive"))
+    sub.add_argument("--output", type=Path, default=Path("benchmarks/archive/overview.png"))
+    sub.add_argument("--scoring", choices=["original", "latest"], default="latest")
     args = parser.parse_args(argv)
     try:
         if args.command == "compare":
-            report = compare(args.results, args.output)
+            report = compare(args.results, args.output, args.rubric)
             print(f"Wrote {args.output}.json and .md ({len(report['groups'])} separate fingerprint groups)")
+            return 0
+        if args.command == "regrade":
+            print(regrade_inspection(args.results, args.run_id))
+            return 0
+        if args.command == "archive":
+            print(archive_run(args.results, args.run_id, args.archive, allow_incomplete=args.allow_incomplete))
+            return 0
+        if args.command == "visualize":
+            from .plot import visualize_archive
+            print(visualize_archive(args.archive, args.output, args.scoring))
             return 0
         config = load_config(args.config)
         if args.command == "doctor":

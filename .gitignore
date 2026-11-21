@@ -71,3 +71,4 @@ _attic/
 /benchmarks/comparison*
 .env
 .secrets
+/benchmarks/archive/.staging-*/

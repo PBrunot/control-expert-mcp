@@ -27,9 +27,9 @@ def aggregate(rows: list) -> dict:
                    for key in ("input_tokens", "output_tokens", "total_tokens")}}
     return {"cases": len(rows), "completion": rate([r.get("status") == "completed" for r in rows]),
             "accepted": rate([r.get("success", False) for r in rows]),
-            "build": rate([r.get("validation", {}).get("compile_pass") for r in rows]),
-            "static_behavior": rate([True if r.get("validation", {}).get("static_behavior") == "pass" else None for r in rows]),
-            "runtime_behavior": rate([True if r.get("validation", {}).get("runtime_behavior") == "pass" else None for r in rows]),
+            "build": rate([r.get("validation", {}).get("compile_pass") for r in rows if r.get("task") != "inspect"]),
+            "static_behavior": rate([True if r.get("validation", {}).get("static_behavior") == "pass" else None for r in rows if r.get("task") != "inspect"]),
+            "runtime_behavior": rate([True if r.get("validation", {}).get("runtime_behavior") == "pass" else None for r in rows if r.get("task") != "inspect"]),
             "all_attempts": metrics(rows), "accepted_attempts": metrics([r for r in rows if r.get("success")]),
             "known_partial_tokens": {key: sum(r.get("usage", {}).get("known_partial_tokens", {}).get(key, 0) for r in rows)
                                      for key in ("input_tokens", "output_tokens", "total_tokens")},
@@ -38,7 +38,7 @@ def aggregate(rows: list) -> dict:
             "statuses": {status: sum(r["status"] == status for r in rows) for status in sorted({r["status"] for r in rows})}}
 
 
-def compare(results: Path, output: Path) -> dict:
+def compare(results: Path, output: Path, rubric: str | None = None) -> dict:
     groups = defaultdict(list)
     pairs = []
     interrupted = []
@@ -56,7 +56,11 @@ def compare(results: Path, output: Path) -> dict:
             for attempt in attempts:
                 path = attempt / "summary.json"
                 if path.exists():
-                    row = read_json(path)
+                    if rubric:
+                        from .regrade import regraded_row
+                        row = regraded_row(path, rubric)
+                    else:
+                        row = read_json(path)
                     if row.get("fingerprint") != plan["fingerprint"]:
                         raise ValueError("Summary does not match campaign fingerprint")
                     summaries.append(row)
@@ -91,7 +95,7 @@ def compare(results: Path, output: Path) -> dict:
                 groups[plan["fingerprint"]].extend(summaries)
                 # Pair only within the same scheduled crossover campaign.
                 pairs.append((plan["run_id"], case["task"], case["repeat"], summaries[-1]))
-    report = {"groups": {}, "interrupted_attempts": interrupted, "scheduled_not_started": pending,
+    report = {"groups": {}, "scoring_view": rubric or "original", "interrupted_attempts": interrupted, "scheduled_not_started": pending,
               "mutable_alias_campaigns": aliases,
               "limitations": ["API client/model results differ from ChatGPT UI orchestration.",
                               "Static acceptance does not validate PLC runtime semantics.",
@@ -119,7 +123,7 @@ def compare(results: Path, output: Path) -> dict:
                 deltas[fingerprint][f"{task}:{key}:B_minus_A"].append(delta)
     report["paired_differences"] = {fp: {key: distribution(vals) for key, vals in series.items()} for fp, series in deltas.items()}
     write_json(output.with_suffix(".json"), report)
-    lines = ["# Control Expert API benchmark", "", *report["limitations"], "",
+    lines = ["# Control Expert API benchmark", "", "Scoring view: " + report["scoring_view"], "", *report["limitations"], "",
              "Distinct immutable fingerprints are reported separately. p95 uses nearest rank.", "",
              "| Group | Condition | Cases | Accepted | Built | Runtime verified | Median seconds | Median tokens |",
              "|---|---|---:|---:|---:|---:|---:|---:|"]

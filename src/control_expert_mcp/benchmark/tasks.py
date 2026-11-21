@@ -5,7 +5,7 @@ import json
 import re
 import xml.etree.ElementTree as ET
 
-RUBRIC_VERSION = "feeder-1"
+RUBRIC_VERSION = "feeder-2"
 ORIENTATION = (
     "Work only on the already-open disposable training project, MAST/Feeder. "
     "Obtain its source through MCP. Offline only. Reference tools are available as listed. "
@@ -84,14 +84,21 @@ def declarations(xml: str) -> list:
 def inspect_grade(answer: str) -> dict:
     try:
         data = json.loads(answer)
+        expression = normalize(data["initialization_expression"]).removesuffix(";")
+        expression = expression.removeprefix("feeder_state:=")
+        temperature = {k: v.lower() for k, v in data["temperature"].items()}
+        conversion = normalize(temperature["conversion"]).removesuffix(";")
+        conversion = conversion.removeprefix("cmeasured_temp:=")
+        if conversion == "int_to_real(measured_temp)":
+            temperature["conversion"] = "int_to_real"
         checks = {
             "location": [data["task"].upper(), data["section"].lower(), data["language"].upper()] == ["MAST", "feeder", "ST"],
             "initialization_event": {k: v.lower() for k, v in data["initialization_event"].items()} == {"edge": "falling", "variable": "mixing_done"},
-            "initialization_expression": normalize(data["initialization_expression"]) == "material_a_value+material_b_value",
+            "initialization_expression": expression in {"material_a_value+material_b_value", "material_b_value+material_a_value"},
             "decrement_event": {k: v.lower() for k, v in data["decrement_event"].items()} == {"edge": "rising", "variable": "forming"},
             "full": normalize(data["full_condition"]) == "feeder_state>2",
             "empty": normalize(data["empty_condition"]) == "feeder_state<=2",
-            "temperature": {k: v.lower() for k, v in data["temperature"].items()} == {
+            "temperature": temperature == {
                 "conversion": "int_to_real", "input": "measured_temp", "converted": "cmeasured_temp",
                 "comparison": "=", "setpoint": "setpoint_temp"},
         }

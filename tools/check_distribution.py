@@ -16,6 +16,7 @@ HELPERS = {
     "requirements-help.txt", "test_export_ce_help.py", "test_mcp_runtime.py",
     "index_ce_help.py", "test_documentation.py", "test_diagnostics.py",
     "test_benchmark.py", "benchmark_fake_server.py",
+    "test_benchmark_archive.py",
 }
 
 

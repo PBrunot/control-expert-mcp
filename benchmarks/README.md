@@ -153,7 +153,7 @@ rebuilds edits. Model-requested builds belong inside workflow time; evaluator
 builds do not. Parsed empty diagnostics alone never establish build success;
 `build_state=built_ok` with no `error` is required and capture metadata is retained.
 
-The private `feeder-1` rubric grades inspection JSON deterministically. Gold data
+The private `feeder-2` rubric grades inspection JSON deterministically. Gold data
 and evaluation results are never sent to the model. Threshold/repair checks accept
 the original normalized executable statement sequence with exactly the prescribed
 change. Temperature checks accept unchanged surrounding statements with recognized
@@ -223,6 +223,51 @@ them. Public/manual UI inspection cannot guarantee a fixed hidden model snapshot
 or expose complete internal orchestration. Record `input_tokens`, `output_tokens`,
 `total_tokens`, cached/reasoning details and unavailable request IDs as **null**.
 Do not infer them from MCP bytes. No website automation/private endpoints are used.
+
+## GitHub archive and graphical overview
+
+After a campaign, archive its sanitized metrics and regenerate the image:
+
+```powershell
+.venv\Scripts\ce-bench.exe archive --results benchmarks\results --run-id YOUR_RUN_ID --archive benchmarks\archive
+.venv\Scripts\ce-bench.exe visualize --archive benchmarks\archive --output benchmarks\archive\overview.png
+git add benchmarks/archive
+git commit -m "Archive Control Expert benchmark results and overview"
+```
+
+Commit the data, PNG and `overview.metadata.json` together. The graphical overview
+reads only archived JSON: task acceptance, workflow medians and provider tokens,
+with separate rows for each campaign/model/measured source/condition. It expands
+as more models and revisions are archived; incompatible experiments are not pooled.
+The PNG's metadata sidecar records exact source-data and image hashes, plotting
+code hash and matplotlib version. Offline tests detect data/image mismatches.
+`--scoring original` plots original scores; the default `latest` applies the latest
+explicit inspection regrade and shows original-to-current counts in the image.
+See [the archived overview](archive/README.md).
+
+Individual archive directories are immutable and checksummed. `index.json` and
+README are derived navigation. Missing cases require `archive --allow-incomplete`,
+which creates a separate labeled snapshot. Raw native projects, transcripts,
+manual excerpts, credentials, local paths and machine names are not copied.
+Allowlisted scores/metrics, source/dependency/corpus fingerprints and artifact
+hashes are retained. Keep the original local evidence for detailed audits.
+
+The first real run used rubric `feeder-1`: both factually correct inspection
+answers included optional assignment/function-expression forms that it rejected.
+Rubric `feeder-2` accepts these equivalent forms without relaxing any required
+facts. Original summaries remain 6/8; explicit deterministic regrading gives 8/8:
+
+```powershell
+.venv\Scripts\ce-bench.exe regrade --results benchmarks\results --run-id 20261121T100834Z-be7edc84
+.venv\Scripts\ce-bench.exe compare --results benchmarks\results --output benchmarks\comparison-feeder-2 --rubric feeder-2
+```
+
+Regrading sends no API requests and performs no new CE operations. It verifies
+original summary/response hashes, retains saved-artifact scope evidence, and
+appends a new rubric record. Both score versions are in the archive. The measured
+dirty Python package was verified against commit `d94539a9068ae11474460caeb9c3224462138d7f`
+before further code changes; the archive preserves that proof and original dirty
+metadata rather than relabeling the run as a clean checkout.
 
 ## Offline checks
 

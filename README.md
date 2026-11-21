@@ -462,6 +462,11 @@ See [benchmark setup, commands and limitations](benchmarks/README.md) and the
 results do not reproduce ChatGPT UI orchestration; static checks do not establish
 PLC runtime behavior.
 
+[Archived results and graphical overview](benchmarks/archive/README.md) track
+tests, models and measured source revisions. Regenerate the committed PNG from
+archive JSON with `ce-bench visualize`; original scores and explicit regrades
+remain available.
+
 ## Troubleshooting
 
 - **`Catalog object not found` on `new_project`** — the CPU part number/version must exactly match the hardware catalog of *your* Control Expert version (spacing matters: `BMX P34 2020`, firmware like `02.70` is required).
