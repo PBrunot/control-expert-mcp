@@ -1,0 +1,2 @@
+# Archive checksums refer to exact file bytes. Preserve them on every platform.
+/benchmarks/archive/** -text
