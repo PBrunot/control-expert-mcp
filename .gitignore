@@ -63,3 +63,11 @@ Thumbs.db
 
 # Local attic - snapshots that may contain customer data, never commit
 _attic/
+
+# Local benchmark configuration, credentials, projects and evidence
+/benchmarks/local.json
+/benchmarks/.local/
+/benchmarks/results/
+/benchmarks/comparison*
+.env
+.secrets

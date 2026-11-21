@@ -1,0 +1,35 @@
+{
+  "provider": {"name": "openai"},
+  "model": {
+    "id": "REPLACE_WITH_EXACT_MODEL_SNAPSHOT",
+    "identity": "pinned",
+    "reasoning_effort": "medium",
+    "max_output_tokens": 12000
+  },
+  "cpu": {"part_number": "BMX P34 2020", "version": "02.70"},
+  "ce_version": "16.4",
+  "fixture": "../tools/lang_refs/ST_2_Feeder.xml",
+  "workspace": ".local",
+  "results": "results",
+  "tool_timeout": 180,
+  "request_timeout": 180,
+  "workflow_timeout": 900,
+  "max_turns": 30,
+  "max_tool_calls": 70,
+  "conditions": {
+    "A": {
+      "command": "E:\\GitHub\\control-expert-mcp\\.venv\\Scripts\\python.exe",
+      "args": ["-m", "control_expert_mcp"],
+      "cwd": "..",
+      "env": {"CE_MCP_MANUALS_DIR": "E:\\GitHub\\control-expert-mcp\\manuals\\ce-16.4"},
+      "documentation": false
+    },
+    "B": {
+      "command": "E:\\GitHub\\control-expert-mcp\\.venv\\Scripts\\python.exe",
+      "args": ["-m", "control_expert_mcp"],
+      "cwd": "..",
+      "env": {"CE_MCP_MANUALS_DIR": "E:\\GitHub\\control-expert-mcp\\manuals\\ce-16.4"},
+      "documentation": true
+    }
+  }
+}

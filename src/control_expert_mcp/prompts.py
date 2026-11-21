@@ -20,6 +20,27 @@ from __future__ import annotations
 
 def register_prompts(mcp) -> None:
     @mcp.prompt()
+    def benchmark_training_project() -> str:
+        """Work on a disposable Feeder training project under the local benchmark."""
+        return (
+            "Use ce-bench doctor, prepare and validate before an explicitly invoked API run. "
+            "The harness opens a unique copy before every task and repetition, serializes "
+            "Control Expert use, and forces CE_MCP_ENABLE_ONLINE=0. Read MAST/Feeder through "
+            "get_project_structure/read_section/list_variables; preserve EBOOL declarations, "
+            "initial values and statement order. This isolated demo has no process model: "
+            "edge inputs, Sec, materials and temperatures are externally driven. Do not add "
+            "a ticking Sec assignment. For edits use write_st_logic without declarations, "
+            "build_project until built_ok with no error, then save_project without a path. "
+            "Inspect diagnostic capture availability/freshness/attribution; empty diagnostics "
+            "alone are insufficient. The evaluator independently reopens the saved output, "
+            "exports its section/declarations and rebuilds outside the model workflow. "
+            "Static recognized-subset checks do not establish simulator execution. "
+            "After a timeout, stop CE work until the operator verifies the session idle and "
+            "uses ce-bench recover --verified-idle. See benchmarks/README.md for conditions, "
+            "fixed-model policy, paid-run commands and resume fingerprints."
+        )
+
+    @mcp.prompt()
     def consult_installed_manuals() -> str:
         """Export and consult the locally installed Control Expert help as Markdown."""
         return (

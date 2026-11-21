@@ -449,6 +449,19 @@ The installed 16.4 corpus indexed 280 manuals / 22,550 topics; `TON`, `READ_VAR`
 and Structured Text searches and topic retrieval were exercised. CI uses
 `python -m unittest discover -s tools -p "test_*.py"` with synthetic sources only.
 
+## Local model benchmarks
+
+The optional `ce-bench` CLI compares server revisions or installed-manual tool
+availability with a fixed configured API model. It supports OpenAI and DeepSeek,
+four isolated Feeder training tasks, provider token accounting, saved-artifact
+checks, interleaved A/B schedules, resume and comparison reports. API calls are
+explicit opt-in; normal MCP server use needs no provider package or key.
+See [benchmark setup, commands and limitations](benchmarks/README.md) and the
+[validation checkpoint](benchmarks/CHECKPOINT.md). The
+`benchmark_training_project` prompt describes the offline MCP workflow. API
+results do not reproduce ChatGPT UI orchestration; static checks do not establish
+PLC runtime behavior.
+
 ## Troubleshooting
 
 - **`Catalog object not found` on `new_project`** — the CPU part number/version must exactly match the hardware catalog of *your* Control Expert version (spacing matters: `BMX P34 2020`, firmware like `02.70` is required).

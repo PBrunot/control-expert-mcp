@@ -15,6 +15,7 @@ HELPERS = {
     "check_distribution.py", "check_ce_automation.py", "export_ce_help.py",
     "requirements-help.txt", "test_export_ce_help.py", "test_mcp_runtime.py",
     "index_ce_help.py", "test_documentation.py", "test_diagnostics.py",
+    "test_benchmark.py", "benchmark_fake_server.py",
 }
 
 
@@ -56,6 +57,9 @@ def check_sdist(path: Path, expected_modules: set[str]) -> None:
     source_modules = {"src/" + name for name in expected_modules}
     allowed = source_modules | {
         "README.md", "pyproject.toml", "MANIFEST.in", "PKG-INFO", "setup.cfg", "LICENSE",
+        "benchmarks/example.json", "benchmarks/README.md", "benchmarks/CHECKPOINT.md",
+        "benchmarks/deepseek.example.json",
+        "tools/lang_refs/ST_2_Feeder.xml",
         *("tools/" + name for name in HELPERS),
         *(p.relative_to(ROOT).as_posix() for p in (ROOT / "samples").glob("*.json")),
     }

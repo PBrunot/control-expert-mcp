@@ -13,6 +13,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+benchmark = ["openai>=2,<3"]
 test = [
     "beautifulsoup4>=4.15,<5",
     "markdownify>=1.2.4,<2",
@@ -24,6 +25,7 @@ Issues = "https://github.com/PBrunot/control-expert-mcp/issues"
 
 [project.scripts]
 control-expert-mcp = "control_expert_mcp.server:main"
+ce-bench = "control_expert_mcp.benchmark.cli:main"
 
 [build-system]
 requires = ["setuptools>=84.2.1"]
