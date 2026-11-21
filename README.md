@@ -1,147 +1,101 @@
 # Control Expert MCP Server
 
-An [MCP](https://modelcontextprotocol.io/) server that connects AI agents (Claude Desktop, Claude Code, VS Code Copilot, or any MCP client) to a local **EcoStruxure Control Expert** (formerly **Unity Pro**) installation — so the AI can **read, edit, and create PLC projects from scratch**.
+[![CI](https://github.com/PBrunot/control-expert-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/PBrunot/control-expert-mcp/actions/workflows/ci.yml)
+![Platform: Windows](https://img.shields.io/badge/platform-Windows-blue)
+![Python: 3.11+](https://img.shields.io/badge/python-3.11%2B-blue)
 
-Inspired by [tiaportal-mcp](https://github.com/heilingbrunner/tiaportal-mcp) for Siemens TIA Portal. Where TIA Portal exposes the Openness API, Control Expert exposes the **Unity Developer's Edition (UDE) COM automation server** (`PSBroker.PServerBroker`) — this server drives it through `pywin32` and exposes it as MCP tools over stdio.
+Connect MCP clients to a local **EcoStruxure Control Expert** (formerly **Unity Pro**) installation. Inspect, create, edit, and build PLC projects through Schneider Electric's Unity Developer's Edition (UDE) COM automation API.
 
+```text
+MCP client ── stdio ──> control-expert-mcp ── COM ──> Control Expert
+                                         └─ Modbus TCP ──> PLC / simulator (opt-in)
 ```
-AI agent (Claude, Copilot, ...) ──MCP/stdio──> control-expert-mcp ──COM──> Control Expert
-```
 
-## What the AI can do
+Inspired by [tiaportal-mcp](https://github.com/heilingbrunner/tiaportal-mcp). This project uses the Control Expert UDE broker (`PSBroker.PServerBroker`) through `pywin32`.
 
-- **Projects**: create from scratch for any CPU in the hardware catalog (M340, M580, Premium, Quantum...), open/save `.stu`/`.sta`, import/export `.xef`/`.zef`
-- **Browse**: tasks, sections, variables, DFB/DDT types, CPU/hardware info, build state
-- **Program**: create/read/delete sections in **ST, LD, FBD, SFC, IL**; write logic by importing Control Expert XML (the AI reads an existing section's XML once and mirrors the schema — validated round-trip for all five languages)
-- **Hardware**: walk the full bus → drop → rack → module topology, **add/remove IO modules** by catalog part number, change the CPU
-- **Modbus / DTMs** (validated live on M580): browse the DTM topology, add slave DTMs (`add_dtm("Modbus Device", ..., parent_dtm="BMEP58_ECPU_EXT")` — the protocol id is `Modbus` and is auto-tried), **set device IP addresses**, read the scanner state (`get_dtm_control_parameters`), and **add Modbus scan requests** (read/write addresses + sizes) by editing the master DTM dataset through `get_master_dtm_dataset` / `set_master_dtm_dataset` — a `ManagedModbusRequest` template with the numbering rules is built into the tool description; a written scan line builds `built_ok` and shows up as a `ModbusScanLine` in the scanner config
-- **Networks** (Premium/Quantum): create logical Ethernet networks and set their IP service configuration
-- **Variables**: list/create/update/delete global variables incl. type, comment, address (`%MW...`), initial value
-- **Build**: analyze and build the project, get the resulting build state
-- **UI**: pop the Control Expert window open so a human can watch or take over, and open an animation table's editor live (`open_animation_table`) to watch values animate while the AI drives a test
-- **Online** (opt-in): connect to PLC/simulator, download/upload, run/stop
-- **Live values** (opt-in): read and write running PLC/simulator values over **Modbus TCP** (`modbus_connect` → `read_tags`/`write_tags`) — the UDE/COM API has no live tag access, so this is the channel for testing logic against a running controller (located `%M`/`%MW` tags; mirror unlocated DFB internals to `%MW` first)
+> [!WARNING]
+> Online tools can download applications, start or stop controllers, and write process values. They are disabled by default. Enable them only for a simulator or a supervised test bench; production equipment requires qualified supervision.
+
+## Contents
+
+- [Features](#features)
+- [Requirements](#requirements)
+- [Quick start](#quick-start)
+- [MCP client configuration](#mcp-client-configuration)
+- [Configuration](#configuration)
+- [Usage](#usage)
+- [Tool reference](#tool-reference)
+- [Guided workflows](#guided-workflows)
+- [PLC and simulator access](#plc-and-simulator-access)
+- [Searchable local manuals](#searchable-local-manuals)
+- [Troubleshooting](#troubleshooting)
+- [Development and validation](#development-and-validation)
+- [Packaging and releases](#packaging-and-releases)
+- [Contributing](#contributing)
+- [License and affiliation](#license-and-affiliation)
+
+## Features
+
+- **Project management:** create projects using installed CPU catalog entries; open and save `.stu` / `.sta`; import and export `.xef` / `.zef`.
+- **Program authoring:** inspect and edit ST, LD, FBD, SFC, and IL sections. Write ST directly or import Control Expert exchange XML for graphical languages, variables, DFBs, and DDTs.
+- **Hardware configuration:** inspect buses, drops, racks, and modules; add, replace, or remove supported hardware; change the CPU.
+- **Communications:** manage DTMs, device addresses, M580 Modbus scan requests, CPU Ethernet services, and Premium/Quantum logical networks.
+- **Validation:** check exchange XML against installed schemas, analyze and build projects, and retrieve build diagnostics.
+- **Documentation:** search locally converted vendor manuals and retrieve topics with source citations, without opening Control Expert.
+- **Monitoring and commissioning:** open animation tables and, when explicitly enabled, connect to a PLC or simulator and read or write located tags over Modbus TCP.
+
+Availability depends on the installed Control Expert version, license, hardware catalog, and DTM libraries.
 
 ## Requirements
 
-- Windows with **EcoStruxure Control Expert** (or Unity Pro) installed and licensed — validated with **Control Expert 14.0 and 16.4**. Other versions registering `PSBroker.PServerBroker.1` may work (the UDE automation server ships with Control Expert itself; the separate UDE package is only needed for documentation)
-- **Python 3.11+** with `pywin32`
-- The server must run **on the same machine** as Control Expert (DCOM remoting is possible but not configured here)
+| Requirement | Details |
+| --- | --- |
+| Operating system | Windows for Control Expert COM automation |
+| Python | 3.11 or newer, as declared in `pyproject.toml` |
+| Control Expert | Licensed local installation of EcoStruxure Control Expert or Unity Pro; validated with versions 14.0 and 16.4 |
+| Automation interface | Registered UDE COM broker (`PSBroker.PServerBroker.1`) |
+| MCP client | A client supporting stdio servers, such as Claude Desktop, Claude Code, or VS Code with GitHub Copilot |
 
-## Install
+Run the server on the **same machine as Control Expert**. DCOM remoting is not configured. The UDE automation server ships with Control Expert; the separate UDE package is only needed for its documentation. Python dependencies are installed with the package.
+
+## Quick start
+
+Run these commands in PowerShell:
 
 ```powershell
+git clone https://github.com/PBrunot/control-expert-mcp.git
 cd control-expert-mcp
 py -3.11 -m venv .venv
-.venv\Scripts\pip install -e .
+.venv\Scripts\python.exe -m pip install -e .
 ```
 
-## Distribution, CI, and PyPI releases
+Configure your MCP client with the absolute path to `.venv\Scripts\python.exe` and arguments `["-m", "control_expert_mcp"]`, using an example below.
 
-The distribution is a Python wheel with the `control-expert-mcp` console command.
-Users need Windows, Python 3.11+, and a licensed local Control Expert installation.
-Control Expert itself and its installed manuals remain local to each user.
-
-### Install a downloaded release
-
-Download the wheel from the `python-distributions` artifact of a successful GitHub
-Actions run, then install it into a dedicated environment:
+To launch the stdio server manually:
 
 ```powershell
-py -3.11 -m venv C:\Tools\control-expert-mcp
-C:\Tools\control-expert-mcp\Scripts\python.exe -m pip install .\control_expert_mcp-0.9.0-py3-none-any.whl
+.venv\Scripts\python.exe -m control_expert_mcp
 ```
 
-Configure the MCP client with that environment's Python executable and
-`["-m", "control_expert_mcp"]`, as shown below. Pip downloads the required Python
-dependencies; a disconnected installation also needs a compatible dependency
-wheelhouse prepared on a connected Windows machine.
+The installed `control-expert-mcp` console command is equivalent. This is a stdio service; an MCP client normally starts and manages the process.
 
-After the first PyPI release, users can install `control-expert-mcp==0.9.0` instead
-of a wheel path. Clients with [uv](https://docs.astral.sh/uv/guides/tools/) available
-can launch an isolated, versioned installation directly:
+## MCP client configuration
 
-```json
-{
-  "mcpServers": {
-    "control-expert": {
-      "command": "uvx",
-      "args": ["--python", "3.11", "--from", "control-expert-mcp==0.9.0", "control-expert-mcp"],
-      "env": {"CE_MCP_ENABLE_ONLINE": "0"}
-    }
-  }
-}
-```
-
-### Continuous integration and local release checks
-
-[CI](.github/workflows/ci.yml) runs offline regression tests on Windows with
-Python 3.11–3.15 for pushes, pull requests, and manual runs. It then builds the
-source archive and wheel, checks metadata with Twine, audits archive contents,
-and runs the tests against the installed wheel in a fresh environment outside the
-checkout. Successful runs retain the distributions as artifacts for 14 days.
-No Control Expert installation, manual corpus, PLC, or simulator is required;
-licensed COM integration remains a local check using `tools/check_ce_automation.py`.
-
-To reproduce the package checks locally, use a fresh output directory:
-
-```powershell
-.venv\Scripts\python.exe -m pip install ".[test]" build twine
-.venv\Scripts\python.exe -m unittest discover -s tools -p "test_*.py"
-.venv\Scripts\python.exe -m build --outdir dist/0.9.0
-.venv\Scripts\python.exe -m twine check --strict dist/0.9.0/*
-.venv\Scripts\python.exe tools/check_distribution.py --dist-dir dist/0.9.0
-```
-
-`MANIFEST.in` includes selected helpers and sample configurations in the source
-archive. The wheel contains the runtime package. The archive audit rejects
-unexpected files, including generated manuals, scratch data, customer projects,
-and vendor extracts. Both artifacts use the version from `pyproject.toml`.
-
-### Publish through the configured PyPI account
-
-[publish.yml](.github/workflows/publish.yml) uses
-[PyPI Trusted Publishing](https://docs.pypi.org/trusted-publishers/using-a-publisher/)
-with short-lived GitHub OIDC credentials. Its pending publisher is configured for:
-
-| PyPI setting | Value |
-| --- | --- |
-| Project | `control-expert-mcp` |
-| GitHub owner | `PBrunot` |
-| Repository | `control-expert-mcp` |
-| Workflow filename | `publish.yml` |
-| Environment | `(Any)` currently; the production job uses `pypi` |
-
-A pending publisher creates the project on its first successful upload; it does
-not reserve the name in advance. No PyPI API token is needed in repository secrets.
-
-1. Commit and push the implementation, tests, and workflow files to the repository.
-2. Let CI pass. Set a new version in `pyproject.toml` for each subsequent release.
-3. Create and push a matching tag, such as `v0.9.0`, then publish a GitHub Release
-   for that tag. The publish workflow runs the full CI pipeline again and uploads
-   its validated artifacts to PyPI. Production publication rejects a tag that
-   differs from the wheel's version.
-4. Verify the project on PyPI and test installation into a clean environment.
-
-Manual workflow dispatch defaults to **TestPyPI**. Testing there requires a
-separate account/pending publisher on TestPyPI for the same repository and workflow;
-its job uses the `testpypi` environment. A manual production run must select the
-matching release tag and choose `pypi`. Published version filenames cannot be reused.
-
-## Hook up an AI client
-
-The server speaks MCP over stdio. Point your client at the venv's Python:
+Replace `C:\path\to\control-expert-mcp` with your checkout path. Keep online access disabled for initial setup.
 
 ### Claude Desktop
 
-`%APPDATA%\Claude\claude_desktop_config.json` (see [samples/claude_desktop_config.json](samples/claude_desktop_config.json)):
+Add this entry to `%APPDATA%\Claude\claude_desktop_config.json`. A copy is available in [samples/claude_desktop_config.json](samples/claude_desktop_config.json).
 
 ```json
 {
   "mcpServers": {
     "control-expert": {
       "command": "C:\\path\\to\\control-expert-mcp\\.venv\\Scripts\\python.exe",
-      "args": ["-m", "control_expert_mcp"]
+      "args": ["-m", "control_expert_mcp"],
+      "env": {
+        "CE_MCP_ENABLE_ONLINE": "0"
+      }
     }
   }
 }
@@ -153,9 +107,11 @@ The server speaks MCP over stdio. Point your client at the venv's Python:
 claude mcp add control-expert -- C:\path\to\control-expert-mcp\.venv\Scripts\python.exe -m control_expert_mcp
 ```
 
-### VS Code (GitHub Copilot agent mode)
+Online access remains disabled unless the server inherits an enabling environment variable.
 
-`.vscode/mcp.json` (see [samples/vscode-mcp.json](samples/vscode-mcp.json)):
+### VS Code / GitHub Copilot
+
+Add the server to `.vscode/mcp.json`. See [samples/vscode-mcp.json](samples/vscode-mcp.json).
 
 ```json
 {
@@ -163,331 +119,279 @@ claude mcp add control-expert -- C:\path\to\control-expert-mcp\.venv\Scripts\pyt
     "control-expert": {
       "type": "stdio",
       "command": "C:\\path\\to\\control-expert-mcp\\.venv\\Scripts\\python.exe",
-      "args": ["-m", "control_expert_mcp"]
+      "args": ["-m", "control_expert_mcp"],
+      "env": {
+        "CE_MCP_ENABLE_ONLINE": "0"
+      }
     }
   }
 }
 ```
 
-## Tools
+## Configuration
 
-| Tool | Purpose |
+Set environment variables in the MCP client's server configuration so they reach the server process.
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `CE_MCP_ENABLE_ONLINE` | Disabled | Set to `1` to register `plc_*`, `modbus_*`, `read_tags`, and `write_tags`. Restart the server after changing it. |
+| `CE_MCP_SCHEMA_DIR` | Auto-discovered | Override the path to Control Expert's installed `SrcXmlSchema` directory for XML validation. |
+| `CE_MCP_MANUALS_DIR` | Repository-relative `manuals/ce-16.4` | Path to a converted and indexed local manual corpus. Set an absolute path for packaged installations. |
+
+## Usage
+
+Start with a disposable project or a copy of an existing project. Example requests to your connected AI client:
+
+- “Open this project and summarize its CPU, tasks, sections, and global variables.”
+- “Create an ST section for a motor interlock, declare its variables, and build the project.”
+- “Inspect the hardware tree and list the configured Modbus devices.”
+- “Search the installed manuals for `READ_VAR` and cite the relevant topic.”
+
+### Authoring logic
+
+For Structured Text, `write_st_logic` accepts IEC source directly. The following illustrates MCP tool arguments; it is not a standalone Python script:
+
+```text
+write_st_logic(
+    task="MAST",
+    section="MotorControl",
+    st_source="MotorRun := StartButton AND NOT StopButton;",
+    declare="StartButton:BOOL, StopButton:BOOL, MotorRun:BOOL"
+)
+build_project()
+```
+
+The tool creates the section or replaces its existing logic. For LD, FBD, SFC, and IL, consult `get_language_reference`, export a similar object when needed, validate the candidate XML with `validate_xml`, and import it with `import_xml`. Declare referenced variables first or include them in the exchange XML.
+
+**Imports can replace existing sections.** Build after changes, inspect the result, and save explicitly. `close_project` discards changes unless `save=true`.
+
+### Interpreting build results
+
+`build_project` and `analyze_project` return `build_state`, raw `output`, an `error` when present, parsed `diagnostics`, and capture metadata. Recognized diagnostic lines include severity, code, task/section, and line/column where available; unknown or localized formats remain in raw output.
+
+An empty diagnostic list does **not** prove a clean build. Check `build_state`, `error`, raw output, and `diagnostics_summary` together. `diagnostics_available` distinguishes an empty Build tab from unavailable output. Capture metadata reports freshness and snapshot/appended scope, but attribution remains `unverified`: the COM output API provides no operation identifier, and identical output may belong to a repeated build or an older operation.
+
+## Tool reference
+
+Tools are registered in [server.py](src/control_expert_mcp/server.py). The client exposes their full argument schemas and descriptions.
+
+| Area | Tools |
 | --- | --- |
-| `get_status` | Server version, open project, CPU, build state |
-| `open_project` | Open `.stu` / `.sta` / `.xef` / `.zef` |
-| `new_project` | Create a project for a CPU (e.g. `BMX P34 2020` + `02.70`) |
-| `save_project` / `close_project` | Persist / close (close discards unless `save=true`) |
-| `build_project` / `analyze_project` | Build or analyze; returns resulting build state |
-| `get_documentation_status` | Local manual conversion/index health, warnings, versions, freshness |
-| `search_manuals` | Ranked manual excerpts and citations, including IEC symbol search |
-| `get_manual_topic` | Original indexed Markdown by topic ID, with section selection and pagination |
-| `get_project_structure` | Tasks, sections (+language), events, fct modules |
-| `list_variables` | Variables with type/comment/address/initial value |
-| `create_variable` / `update_variable` / `delete_variable` | Variable editing |
-| `read_section` | Section logic as Control Expert XML |
-| `write_st_logic` | **Write ST logic as plain IEC text** (no XML) — creates or replaces a section, with inline variable declarations |
-| `get_language_reference` | Authoring guide + validated example for ST/LD/FBD/SFC/IL — the exchange-XML structure rules an AI client needs to write graphical logic (FBD pin-geometry rule, LD line/cell model, SFC chart layout) |
-| `validate_xml` | **Pre-validate** candidate exchange-XML against the installed `SrcXmlSchema` XSDs before import/build — instant structural errors with the legal value sets |
-| `place_fb_in_ladder` | **Drop any project DFB into Ladder, no template** — reads the DFB interface and generates the correct (CE-owned) pin geometry automatically, then bind pins |
-| `use_fb_in_ladder` | Clone a GUI-authored block-in-LD template and rebind instance + variables (fallback for elementary EFBs / exact GUI geometry) |
-| `create_section` / `delete_section` | Section management (ST/LD/FBD/SFC/IL) |
-| `create_task` | Add MAST/FAST/AUX/SAFE task |
-| `import_xml` | **The main write path** — import section logic, variables, DFB/DDT types, configuration, or whole-project exchange files (inline XML or file) |
-| `export_xml` | Export variables / program / configuration / one DFB / one section as XML |
-| `export_project` | Full application export to `.xef` / `.zef` |
-| `list_data_types` | DFB + DDT types |
-| `get_hardware` | CPU + bus → drop → rack → module tree |
-| `add_io_module` / `remove_io_module` | Add/remove rack modules by part number + catalog version (e.g. `BMX DDI 1602` + `02.00`) |
-| `add_drop` / `add_rack` | Build out remote drops/racks (e.g. an X80 EIO drop + `BME XBP 1200` rack on an M580 RIO bus) |
-| `change_cpu` | Swap the CPU reference |
-| `list_animation_tables` / `create_animation_table` / `delete_animation_table` | Watch/animation tables (accepts hierarchical paths like `Pump1.Speed`, `SFC_Demo.S_Init.x`) for monitoring/forcing values online |
-| `list_dtms` | DTM Browser topology with names, types, addresses |
-| `add_dtm` / `delete_dtm` | Add communication DTMs or slave devices (e.g. `Modbus Device` under the M580 CPU DTM) |
-| `set_dtm_address` | Set a slave's IP / bus address (+ optional gateway/subnet — fixes the "IP Address and Gateway address are not in the same domain" build warning) |
-| `configure_cpu_ethernet` | M580 CPU embedded Ethernet: IP/subnet/gateway + Security-screen services (tftp/eip/dhcp_bootp/ftp/web/snmp). Enabling tftp+eip+dhcp_bootp clears the remote-EIO CRA build error |
-| `get_dtm_control_parameters` / `set_dtm_control_parameters` | Modbus TCP I/O scanner config XML (`CetControlParameter*` schema): IP, unit id, timeouts, `ModbusTcpRequest` scan lines |
-| `get_dtm_dataset` / `set_dtm_dataset` | A slave DTM's own dataset (identity + bus address) |
-| `get_master_dtm_dataset` / `set_master_dtm_dataset` | The master/CPU DTM dataset (via ZEF round-trip) — `<SlaveDevices>/<ManagedModbusRequestList>` holds the **Modbus scan lines**; write a `ManagedModbusRequest` node to add a request |
-| `list_networks` / `add_network` / `set_network_ip` | Logical networks on Premium/Quantum |
-| `show_ui` | Make the Control Expert window visible (read-only by default so it can follow along / open editors while the client keeps write) |
-| `open_animation_table` | Open an animation table's editor in the live CE window so a human watches values animate during a test |
-| `plc_*` (opt-in) | Online: setup/connect/disconnect/state/transfer/run/stop |
-| `modbus_connect` / `modbus_disconnect` / `modbus_status` (opt-in) | Open/close a Modbus TCP link to the CPU/simulator's server (`127.0.0.1:502` for the sim) for live values |
-| `read_tags` / `write_tags` (opt-in) | Read/write LIVE located-tag values (`%M`/`%MW`) by name or address (`%MW86`, `%MW2:REAL`); the only live read/write path (COM API has none) |
+| Project lifecycle | `get_status`, `open_project`, `new_project`, `save_project`, `close_project`, `export_project` |
+| Build and settings | `analyze_project`, `build_project`, `get_project_setting`, `set_project_settings` |
+| Project structure | `get_project_structure`, `create_task`, `create_section`, `delete_section`, `read_section` |
+| Logic authoring | `write_st_logic`, `get_language_reference`, `place_fb_in_ladder`, `use_fb_in_ladder` |
+| Exchange XML | `validate_xml`, `import_xml`, `export_xml` |
+| Variables and types | `list_variables`, `create_variable`, `update_variable`, `delete_variable`, `list_data_types` |
+| Hardware | `get_hardware`, `add_io_module`, `remove_io_module`, `replace_io_module`, `add_drop`, `add_rack`, `replace_rack`, `change_cpu` |
+| DTM topology and addressing | `list_dtms`, `add_dtm`, `delete_dtm`, `set_dtm_address` |
+| DTM configuration | `get_dtm_control_parameters`, `set_dtm_control_parameters`, `get_dtm_dataset`, `set_dtm_dataset`, `get_master_dtm_dataset`, `set_master_dtm_dataset` |
+| Ethernet and networks | `configure_cpu_ethernet`, `list_networks`, `add_network`, `set_network_ip` |
+| Animation tables and UI | `list_animation_tables`, `create_animation_table`, `delete_animation_table`, `show_ui`, `open_animation_table` |
+| Simulator process | `start_simulator`, `stop_simulator` |
+| Local manuals | `get_documentation_status`, `search_manuals`, `get_manual_topic` |
+| PLC connection **(opt-in)** | `plc_setup_connection`, `plc_connect`, `plc_disconnect`, `plc_state`, `plc_transfer`, `plc_command` |
+| Live values **(opt-in)** | `modbus_connect`, `modbus_disconnect`, `modbus_status`, `read_tags`, `write_tags` |
 
-### How the AI writes logic
+DTM scan-request configuration uses the master/CPU dataset's `ManagedModbusRequestList`. Follow the template in `set_master_dtm_dataset` and the `add_modbus_device` prompt, including GUID and numbering rules. `place_fb_in_ladder` generates pin geometry for project DFBs; `use_fb_in_ladder` provides a template-based fallback for elementary blocks or exact GUI geometry.
 
-Program sections are exchanged as Control Expert XML. An ST section looks like:
+## Guided workflows
 
-```xml
-<STExchangeFile>
-  <fileHeader company="Schneider Automation" product="Control Expert V14.0 - 190112"
-              dateTime="date_and_time#2026-6-11-1:0:0" content="Structured source file"
-              DTDVersion="41"></fileHeader>
-  <contentHeader name="Project" version="0.0.000"></contentHeader>
-  <program>
-    <identProgram name="Logic01" type="section" task="MAST"></identProgram>
-    <STSource>
-IF StartButton AND NOT StopButton THEN
-    MotorRun := TRUE;
-ELSE
-    MotorRun := FALSE;
-END_IF;
-    </STSource>
-  </program>
-</STExchangeFile>
-```
+The server includes reusable MCP prompts in [prompts.py](src/control_expert_mcp/prompts.py). Select them through your client's prompt picker.
 
-`import_xml(kind="section", xml_content=...)` creates the section if it doesn't exist, or deletes-and-replaces it on conflict. The agent should declare referenced variables first (`create_variable`) or include a `<dataBlock>`, then `build_project` to validate.
-
-## Online tools (live PLC / simulator) — disabled by default
-
-Tools that touch a controller (`plc_connect`, `plc_transfer`, `plc_command`, ...) are **not registered** unless you set the environment variable:
-
-```
-CE_MCP_ENABLE_ONLINE=1
-```
-
-Starting/stopping a PLC or downloading an application affects the physical process. Only enable this on test benches or with the simulator, and keep a human in the loop.
-
-**Simulator commissioning** (validated end to end): launch the PLC simulator first — `start_simulator` or `PLC_Simulator\sim.exe` from the Control Expert install (it sits in the tray) — then `plc_setup_connection("simulator", "127.0.0.1")` → `plc_connect("simulator")` → `plc_transfer("pc_to_plc")` → `plc_command("run")`. The project must build clean (`built_ok`) before download. `plc_state` reports connection + run/stop and whether PC == PLC.
-
-> **Known limitation:** a freshly started simulator with *no station loaded* (`plc_state` = `no_conf`) rejects `plc_transfer` with *"Family check failed"* — the API download (unlike the Control Expert GUI's) requires the sim to already have a station of a matching family. Seed it once by transferring any project from the Control Expert GUI (PLC → Simulation Mode → Connect → Transfer); the loaded station persists while sim.exe runs, and all API downloads work from then on (stop the PLC first — transfer to a running PLC fails).
-
-### Live values over Modbus TCP (validated end to end)
-
-The UDE/COM automation API serves the *project database* — it has **no live tag-value read/write** (animation tables only render in the GUI; `IVariable` exposes only the offline initial value). Live values go over the CPU's **Modbus TCP server** instead — the same channel SCADA/Vijeo use:
-
-```
-modbus_connect(host="127.0.0.1")          # the sim's Modbus server; or a real CPU IP, port 502
-read_tags("EMFM1FLOW, RESIDUAL2CLTHSP, %MW0, %MW2:REAL")
-write_tags({"RESIDUAL2CLTHSP": 4.0, "%MX100.0": true})
-```
-
-- Tags are global variable **names** (address + IEC type resolved from the project) or explicit **addresses** with optional `:TYPE` (`%MW86`, `%MW2:REAL`, `%MW70:UDINT`, `%M3`, `%MW10.2` bit). Decoding is type-driven (INT/UINT, DINT/UDINT, REAL, BOOL coil/word-bit).
-- **Only LOCATED `%M`/`%MW` tags are reachable.** Unlocated DFB internals (e.g. `Pump1.Running`) must be mirrored to `%MW`/`%M` in the program first (see the `test_logic_live` prompt).
-- 32-bit `REAL`/`DINT` use **Schneider low-word-first** order by default; pass `word_order="high_first"` if a server differs.
-- The Control Expert **simulator exposes a Modbus server on `127.0.0.1:502`**, so the whole read/write test loop works against the sim — no hardware required.
-
-## Prompts (guided workflows)
-
-The server ships **MCP prompts** ([src/control_expert_mcp/prompts.py](src/control_expert_mcp/prompts.py)) — reusable recipes that encode the validated flows *and their non-obvious gotchas* so a client doesn't rediscover them by trial and error. In Claude Code they appear as `/mcp__control-expert__<name>` slash commands; other MCP clients list them in their prompt picker.
-
-| Prompt | What it walks you through |
+| Prompt | Workflow |
 | --- | --- |
-| `commission_simulator` | Build → start sim → connect → transfer → run, incl. the **manual first-transfer / "Family check failed"** seed step |
-| `test_logic_live` | The Modbus test loop for a DFB instance, incl. **mirroring unlocated internals to `%MW`** and word-order gotcha |
-| `author_logic` | The `get_language_reference` → write/import → `build_project` → fix-from-output loop (per language) |
-| `scaffold_project` | `new_project` (exact CPU+version) → rack/PSU/IO → build → save |
-| `add_modbus_device` | Add a Modbus-TCP slave DTM under the M580 CPU and configure a scan line |
+| `scaffold_project` | Create a project using exact CPU/catalog versions, configure hardware, build, and save. |
+| `author_logic` | Consult language references, author or import logic, build, and resolve errors. |
+| `fb_in_ladder` | Place a function block in Ladder and bind its pins. |
+| `add_modbus_device` | Add a Modbus TCP slave DTM and configure a scan request. |
+| `commission_simulator` | Build, start the simulator, connect, transfer, and run, including the first-transfer limitation. |
+| `test_logic_live` | Test located values over Modbus, including mirrors for unlocated DFB internals. |
+| `consult_installed_manuals` | Prepare, search, retrieve, and cite local documentation. |
+| `benchmark_training_project` | Run the offline benchmark training workflow. |
 
-## Extending the server
+## PLC and simulator access
 
-When you add a tool or capability, **also add (or extend) an MCP prompt** in [prompts.py](src/control_expert_mcp/prompts.py) that walks a client through using it. This is a project convention, not an afterthought: a good prompt turns an hour of trial-and-error into one slash command.
+Set `CE_MCP_ENABLE_ONLINE=1` in the server environment and restart it to expose online tools. Use the `commission_simulator` prompt for the complete procedure.
 
-Write a prompt for anything a client **cannot guess from the tool description alone** — an environment flag (`CE_MCP_ENABLE_ONLINE`), a manual GUI step (the simulator family-check seed), an ordering constraint (stop the PLC before transfer), or an addressing rule (located-only Modbus, low-word-first REALs). Rules of thumb:
+The commissioning sequence is:
 
-- Each new workflow → a prompt; each new tool → at least a mention in a relevant prompt.
-- Put the **gotcha** in the prompt text explicitly (the steps that cost *you* time while building it).
-- Mirror the validated sequence (tool names + argument shapes), and reference related prompts by name.
-- Keep the standing orientation in the server `instructions` string short; put step-by-step recipes in prompts.
+1. Build the project and confirm `build_state="built_ok"`.
+2. Launch the simulator with `start_simulator` or the installed `PLC_Simulator\sim.exe`.
+3. Configure `plc_setup_connection(target="simulator", address="127.0.0.1")` and call `plc_connect(target="simulator")`.
+4. Ensure the controller is stopped before `plc_transfer(direction="pc_to_plc")`.
+5. Call `plc_command(command="run")` and inspect `plc_state`.
 
-## Local automation checks and Markdown manuals
+> [!IMPORTANT]
+> A fresh simulator with no station loaded (`no_conf`) can reject API downloads with **“Family check failed.”** Seed it once through the Control Expert GUI: PLC → Simulation Mode → Connect → Transfer, using a project of the matching controller family. The station persists while `sim.exe` runs. Subsequent API downloads require the controller to be stopped.
 
-The COM bridge was validated with **Control Expert 16.4** using an offline M340
-`BMX P34 2020` / `02.70` scratch project: create, import ST and a variable, build
-with zero errors/warnings, save, export XEF, reopen, and read the variable back.
-The server uses the MCP 2.x `MCPServer` API. COM remains on its dedicated STA
-thread, and shared Modbus calls are serialized for concurrent MCP handlers.
+### Live values over Modbus TCP
 
-```powershell
-.venv\Scripts\python.exe tools/check_ce_automation.py
-# Optional: create/build/delete a disposable project; never connects to a PLC.
-.venv\Scripts\python.exe tools/check_ce_automation.py --exercise-project --report manuals/ce-16.4/automation-check.json
+The UDE COM API exposes the offline project database, not live tag values. This server uses Modbus TCP for live reads and writes. Animation tables can display values in the GUI.
+
+Example MCP tool calls against a simulator:
+
+```text
+modbus_connect(host="127.0.0.1", port=502)
+read_tags(tags="MotorRun, %MW0, %MW2:REAL")
+write_tags(values={"%MW2:REAL": 4.0})
+modbus_disconnect()
 ```
 
-Convert locally installed help into searchable Markdown (Windows, Python 3.11+,
-and [7-Zip](https://www.7-zip.org/) required for CHM extraction):
+- Only **located `%M` / `%MW` tags** are reachable. Mirror unlocated DFB internals such as `Pump1.Running` to located variables in the program first.
+- Use global variable names or explicit addresses, optionally with a type: `%M3`, `%MW86`, `%MW2:REAL`, `%MW70:UDINT`, or `%MW10.2` for a word bit.
+- 32-bit `REAL` / `DINT` values use Schneider's low-word-first order by default. Set `word_order="high_first"` when required by the target.
+- The validated simulator endpoint is `127.0.0.1:502`.
+
+## Searchable local manuals
+
+Convert your locally installed Control Expert help, then build its search index. Conversion requires Windows, the optional help dependencies, and 7-Zip for CHM extraction.
+
+From the repository root:
 
 ```powershell
 .venv\Scripts\python.exe -m pip install -e . -r tools/requirements-help.txt
 .venv\Scripts\python.exe tools/export_ce_help.py --list
 .venv\Scripts\python.exe tools/export_ce_help.py --languages en --jobs 4
-.venv\Scripts\python.exe -m unittest discover -s tools -p "test_*.py"
+.venv\Scripts\python.exe tools/index_ce_help.py --manuals-dir manuals/ce-16.4
 ```
 
-The default installation is
-`C:\Program Files (x86)\Schneider Electric\EcoStruxure Control Expert 16.4`.
-Use `--install-dir` and `--output` to override either path. The default output is
-`manuals/ce-16.4/README.md`, linking each manual's `_index.md`, topic files, and
-images. `manifest.json` records source SHA-256 hashes, dependency versions,
-warnings, and failures. Unchanged completed sources are skipped on reruns;
-`--force` regenerates them, and repeatable `--include baselib.chm` filters sources.
-The process exits nonzero if any source fails, and partial exports can be resumed.
+The converter defaults to `C:\Program Files (x86)\Schneider Electric\EcoStruxure Control Expert 16.4` and writes to `manuals/ce-16.4`. Use `--install-dir` and `--output` to override paths, `--languages en it` or `--languages all` for additional languages, and `--include baselib.chm` to select a source. Completed unchanged sources are cached; `--force` regenerates them. Failed or partial exports can be resumed.
 
-English help and documents without language-specific directories are included by
-default. Use `--languages en it` or `--languages all` for additional installed
-languages. CHM exports preserve topic anchors, table-of-contents entries, and
-cross-manual links where the target book is installed in the same help directory.
-HTML scripts are not executed. PDF conversion retains page markers and extracted
-images; complex layout and tables may need comparison with the originals. OCR is
-disabled, and pages without native text are reported. PyMuPDF 2.x uses its
-native-text engine here; the optional ONNX layout engine triggered a native
-access violation on the validation host and is explicitly disabled. Generated vendor manuals
-and local reports are ignored by Git. The converter does not use COM or PLC access.
-The `consult_installed_manuals` MCP prompt describes this workflow.
-
-### MCP documentation service
-
-The existing MCP server serves converted manuals without opening Control Expert
-or connecting to a PLC. Conversion and SQLite FTS5 indexing are explicit local
-preparation commands; requests never convert, index, or download documentation.
+Set `CE_MCP_MANUALS_DIR` to the absolute corpus path in your client configuration. Wheel installations can index an existing corpus with:
 
 ```powershell
-.venv\Scripts\python.exe tools/index_ce_help.py --manuals-dir manuals/ce-16.4
-$env:CE_MCP_MANUALS_DIR = (Resolve-Path manuals/ce-16.4).Path
-.venv\Scripts\python.exe -m control_expert_mcp
+python -m control_expert_mcp.documentation --manuals-dir C:\path\to\manuals\ce-16.4
 ```
 
-Set `CE_MCP_MANUALS_DIR` in the MCP client's server environment too. The development
-default is `manuals/ce-16.4` relative to the package's repository; packaged
-installations should configure an explicit corpus directory. SQLite must support
-FTS5, as in the validated Windows Python installation.
+Use `get_documentation_status`, then `search_manuals(query="TON")`, and retrieve a result with `get_manual_topic(topic_id=...)`. Searches return excerpts and citations; topic retrieval preserves original Markdown, tables, code, and source context. Follow `next_cursor` with the same topic and section until it is null.
 
-For a wheel installation, the same explicit indexer is available as
-`python -m control_expert_mcp.documentation --manuals-dir <corpus-directory>`.
+Key behavior and limits:
 
-| Tool | Result |
-| --- | --- |
-| `get_documentation_status()` | Corpus, installation version, indexed counts, failures, warnings and freshness. |
-| `search_manuals(query, library="", language="", limit=8, manual_version="", installation_version="")` | Ranked topic IDs, excerpts, section cursors, citations and alternate citations for identical source topics. |
-| `get_manual_topic(topic_id, section="", cursor=0, max_chars=12000)` | Original Markdown, source citation, overlapping headings/anchors/pages and continuation cursor. |
-
-`language` filters corpus language (`en`, `it`, etc.), not ST/LD/FBD. `library`
-matches explicit manifest metadata or a book-title substring. Version filters are
-exact; missing metadata does not match. Queries are literal words/symbols, not FTS
-operators (up to 512 characters, limit 1–50). Exact headings and symbol prefixes
-rank before weighted full-text results. Search considers at most 1,000 candidate
-passages and returns one hit per topic, grouping identical source-hash/topic-path
-pairs with alternate citations.
-
-Call `get_documentation_status`, `search_manuals("TON")`, then `get_manual_topic`
-with the returned topic ID and cursor. `section` selects an exact heading or CHM
-anchor; ambiguous headings require a cursor instead. Cursors are character offsets
-within the topic, or within the selected section if supplied. Continue with
-`next_cursor` and identical topic/section arguments until it is null. `max_chars`
-is 1–24,000; `sections` describes headings overlapping the returned page.
-
-The index reads only successful (`converted`/`cached`) sources and Markdown outputs
-listed in `manifest.json`. Stable topic IDs derive from source-relative paths.
-Heading-based passages are split at paragraph boundaries with a 6,000-character
-target, keeping individual tables and fenced code together even when they exceed
-that target. Retrieval preserves original Markdown, tables, code, links, image
-references, warnings and applicability statements. Search normalizes HTML anchors
-and Markdown escapes and preserves underscores in symbols such as `READ_VAR`.
-
-Citations include book title, original source path/hash, converted topic path/hash,
-topic ID, heading/anchor or PDF page, language, converter fingerprint and warnings.
-Installation version comes from manifest `installation_version`, or the explicitly
-named Control Expert version in the installation path. It never populates the
-manual version. Optional per-manual fields `manual_version`, `document_revision`,
-`language`, and `library` are preserved without guessing. The converter does not
-automatically extract publication versions/revisions: unknown fields are null,
-and the original publication text remains retrievable. CPU applicability and
-installed-block availability are never inferred from a manual match.
-
-Index updates build a temporary database and publish it atomically. Requests use
-independent read-only connections. A full manifest hash (including converter
-fingerprints) detects stale indexes; retrieval refuses stale data until reindexed.
-Freshness means alignment with that conversion manifest, not a fresh scan of the
-vendor installation or every exported file on each request. Rerun conversion after
-vendor updates and indexing after conversion or metadata changes. Missing/corrupt
-indexes report preparation steps. On Windows, if an active reader prevents atomic
-replacement, retry indexing after requests finish; the previous index is retained.
-
-Indexing rejects traversal and symlink escapes outside each manual directory.
-Retrieval uses opaque topic IDs and stored snapshots, never caller-supplied paths.
-Manual contents are reference data, never tool-execution instructions. Generated
-manuals/indexes stay local and excluded from Git and distributions.
-
-The `consult_installed_manuals` prompt guides discovery, retrieval, citations,
-language-reference consultation and edit/build validation. Offline CI uses synthetic
-text and mocked COM responses. Real manuals and the M580 demo are local-only inputs.
-Structured block lookup, optional vendor results in `get_language_reference`,
-`ce-help://` resources and diagram/image retrieval remain future extensions.
-
-### Build diagnostics and their limits
-
-`build_project` and `analyze_project` retain `build_state`, `error` when present,
-and raw `output`. They add parsed `diagnostics` with severity, code, task/section,
-line/column location and original message for recognized lines. Unknown fields
-are null; unrecognized/localized formats remain in raw output. An empty parsed
-list does not establish that output contains no errors.
-`diagnostics_summary` preserves recognized English process-summary counts (or
-null); these can include uncoded warnings absent from the parsed diagnostic list.
-
-`diagnostics_available` distinguishes a readable (even empty) Build tab from
-unavailable output (`output=null`). `diagnostics_capture` reports operation,
-source tab, read errors, observed freshness (`changed`, `unchanged`, `unknown`)
-and scope (`snapshot` or `appended`). `diagnostics_output` is an observed appended
-suffix when detectable, otherwise the full snapshot. Build/analyze never fall
-back to Import/export or User errors tabs. Identical output can be a repeated
-successful build or old output: attribution remains `unverified`, even when text
-changes, because the output API supplies no operation identifier. Check
-`build_state` and `error` along with capture metadata before attempting repairs.
-
-Local validation on 2026-11-21 used Windows/Python 3.11.5, licensed Control Expert
-16.4, and a disposable copy of `demo_ControlExpert_M580.stu` (BME P58 3040,
-firmware 03.20). Analyze and full build succeeded with the demo's existing single
-network warning. An ST section referencing an undefined symbol produced E1061
-with task/section and line/column; deleting that temporary section restored
-`built_ok`. A repeated full build returned identical output and correctly reported
-`freshness="unchanged"`. The original demo's SHA-256 remained unchanged. No PLC
-connection or transfer occurred. The local runner/report are in the ignored
-`tmp/validate_documentation_m580.py` and `tmp/documentation-m580-check/report.json`.
-The installed 16.4 corpus indexed 280 manuals / 22,550 topics; `TON`, `READ_VAR`
-and Structured Text searches and topic retrieval were exercised. CI uses
-`python -m unittest discover -s tools -p "test_*.py"` with synthetic sources only.
-
-## Local model benchmarks
-
-The optional `ce-bench` CLI compares server revisions or installed-manual tool
-availability with a fixed configured API model. It supports OpenAI and DeepSeek,
-four isolated Feeder training tasks, provider token accounting, saved-artifact
-checks, interleaved A/B schedules, resume and comparison reports. API calls are
-explicit opt-in; normal MCP server use needs no provider package or key.
-See [benchmark setup, commands and limitations](benchmarks/README.md) and the
-[validation checkpoint](benchmarks/CHECKPOINT.md). The
-`benchmark_training_project` prompt describes the offline MCP workflow. API
-results do not reproduce ChatGPT UI orchestration; static checks do not establish
-PLC runtime behavior.
-
-[Archived results and graphical overview](benchmarks/archive/README.md) track
-tests, models and measured source revisions. Regenerate the committed PNG from
-archive JSON with `ce-bench visualize`; original scores and explicit regrades
-remain available.
+- Conversion and indexing are explicit local operations. MCP requests never convert, index, or download manuals and require no COM session or PLC connection.
+- Search accepts literal words and symbols. `language` selects the documentation language, not the PLC programming language; version filters require exact metadata matches.
+- Citations include source paths/hashes, topic locations, language, converter metadata, and warnings. Unknown publication versions remain unknown; a manual match does not establish CPU applicability or installed-block availability.
+- Stale indexes are refused. Rerun conversion after vendor updates and indexing after corpus or metadata changes. Freshness is checked against the conversion manifest, not a live scan of the vendor installation.
+- Conversion performs no OCR. PDF layouts and tables may need comparison with the originals; pages without native text are reported. CHM scripts are not executed.
+- Generated vendor manuals, indexes, and reports stay local and are excluded from Git and distributions. Treat manual content as reference data.
 
 ## Troubleshooting
 
-- **`Catalog object not found` on `new_project`** — the CPU part number/version must exactly match the hardware catalog of *your* Control Expert version (spacing matters: `BMX P34 2020`, firmware like `02.70` is required).
-- **`application object reference is not found in the catalog` on `add_io_module`** — same rule for modules: the catalog version is mandatory (`02.00` for most M340 IO modules, `01.00` for racks/power supplies).
-- **`new_project` fails with a bare `Exception occurred` for a CPU family** — your Control Expert license/DTM library probably doesn't include that platform. The error carries no description; test the same CPU in the Control Expert GUI to confirm.
-- **`add_dtm` says "protocol Id parameter is empty or invalid" / "Impossible to create a new DTM object"** — slave DTMs need the FDT protocol name as protocol_id (`Modbus` for the generic Modbus TCP device; the server auto-tries `Modbus` and `EtherNet/IP` when empty) and a device_type_name that exactly matches the DTM catalog (`Modbus Device`). List the catalog names with `tools/list_dtm_catalog.py`.
-- **`set_master_dtm_dataset` crashes the server (RPC failed)** — almost always malformed request XML; in particular `requestUniqueID` must be a fresh GUID, not an integer. Mirror the validated template in the tool description exactly.
-- **`Write access mode is already reserved by another client`** — Control Expert (the GUI) or another automation client has the project open for writing. Close it there first. The server holds one write token per session by design.
-- **Broker creation fails** — Control Expert isn't installed, or its COM registration is broken (re-register by repairing the installation).
-- **First call is slow** — `open_project`/`new_project` start the Unity server process and can take 30–120 s for large projects. Configure generous tool timeouts in your client.
-- **Import fails with `Invalid file`** — the XML doesn't match the exchange schema. Export a similar object first (`read_section`, `export_xml`) and mirror its structure, including `fileHeader`/`contentHeader`.
+| Symptom | Action |
+| --- | --- |
+| COM broker creation fails | Confirm Control Expert is installed and licensed. Repair its installation if COM registration is broken. |
+| `Catalog object not found` | Match CPU part number, spacing, and firmware exactly to the installed catalog; for example, `BMX P34 2020` / `02.70`. |
+| Module reference is missing from the catalog | Supply the exact module reference and catalog version. Check the installed catalog rather than assuming a version. |
+| `new_project` returns a bare `Exception occurred` | Try the same CPU in the GUI to check platform licensing and installed libraries. |
+| Write access is reserved by another client | Close the project in the other writable GUI/automation session. The server holds one write token per session. |
+| First project operation takes a long time | Startup and large-project loading can take 30–120 seconds. Increase the client's tool timeout. |
+| XML import reports `Invalid file` | Export a similar object and mirror its schema, including headers. Run `validate_xml` before importing. |
+| DTM protocol ID is invalid | Use the exact DTM catalog name, such as `Modbus Device`, and protocol `Modbus`. Inspect `tools/list_dtm_catalog.py` when needed. |
+| Master DTM dataset update fails with an RPC error | Check request XML against the tool's template. `requestUniqueID` must be a fresh GUID. |
+| Simulator transfer reports `Family check failed` | Complete the GUI seed transfer described under [PLC and simulator access](#plc-and-simulator-access). |
+| Manuals are unavailable or stale | Check the corpus path with `get_documentation_status`, then rerun the required conversion/indexing step. |
 
-## Architecture notes
+Report reproducible bugs through [GitHub Issues](https://github.com/PBrunot/control-expert-mcp/issues). Include Python and Control Expert versions, CPU/firmware when relevant, the tool sequence, and sanitized errors. Exclude customer projects, credentials, and proprietary exports.
 
-- All COM calls run on a **single dedicated STA worker thread** (COM apartment affinity); MCP tool calls are marshalled onto it (the dispatcher is reentrant — nested bridge calls on the worker thread execute directly).
-- Hardware and DTM objects expose their members on **secondary dual interfaces** (`IProject3`, `IConfiguration2`, `IBus`, `IModule`, `IPServerDtm*`, ...) that the default dispinterface doesn't include. The bridge QIs each object with IIDs harvested from `HKCR\Interface` and wraps the result as IDispatch (`_qi`), which is the only way to reach `DTMRoot`, `InternalBuses`, `AddChild`, etc. from late-bound clients.
-- The **write-access token** (`app.Project(1)`) is acquired once per session and cached; failed-call tracebacks are stripped so they can't pin COM references and deadlock `ProjectClose`.
-- `Project` is a parameterized COM property — it is invoked with explicit `DISPATCH_PROPERTYGET` flags because pywin32 dynamic dispatch can't call it.
-- Import temp files get the **extension matching the XML root element** (`STExchangeFile` → `.xst`, `VariablesExchangeFile` → `.xsy`, ...) because Control Expert picks the parser from the extension.
-- Enum constants (languages, export options, PLC commands...) were extracted from `PServer.tlb` — see [src/control_expert_mcp/constants.py](src/control_expert_mcp/constants.py).
+## Development and validation
 
-## Disclaimer
+### Repository layout
 
-Not affiliated with Schneider Electric. The UDE automation interface is provided by Schneider "as is" and is no longer commercialized; this project drives it at your own risk. **Never point online tools at production equipment without qualified supervision.**
+```text
+src/control_expert_mcp/  MCP tools, COM bridge, Modbus access, schemas, prompts,
+                        language references, documentation service, and benchmarks
+samples/                MCP client configuration examples
+tools/                  Diagnostics, offline tests, help conversion, and integration scripts
+benchmarks/             Benchmark setup, checkpoints, and archived results
+.github/workflows/      CI and package publishing
+```
+
+The DDT Mirror application has moved to a separate repository.
+
+### Offline checks
+
+```powershell
+.venv\Scripts\python.exe -m pip install -e ".[test]"
+.venv\Scripts\python.exe -m compileall -q src
+.venv\Scripts\python.exe -m unittest discover -s tools -p "test_*.py"
+```
+
+[CI](.github/workflows/ci.yml) runs offline regression tests on Windows with Python 3.11–3.15, validates distributions, and tests the installed wheel in an isolated environment. These checks use synthetic documentation and mocked COM responses; they do not validate licensed COM integration or PLC runtime behavior.
+
+### Local Control Expert validation
+
+Review scripts before running them. Integration workflows can modify projects or terminate Control Expert processes.
+
+```powershell
+.venv\Scripts\python.exe tools/check_ce_automation.py
+# Optional: create, build, export, reopen, and delete a disposable offline project.
+.venv\Scripts\python.exe tools/check_ce_automation.py --exercise-project --report tmp/automation-check.json
+```
+
+The automation check does not connect to a PLC. The default scratch CPU is M340 `BMX P34 2020` / `02.70`; override `--cpu` and `--cpu-version` for your installed catalog.
+
+Recorded local validation includes Control Expert 16.4 with an M340 scratch-project round trip and an offline M580 `BME P58 3040` / `03.20` demo check. The M580 check exercised analyze/build, an intentional undefined-symbol diagnostic, cleanup back to `built_ok`, and unchanged-output detection. These are environment-specific results, not a guarantee for every CPU or installation.
+
+### Architecture and extension rules
+
+- Keep all COM calls on the bridge's dedicated STA worker thread.
+- Preserve session write-token handling. The bridge acquires and caches the project's write token once per session.
+- Hardware and DTM automation use secondary COM interfaces; preserve the bridge's interface-query helpers.
+- Exchange-file extensions must match XML roots because Control Expert selects import parsers by extension.
+- Shared Modbus calls are serialized across concurrent MCP handlers.
+
+See [bridge.py](src/control_expert_mcp/bridge.py), [schema.py](src/control_expert_mcp/schema.py), and [constants.py](src/control_expert_mcp/constants.py) for implementation details.
+
+### Optional model benchmarks
+
+The `ce-bench` CLI compares server revisions or manual-tool availability using configured OpenAI or DeepSeek API models. Provider packages and API calls are optional; normal server operation needs no provider key.
+
+See the [benchmark guide](benchmarks/README.md), [validation checkpoint](benchmarks/CHECKPOINT.md), and [archived results](benchmarks/archive/README.md). Static artifact checks do not establish PLC runtime behavior, and API results do not reproduce ChatGPT UI orchestration.
+
+## Packaging and releases
+
+Build and validate distributions from the repository root using a fresh output directory:
+
+```powershell
+.venv\Scripts\python.exe -m pip install build twine
+.venv\Scripts\python.exe -m build --outdir dist/0.9.0
+.venv\Scripts\python.exe -m twine check --strict dist/0.9.0/*
+.venv\Scripts\python.exe tools/check_distribution.py --dist-dir dist/0.9.0
+```
+
+Use the version declared in `pyproject.toml` when choosing the output directory. The wheel contains the runtime package; the source archive includes selected tools and samples listed in `MANIFEST.in`. The archive audit rejects unexpected content, including customer projects, generated manuals, and vendor extracts.
+
+Successful CI runs retain a `python-distributions` artifact for 14 days. To install a downloaded wheel in a dedicated environment:
+
+```powershell
+py -3.11 -m venv C:\Tools\control-expert-mcp
+C:\Tools\control-expert-mcp\Scripts\python.exe -m pip install .\control_expert_mcp-0.9.0-py3-none-any.whl
+```
+
+Use the actual downloaded filename, then point your client to that environment's Python executable. Disconnected installations also need a compatible dependency wheelhouse prepared on a connected Windows machine.
+
+The [publish workflow](.github/workflows/publish.yml) reruns CI and uploads validated artifacts using PyPI Trusted Publishing with GitHub OIDC:
+
+1. Update the version in `pyproject.toml` and let CI pass.
+2. Create the matching `v<version>` tag and publish a GitHub Release for it.
+3. Verify publication and installation in a clean environment.
+
+Production publishing requires a tag matching the wheel version. Manual workflow dispatch defaults to TestPyPI; its publisher must be configured separately. Jobs use the `pypi` or `testpypi` GitHub environment. Published version filenames cannot be reused.
+
+## Contributing
+
+Bug reports, documentation improvements, and focused pull requests are welcome.
+
+1. Describe the problem or intended behavior in an issue or pull request.
+2. Follow the existing Python style: four-space indentation, type hints for public helpers, and concise docstrings.
+3. Add or extend an MCP prompt for each new capability, including the validated tool sequence, prerequisites, and known gotchas.
+4. Update the README tool reference when capabilities change.
+5. Run the relevant offline checks and document local integration validation when available: CPU, Control Expert version, prerequisites, commands, and results. State any environment limitations.
+
+Use concise, descriptive commit subjects. Keep customer exports, proprietary reference data, vendor binaries, generated archives, and credentials out of commits. See [AGENTS.md](AGENTS.md) for repository conventions.
+
+## License and affiliation
+
+The package declares the **MIT** license in [pyproject.toml](pyproject.toml).
+
+This project is not affiliated with or endorsed by Schneider Electric. Control Expert and Unity Pro are Schneider Electric products; their software, licenses, and documentation are supplied separately.
