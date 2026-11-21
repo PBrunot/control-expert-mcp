@@ -1,5 +1,35 @@
 # Benchmark implementation checkpoint
 
+## Fresh DeepSeek five-task campaign (2026-11-21)
+
+Committed implementation, retry policy and prior sanitized results as
+`c10a348e60d82a004f98582048277287c50716d8` before starting the paid run, as
+requested. Harness and both server conditions recorded that exact revision with
+`dirty: false`. The same existing native fixtures, CPU/CE version, five task
+prompts, A/B policy, one repetition and seed 1729 were used.
+
+```powershell
+.venv\Scripts\ce-bench.exe run --config benchmarks/.local/deepseek.json --condition A B --repeats 1 --seed 1729
+.venv\Scripts\ce-bench.exe archive --results benchmarks/results --run-id 20261121T114513Z-a78f24bc --archive benchmarks/archive
+.venv\Scripts\ce-bench.exe visualize --archive benchmarks/archive --output benchmarks/archive/overview.png
+```
+
+Campaign `20261121T114513Z-a78f24bc`: `deepseek-flash` (mutable alias), high
+reasoning effort, 8/10 accepted (A 4/5, B 4/5). All eight edit/repair cases passed
+source/declaration/static checks and saved-project rebuilds, including alarms.
+Both inspection answers incorrectly called `FE(Mixing_done)` a rising edge;
+the source uses the falling edge. B additionally fenced its JSON, violating the
+JSON-only output contract and producing the recorded parse failure. No regrade
+or retry was used to hide these model errors. There were no connection failures,
+so the new retry policy was not needed in this real campaign. Offline tests
+exercise recovery and exhaustion independently for both providers.
+
+Provider usage: 469,792 tokens, 68 API requests, 80 tool calls, zero API retries
+and zero tool errors. API credentials were supplied only in the parent process
+environment from ignored local secrets. Runtime behavior remains unverified.
+Sanitized archive and overview are regenerated together; AGENTS.md now requires
+this after every archived benchmark run. Historical campaigns stay separate.
+
 ## API connection retries (2026-11-21)
 
 APIConnectionError now retries the identical provider request up to twice with

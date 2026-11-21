@@ -28,6 +28,8 @@ Keep COM calls on the bridge's dedicated STA worker thread and preserve session 
 
 No automated test framework or coverage threshold is configured. Validate changed behavior with focused scripts and Control Expert import/analyze/build round trips. Record CPU/version, prerequisites, commands, and results. Existing integration scripts use numbered names such as `01_inventory.py`; they require local reference data and may modify projects or terminate Control Expert processes. Review them before execution.
 
+Whenever a benchmark run is archived, regenerate the archive visualization and its metadata with `ce-bench visualize`, verify archive/image integrity, and include the updated data, graphic, and metadata together in the results commit. Never leave the visualization pointing at an older set of archived runs.
+
 ## Commit & Pull Request Guidelines
 
 Use concise, descriptive commit subjects; history includes optional component prefixes such as `gitignore:` and `Web UI:`. Explain behavior changes, link relevant issues, and document validation and environment limitations in pull requests. Update README tool documentation and workflow prompts when capabilities change.
