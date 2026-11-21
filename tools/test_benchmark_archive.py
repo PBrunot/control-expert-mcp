@@ -19,9 +19,9 @@ class ArchiveTests(unittest.TestCase):
             root = Path(temporary)
             for index in (1, 2):
                 case = {"case_id": "inspect-0-A", "attempt_id": "attempt-1", "task": "inspect", "condition": "A",
-                        "status": "completed", "success": True, "workflow_seconds": index,
+                        "status": "completed", "success": True, "workflow_seconds": None if index == 1 else index,
                         "validation": {"rubric": "synthetic", "answer_pass": True},
-                        "usage": {"tokens": {"total_tokens": index * 10}}}
+                        "usage": {"tokens": {"total_tokens": None if index == 1 else index * 10}}}
                 record = {"run_id": f"run-{index}", "model": {"id": f"model-{index}"}, "provider": "synthetic",
                           "cases": [case], "servers": {"A": {"source": {"revision": str(index) * 40}}},
                           "conditions": {"A": {"overall": aggregate([case])}}, "rubric_version": "synthetic"}

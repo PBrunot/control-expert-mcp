@@ -13,6 +13,7 @@ from mcp.types import PaginatedRequestParams
 
 from .core import digest, encode, environment, mark_tainted, write_json
 from .tasks import ORIENTATION
+from .demo import DEMO_PROMPTS, DEMO_ORIENTATION
 
 DOC_TOOLS = {"get_documentation_status", "search_manuals", "get_manual_topic"}
 READ_TOOLS = {"get_status", "get_project_structure", "list_variables", "read_section",
@@ -148,18 +149,20 @@ class MCP:
         return tool_value(await self.call(name, arguments))
 
     def adapter(self, task: str) -> tuple[str, list]:
-        allowed = READ_TOOLS | (set() if task == "inspect" else EDIT_TOOLS)
+        demo = task in DEMO_PROMPTS
+        self.demo_task = demo
+        allowed = READ_TOOLS | (set() if task == "inspect" or demo else EDIT_TOOLS)
+        if demo:
+            allowed |= {"get_hardware", "export_xml", "list_data_types"}
         if self.condition["documentation"]:
             allowed |= DOC_TOOLS
         available = {tool["name"] for tool in self.tools}
-        required = READ_TOOLS | (set() if task == "inspect" else EDIT_TOOLS)
-        if self.condition["documentation"]:
-            required |= DOC_TOOLS
+        required = allowed.copy()
         if required - available:
             raise ValueError(f"Missing required tools: {sorted(required - available)}")
         # Only the known documentation recommendation is normalized in BOTH arms.
         # Unknown guidance changes are retained and fingerprinted, never guessed away.
-        instructions = self.instructions.replace(DOC_GUIDANCE, "") + "\n" + ORIENTATION
+        instructions = self.instructions.replace(DOC_GUIDANCE, "") + "\n" + (DEMO_ORIENTATION if demo else ORIENTATION)
         if any(name in instructions for name in DOC_TOOLS):
             raise ValueError("Unrecognized manual-tool guidance: update explicit normalization before comparing")
         schemas = [{"type": "function", "name": tool["name"],
@@ -171,7 +174,7 @@ class MCP:
     async def dispatch(self, name: str, arguments: dict, schemas: list) -> dict:
         if name not in {tool["name"] for tool in schemas}:
             return {"is_error": True, "error": "Tool unavailable under benchmark policy"}
-        if name in {"read_section", "write_st_logic"}:
+        if name in {"read_section", "write_st_logic"} and not getattr(self, "demo_task", False):
             if arguments.get("task", "").upper() != "MAST" or arguments.get("section", "").lower() != "feeder":
                 return {"is_error": True, "error": "Only MAST/Feeder is in scope"}
         if name == "write_st_logic" and arguments.get("declare"):

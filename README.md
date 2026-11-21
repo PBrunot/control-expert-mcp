@@ -484,7 +484,7 @@ See [bridge.py](src/control_expert_mcp/bridge.py), [schema.py](src/control_exper
 
 The `ce-bench` CLI compares server revisions or manual-tool availability using configured OpenAI or DeepSeek API models. Provider packages and API calls are optional; normal server operation needs no provider key.
 
-Five training tasks cover inspection, threshold edits, temperature tolerance, compile repair, and a demo-derived extension with gated low/high alarm hysteresis. Temperature grading accepts redundant bound parentheses; alarm grading checks a restricted ST transition model across the full INT input range and prior alarm states.
+Five training tasks cover inspection, threshold edits, temperature tolerance, compile repair, and a demo-derived extension with gated low/high alarm hysteresis. Two optional read-only M580 demo tasks cover weighing reverse engineering and I/O mapping against the approved sample answer. Temperature grading accepts redundant bound parentheses; alarm grading checks a restricted ST transition model across the full INT input range and prior alarm states.
 
 See the [benchmark guide](benchmarks/README.md), [validation checkpoint](benchmarks/CHECKPOINT.md), and [archived results](benchmarks/archive/README.md). Static artifact checks do not establish PLC runtime behavior, and API results do not reproduce ChatGPT UI orchestration.
 

@@ -7,6 +7,7 @@ from pathlib import Path
 from statistics import median
 
 from .core import read_json, write_json
+from .demo import DEMO_PROMPTS
 
 
 def distribution(values: list) -> dict:
@@ -17,6 +18,7 @@ def distribution(values: list) -> dict:
 
 
 def aggregate(rows: list) -> dict:
+    read_only = {"inspect", *DEMO_PROMPTS}
     def rate(values):
         known = [value for value in values if value is not None]
         return {"pass": sum(value is True for value in known), "n": len(values),
@@ -27,9 +29,9 @@ def aggregate(rows: list) -> dict:
                    for key in ("input_tokens", "output_tokens", "total_tokens")}}
     return {"cases": len(rows), "completion": rate([r.get("status") == "completed" for r in rows]),
             "accepted": rate([r.get("success", False) for r in rows]),
-            "build": rate([r.get("validation", {}).get("compile_pass") for r in rows if r.get("task") != "inspect" and not r.get("task", "").startswith("opc_")]),
-            "static_behavior": rate([True if r.get("validation", {}).get("static_behavior") == "pass" else None for r in rows if r.get("task") != "inspect" and not r.get("task", "").startswith("opc_")]),
-            "runtime_behavior": rate([True if r.get("validation", {}).get("runtime_behavior") == "pass" else None for r in rows if r.get("task") != "inspect"]),
+            "build": rate([r.get("validation", {}).get("compile_pass") for r in rows if r.get("task") not in read_only and not r.get("task", "").startswith("opc_")]),
+            "static_behavior": rate([True if r.get("validation", {}).get("static_behavior") == "pass" else None for r in rows if r.get("task") not in read_only and not r.get("task", "").startswith("opc_")]),
+            "runtime_behavior": rate([True if r.get("validation", {}).get("runtime_behavior") == "pass" else None for r in rows if r.get("task") not in read_only]),
             "all_attempts": metrics(rows), "accepted_attempts": metrics([r for r in rows if r.get("success")]),
             "known_partial_tokens": {key: sum(r.get("usage", {}).get("known_partial_tokens", {}).get(key, 0) for r in rows)
                                      for key in ("input_tokens", "output_tokens", "total_tokens")},

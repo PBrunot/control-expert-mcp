@@ -55,10 +55,10 @@ def visualize_archive(archive: Path, output: Path, scoring: str = "latest") -> P
     import matplotlib.pyplot as plt
     import numpy as np
 
-    preferred = ["inspect", "threshold", "temperature", "repair", "alarms"]
+    preferred = ["inspect", "threshold", "temperature", "repair", "alarms", "weighing", "io_mapping"]
     task_names = {task for row in rows for task in row["tasks"]}
     tasks = [task for task in preferred if task in task_names] + sorted(task_names - set(preferred))
-    task_labels = ["OPC " + task[4:] if task.startswith("opc_") else task.title() for task in tasks]
+    task_labels = ["OPC " + task[4:] if task.startswith("opc_") else {"io_mapping": "I/O mapping"}.get(task, task.title()) for task in tasks]
     height = 5.2 + .85 * len(rows)
     with plt.rc_context({"font.family": "DejaVu Sans", "font.size": 10, "axes.titlesize": 12,
                          "figure.facecolor": "#f6f8fc", "axes.facecolor": "white"}):
@@ -66,8 +66,7 @@ def visualize_archive(archive: Path, output: Path, scoring: str = "latest") -> P
         grid = fig.add_gridspec(2, 3, height_ratios=[max(2, .68 * len(rows)), 1.65],
                                left=.31, right=.97, top=.74, bottom=.19, hspace=.85, wspace=.3)
         labels = [f"{row['provider']} / {row['model']}\n{row['source'][:12]} · {row['condition']}\n"
-                  + row['scoring'].replace('feeder-temperature-', 'temperature-').replace('feeder-alarms-', 'alarms-')
-                  for row in rows]
+                  + row['run_id'][:15] for row in rows]
         specs = [("Accepted / attempts", "RdYlGn", "acceptance"),
                  ("Median workflow · seconds", "Blues", "time"),
                  ("Median provider tokens · thousands", "Purples", "tokens")]
@@ -88,12 +87,13 @@ def visualize_archive(archive: Path, output: Path, scoring: str = "latest") -> P
                         val = measure["median"]
                         if val is not None:
                             values[y, x] = val / (1000 if kind == "tokens" else 1)
-                            texts[y][x] = f"{values[y, x]:.1f}" + ("*" if measure["unknown_n"] else "")
+                            precision = 0 if kind == "tokens" and values[y, x] >= 1000 else 1
+                            texts[y][x] = f"{values[y, x]:.{precision}f}" + ("*" if measure["unknown_n"] else "")
             maximum = 1 if kind == "acceptance" else max(1, float(np.nanmax(values)) if np.any(~np.isnan(values)) else 1)
             axis.imshow(values, aspect="auto", cmap=cmap, vmin=0, vmax=maximum)
             axis.set_xticks(range(len(tasks)), task_labels, rotation=25, ha="right")
             axis.set_yticks(range(len(rows)), labels if index == 0 else [""] * len(rows))
-            axis.tick_params(length=0, pad=10)
+            axis.tick_params(length=0, pad=10, labelsize=9)
             axis.set_title(title, loc="left", pad=16, fontweight="bold")
             axis.set_xticks(np.arange(-.5, len(tasks), 1), minor=True)
             axis.set_yticks(np.arange(-.5, len(rows), 1), minor=True)

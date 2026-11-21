@@ -10,6 +10,7 @@ from time import perf_counter
 
 from .core import encode
 from .tasks import PROMPTS
+from .demo import DEMO_PROMPTS
 
 CONNECTION_RETRY_DELAYS = (1.0, 2.0)
 
@@ -127,7 +128,7 @@ def request_parameters(config: dict) -> dict:
 async def workflow(mcp, task: str, config: dict, provider, evidence, result: dict, *, prompt: str | None = None):
     """Mutate result incrementally so failures preserve partial usage and counts."""
     instructions, schemas = mcp.adapter(task)
-    user_prompt = PROMPTS[task] if prompt is None else prompt
+    user_prompt = {**PROMPTS, **DEMO_PROMPTS}[task] if prompt is None else prompt
     history = [{"role": "user", "content": user_prompt}]
     usage = Usage()
     result.update(tool_calls=0, tool_errors=0, repair_cycles=0, api_retries=0, transport_retries=0,

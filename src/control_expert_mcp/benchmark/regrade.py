@@ -6,23 +6,35 @@ from pathlib import Path
 
 from .core import digest, read_json, write_json
 from .tasks import RUBRIC_VERSION, inspect_grade
+from .demo import io_mapping_grade
 
 
-def regrade_inspection(results: Path, run_id: str) -> Path:
+def regrade_inspection(results: Path, run_id: str, task: str = "inspect") -> Path:
     if Path(run_id).name != run_id or run_id in {".", ".."}:
         raise ValueError("Invalid run ID")
     run = results / run_id
     plan = read_json(run / "plan.json")
-    output = run / "regrades" / RUBRIC_VERSION
+    if task not in {"inspect", "io_mapping"}:
+        raise ValueError("Unsupported answer regrade task")
+    grader = inspect_grade
+    rubric = RUBRIC_VERSION
+    if task == "io_mapping":
+        reference_path = Path(plan["snapshot"]["config"]["io_mapping_reference"])
+        if digest(reference_path.read_bytes()) != plan["snapshot"]["demo_inputs"]["io_mapping_reference"]:
+            raise ValueError("Reference differs from the original campaign")
+        reference = reference_path.read_text(encoding="utf-8-sig")
+        grader = lambda answer: io_mapping_grade(answer, reference)
+        rubric = grader("")["rubric"]
+    output = run / "regrades" / rubric
     for case in plan["schedule"]:
-        if case["task"] != "inspect":
+        if case["task"] != task:
             continue
         for summary_path in sorted((run / case["case_id"]).glob("attempt-*/summary.json")):
             old = read_json(summary_path)
             answer_path = summary_path.parent / "final-response.txt"
             if old["fingerprint"] != plan["fingerprint"]:
                 raise ValueError("Case fingerprint differs from campaign")
-            grade = inspect_grade(answer_path.read_text(encoding="utf-8"))
+            grade = grader(answer_path.read_text(encoding="utf-8"))
             grade.update(scope=old["validation"].get("scope"), compile_pass=None,
                 runtime_behavior="unverified", static_behavior=None,
                 obtained_source_through_mcp=old["validation"].get("obtained_source_through_mcp"))
@@ -31,9 +43,12 @@ def regrade_inspection(results: Path, run_id: str) -> Path:
             grade["success"] = success
             value = {"case_id": case["case_id"], "attempt_id": summary_path.parent.name,
                 "fingerprint": plan["fingerprint"], "prior_rubric": old["validation"].get("rubric"),
-                "prior_success": old["success"], "rubric": RUBRIC_VERSION, "success": success,
+                "prior_success": old["success"], "rubric": rubric, "success": success,
                 "summary_sha256": digest(summary_path.read_bytes()), "response_sha256": digest(answer_path.read_bytes()),
                 "validation": grade, "method": "Answer-only deterministic regrade; original saved-artifact scope/read evidence retained. No API or CE calls."}
+            if task == "io_mapping":
+                value["reference_sha256"] = digest(reference_path.read_bytes())
+                value["grader_sha256"] = digest(Path(__file__).with_name("demo.py").read_bytes())
             path = output / case["case_id"] / (summary_path.parent.name + ".json")
             if path.exists() and read_json(path) != value:
                 raise ValueError("Regrade already exists with different evidence; use a new rubric version")
@@ -46,7 +61,8 @@ def regraded_row(summary_path: Path, rubric: str) -> dict:
     if Path(rubric).name != rubric or rubric in {".", ".."}:
         raise ValueError("Invalid rubric")
     row = read_json(summary_path)
-    if row["task"] != "inspect":
+    expected_task = "io_mapping" if rubric.startswith("demo-io-mapping-") else "inspect"
+    if row["task"] != expected_task:
         return row
     run = summary_path.parents[2]
     path = run / "regrades" / rubric / row["case_id"] / (summary_path.parent.name + ".json")

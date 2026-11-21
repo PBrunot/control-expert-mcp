@@ -89,6 +89,7 @@ def main(argv=None) -> int:
     sub = subs.add_parser("regrade")
     sub.add_argument("--results", type=Path, required=True)
     sub.add_argument("--run-id", required=True)
+    sub.add_argument("--task", choices=["inspect", "io_mapping"], default="inspect")
     sub = subs.add_parser("archive")
     sub.add_argument("--results", type=Path, required=True)
     sub.add_argument("--run-id", required=True)
@@ -105,7 +106,7 @@ def main(argv=None) -> int:
             print(f"Wrote {args.output}.json and .md ({len(report['groups'])} separate fingerprint groups)")
             return 0
         if args.command == "regrade":
-            print(regrade_inspection(args.results, args.run_id))
+            print(regrade_inspection(args.results, args.run_id, args.task))
             return 0
         if args.command == "archive":
             print(archive_run(args.results, args.run_id, args.archive, allow_incomplete=args.allow_incomplete))
@@ -143,7 +144,7 @@ def main(argv=None) -> int:
                 raise ValueError("Choose distinct configured conditions")
             if args.command == "run" and args.dry_run:
                 report = asyncio.run(doctor(config))
-                print(json.dumps({"paid_requests": 0, "schedule": make_schedule(conditions, args.repeats, args.seed),
+                print(json.dumps({"paid_requests": 0, "schedule": make_schedule(conditions, args.repeats, args.seed, snapshot(config)["prompts"]),
                                   "prerequisites": {k: v for k, v in report.items() if k != "snapshot"}}, indent=2))
             else:
                 if "REPLACE" in config["model"]["id"]:

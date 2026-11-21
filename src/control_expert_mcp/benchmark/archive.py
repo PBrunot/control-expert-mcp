@@ -20,7 +20,7 @@ def summarize_validation(value: dict) -> dict:
     result = {key: value[key] for key in (
         "rubric", "answer_pass", "scope", "static_behavior", "runtime_behavior", "compile_pass",
         "declarations_pass", "model_built", "model_saved", "success", "obtained_source_through_mcp",
-        "evaluator_seconds", "partition_cases", "int_domain", "runtime_checks") if key in value}
+        "checks", "limitation", "evaluator_seconds", "partition_cases", "int_domain", "runtime_checks") if key in value}
     build = value.get("build", {})
     if build:
         capture = build.get("diagnostics_capture", {})
@@ -122,6 +122,7 @@ def archive_run(results: Path, run_id: str, destination: Path, *, allow_incomple
                 "startup_seconds", "discovery_seconds", "setup_seconds", "reset_seconds", "workflow_seconds",
                 "total_seconds", "tool_calls", "tool_errors", "repair_cycles", "api_retries", "transport_retries",
                 "model_requests", "usage", "success", "durable_completed", "provider_failure_code") if key in row}
+            safe["cpu"] = row.get("ce_status", {}).get("project", {}).get("cpu")
             safe["attempt_id"] = attempt.name
             safe["interaction_metrics"] = interaction_metrics(attempt)
             safe["validation"] = summarize_validation(row.get("validation", {}))
@@ -168,13 +169,14 @@ def archive_run(results: Path, run_id: str, destination: Path, *, allow_incomple
         "cpu": config["cpu"], "ce_version": config.get("ce_version"),
         "machine_sha256": digest(snapshot["machine"]), "harness": source_identity(snapshot["harness"]),
         "dependencies": snapshot["dependencies"], "servers": servers,
-        "fixture_sha256": snapshot["fixture_sha256"], "rubric_version": snapshot["rubric_version"],
+        "fixture_sha256": snapshot["fixture_sha256"], "demo_inputs": snapshot.get("demo_inputs", {}), "rubric_version": snapshot["rubric_version"],
         "prompt_sha256": {task: digest(prompt) for task, prompt in snapshot["prompts"].items()},
-        "orientation_sha256": digest(snapshot["orientation"]), "contexts": plan.get("contexts"),
+        "orientation_sha256": digest(snapshot["orientation"]),
+        "demo_orientation_sha256": digest(snapshot["demo_orientation"]) if snapshot.get("demo_orientation") else None, "contexts": plan.get("contexts"),
         "provider_retry_policy": snapshot.get("provider_retry_policy"),
         "seed": plan["seed"], "schedule": plan["schedule"], "cases": rows, "conditions": groups,
         "paired_differences": {key: distribution(values) for key, values in differences.items()},
-        "suite": snapshot.get("suite", "offline-feeder"),
+        "suite": snapshot.get("suite", "offline-feeder-demo" if snapshot.get("demo_inputs") else "offline-feeder"),
         "limitations": ["Small repetition counts are exploratory, not statistically strong comparisons.",
             ("Live scalar OPC input/output checks on PLC Simulator; no physical hardware validation."
              if live else "Static recognized-subset acceptance; PLC runtime behavior remains unverified."),

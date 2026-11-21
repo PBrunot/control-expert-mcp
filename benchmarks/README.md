@@ -7,6 +7,56 @@ system prompt or orchestration. A ChatGPT subscription does not supply API acces
 or an API key. Only `run` and `resume` can send paid requests; tests, `doctor`,
 `prepare`, `validate`, `compare`, and `run --dry-run` never call a provider.
 
+## Full M580 demo inspection cases
+
+Configure both `demo_project` (a disposable source STU) and `io_mapping_reference`
+(the approved Markdown answer) to add `weighing` and `io_mapping` to the five
+Feeder tasks. Paths are relative to the config. The provider examples enable
+these cases using `samples/demo_ControlExpert_M580.STU` and
+`samples/demo_ControlExpert_M580_io_mapping.md`. Existing configurations without
+these fields retain the five-task suite.
+
+On this Windows host the DeepSeek example sets `CommonProgramFiles` to the
+32-bit Common Files directory for the vendor integrity check. No vendor
+integrity checks are disabled. `validate` checks the full demo exports and the
+reference rubric as well as the canonical Feeder edits.
+
+Both cases use independent copies of the full demo, read-only tools, all
+application sections, and no live access. They do not build or save the project.
+The source project and reference hashes are fingerprinted and archived; the
+reference answer is private to the evaluator and never included in model context.
+
+- `weighing`: "Explain how material weighing starts, stops, and advances to mixing.
+  Identify the relevant conditions and variables." Rubric `demo-weighing-1`
+  requires `Weighing_Material_A` and `Weighing_Material_B` in the response. This
+  scores identifier discovery only; explanation semantics remain unverified.
+- `io_mapping`: "Produce a table linking application signals to I/O addresses or
+  device-DDT fields, modules, and channels. Flag signals without a physical
+  mapping." Rubric `demo-io-mapping-2` uses the saved answer as ground truth.
+  It checks all 11 physical instances in Markdown table rows (signal, address or
+  DDT, module type, channel), both internal-memory instances, 14 representative
+  unmapped process signals, and unmapped Robot_one data. It rejects physical
+  addresses/modules on reference-unmapped rows. The complete software inventory
+  and device-DDT leaf expansion are not automatically scored. Unsupported table
+  representations remain unverified. This is a narrow deterministic rubric,
+  not a semantic judge. Equivalent module spacing, channel labels/ranges or counts,
+  signal annotations and explicitly grouped unmapped rows are supported. The
+  original `demo-io-mapping-1` scorer is retained for audit of the first campaign.
+
+An explicit formatting-only answer regrade preserves original summaries and
+responses, validates their hashes and the original reference hash, and makes
+no provider or Control Expert calls:
+
+```powershell
+ce-bench regrade --results benchmarks/results --run-id RUN_ID --task io_mapping
+```
+
+Archive both score views with `archive`, then regenerate with `visualize`.
+
+Each case must obtain source through MCP and leave its project file unchanged.
+One A/B repetition with both demo cases produces 14 independently scored cases.
+Keep older five-task campaigns separate when comparing acceptance rates.
+
 ## Live OPC read/write benchmark
 
 `ce-bench opc` is a separate, opt-in suite. The original Feeder suite below

@@ -96,7 +96,7 @@ def tree_fingerprint(path: Path) -> dict:
 def load_config(path: str) -> dict:
     config = read_json(Path(path))
     allowed_keys = {"provider", "model", "cpu", "ce_version", "fixture", "workspace", "results",
-                    "tool_timeout", "request_timeout", "workflow_timeout", "max_turns", "max_tool_calls", "conditions"}
+                    "tool_timeout", "request_timeout", "workflow_timeout", "max_turns", "max_tool_calls", "conditions", "demo_project", "io_mapping_reference"}
     if set(config) - allowed_keys:
         raise ValueError("Unknown configuration fields; credentials belong only in env or an ignored file")
     base = Path(path).resolve().parent
@@ -107,6 +107,11 @@ def load_config(path: str) -> dict:
         provider["api_key_file"] = str((base / provider["api_key_file"]).resolve())
     for key in ("workspace", "results", "fixture"):
         config[key] = str((base / config[key]).resolve())
+    for key in ("demo_project", "io_mapping_reference"):
+        if config.get(key):
+            config[key] = str((base / config[key]).resolve())
+    if bool(config.get("demo_project")) != bool(config.get("io_mapping_reference")):
+        raise ValueError("demo_project and io_mapping_reference must be configured together")
     for name, condition in config["conditions"].items():
         if not re.fullmatch(r"[A-Za-z0-9_-]+", name):
             raise ValueError("Condition names must contain only letters, digits, underscores or hyphens")
@@ -142,6 +147,7 @@ def load_config(path: str) -> dict:
 
 def snapshot(config: dict) -> dict:
     from .tasks import PROMPTS, RUBRIC_VERSION, ORIENTATION
+    from .demo import DEMO_PROMPTS, DEMO_ORIENTATION
     from .provider import connection_retry_policy
     deps = {}
     for name in ("control-expert-mcp", "mcp", "openai", "pywin32"):
@@ -162,7 +168,10 @@ def snapshot(config: dict) -> dict:
             "harness": git_metadata(Path(__file__).parent), "dependencies": deps,
             "machine": {"hostname": platform.node(), "platform": platform.platform(),
                         "python": platform.python_version(), "processor": platform.processor()},
-            "servers": servers, "prompts": PROMPTS, "orientation": ORIENTATION,
+            "servers": servers, "prompts": {**PROMPTS, **(DEMO_PROMPTS if config.get("demo_project") else {})},
+            "orientation": ORIENTATION, "demo_orientation": DEMO_ORIENTATION,
+            "demo_inputs": {key: digest(Path(config[key]).read_bytes()) for key in
+                            ("demo_project", "io_mapping_reference") if config.get(key)},
             "rubric_version": RUBRIC_VERSION, "provider_retry_policy": connection_retry_policy()}
 
 

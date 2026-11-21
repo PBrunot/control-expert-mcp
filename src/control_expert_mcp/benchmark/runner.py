@@ -17,6 +17,7 @@ from .tasks import (BROKEN_IDENTIFIER, PROMPTS, broken_source, declarations,
                     alarm_fixture, alarm_source, inspect_grade, normalize, source,
                     static_grade, threshold_source)
 from .transport import Evidence, MCP
+from .demo import DEMO_PROMPTS, weighing_grade, io_mapping_grade
 
 
 def clean_build(build: dict) -> bool:
@@ -125,11 +126,16 @@ def prepared(config: dict) -> dict:
             raise ValueError("Prepared fixtures predate alarm task; run prepare again")
         if digest(Path(manifest[key]).read_bytes()) != manifest[key + "_sha256"]:
             raise ValueError("Prepared project changed; prepare again")
+    if config.get("demo_project"):
+        manifest["demo_project"] = config["demo_project"]
+        manifest["io_mapping_reference"] = Path(config["io_mapping_reference"]).read_text(encoding="utf-8-sig")
     return manifest
 
 
 def task_fixture(manifest: dict, task: str) -> tuple[str, dict]:
     """Choose isolated input and expected declarations for one task."""
+    if task in DEMO_PROMPTS:
+        return manifest["demo_project"], manifest
     if task == "alarms":
         return manifest["alarms_baseline"], {**manifest, "variables": manifest["alarms_variables"]}
     return manifest["broken" if task == "repair" else "baseline"], manifest
@@ -178,16 +184,35 @@ async def validate_fixtures(config: dict, condition_name: str) -> Path:
                 checks[task] = grade
                 write_json(directory / "validation.json", checks)
                 await mcp.checked("close_project", save=False)
+            if config.get("demo_project"):
+                output = directory / "demo.stu"
+                shutil.copyfile(config["demo_project"], output)
+                await mcp.checked("open_project", path=str(output))
+                status = await verify_version(mcp, config)
+                for section_name in ("Weighing_Material_A", "Weighing_Material_B", "Mixer"):
+                    value = await mcp.checked("read_section", task="MAST", section=section_name)
+                    if not value.get("xml"):
+                        raise RuntimeError("Demo source is unavailable")
+                for kind in ("variables", "configuration"):
+                    await artifact(mcp, kind)
+                grade = io_mapping_grade(manifest["io_mapping_reference"], manifest["io_mapping_reference"])
+                if not grade["answer_pass"]:
+                    raise ValueError("Approved mapping reference fails its own rubric")
+                await mcp.checked("close_project", save=False)
+                if digest(output.read_bytes()) != digest(Path(config["demo_project"]).read_bytes()):
+                    raise RuntimeError("Read-only demo validation changed its project file")
+                checks["demo"] = {"status": status, "reference_self_check": grade, "read_only": True}
+                write_json(directory / "validation.json", checks)
     return directory
 
 
-def make_schedule(conditions: list[str], repeats: int, seed: int) -> list[dict]:
+def make_schedule(conditions: list[str], repeats: int, seed: int, tasks=None) -> list[dict]:
     if repeats < 1:
         raise ValueError("Positive repeats required")
     rng = random.Random(seed)
     schedule = []
     # Pair conditions within each task/repetition, randomizing both block and arm order.
-    blocks = [(task, repeat) for repeat in range(repeats) for task in PROMPTS]
+    blocks = [(task, repeat) for repeat in range(repeats) for task in (PROMPTS if tasks is None else tasks)]
     rng.shuffle(blocks)
     for task, repeat in blocks:
         arms = conditions.copy()
@@ -201,6 +226,21 @@ def make_schedule(conditions: list[str], repeats: int, seed: int) -> list[dict]:
 async def evaluate(mcp, task: str, manifest: dict, output: Path, answer: str, model_events: list) -> dict:
     started = perf_counter()
     mcp.phase = "evaluation"
+    if task in DEMO_PROMPTS:
+        # Model has no mutation tools. Check the actual read-only project file.
+        calls = [event for event in model_events if event["kind"] == "mcp_call"
+                 and event.get("phase") == "workflow" and not event.get("is_error")]
+        read = any(event["tool"] in {"read_section", "export_xml"} for event in calls)
+        report = (weighing_grade(answer) if task == "weighing" else
+                  io_mapping_grade(answer, manifest["io_mapping_reference"]))
+        unchanged = digest(output.read_bytes()) == digest(Path(manifest["demo_project"]).read_bytes())
+        report.update(scope="pass" if unchanged else "fail", compile_pass=None,
+                      runtime_behavior="unverified", static_behavior=None,
+                      obtained_source_through_mcp=read,
+                      evaluator_seconds=perf_counter() - started,
+                      success=report["answer_pass"] and unchanged and read)
+        await mcp.checked("close_project", save=False)
+        return report
     # Discard unsaved edits, independently reopen the model's saved file.
     await mcp.checked("close_project", save=False)
     await mcp.checked("open_project", path=str(output))
@@ -293,7 +333,7 @@ async def contexts(config, directory) -> dict:
                 status = await mcp.checked("get_documentation_status")
                 if not status.get("ready") or status.get("freshness") != "current":
                     raise ValueError("Condition requires a prepared, current documentation index")
-            result[name] = {task: digest([*mcp.adapter(task), mcp.initialization]) for task in PROMPTS}
+            result[name] = {task: digest([*mcp.adapter(task), mcp.initialization]) for task in {**PROMPTS, **(DEMO_PROMPTS if config.get("demo_project") else {})}}
     return result
 
 
@@ -311,7 +351,7 @@ async def campaign(config: dict, conditions: list[str], repeats: int, seed: int,
         directory = root / run_id
         directory.mkdir(parents=True, exist_ok=False)
         plan = {"run_id": run_id, "base_fingerprint": fingerprint, "fingerprint": fingerprint, "snapshot": current,
-                "seed": seed, "schedule": make_schedule(conditions, repeats, seed)}
+                "seed": seed, "schedule": make_schedule(conditions, repeats, seed, current["prompts"])}
         write_json(directory / "plan.json", plan)
     else:
         if Path(run_id).name != run_id or run_id in {".", ".."}:

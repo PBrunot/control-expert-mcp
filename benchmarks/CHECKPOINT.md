@@ -1,11 +1,72 @@
 # Benchmark implementation checkpoint
 
-## Later runs, archive backlog and a CI regression (2026-11-21, after `c10a348`)
+## M580 weighing and I/O mapping (2026-11-21)
 
-**Nothing has been archived since `20261121T114513Z-a78f24bc`.** `benchmarks/archive/`
-still holds exactly those three campaigns, and its `index.json`, `README.md`,
-`overview.png` and `overview.metadata.json` remain mutually consistent; the offline
-suite passes, including the archive-integrity and regrade tests.
+Added two optional read-only tasks using disposable copies of the full M580
+sample, configured through `demo_project` and `io_mapping_reference` in both
+provider examples. The approved mapping reference is private to the judge.
+`demo-weighing-1` requires both Weighing_Material_A and Weighing_Material_B;
+explanation semantics are not automatically scored. The mapping rubric checks
+all 11 physical instances, both memory-only instances, 14 representative
+unmapped signals and Robot_one; exhaustive software/leaf coverage is unverified.
+
+Host: Windows, Python 3.11.5 x64, Control Expert V16.4. Feeder CPU: BMX P34 2020 /
+02.70. Full demo CPU: BME P58 3040 / 03.20. Offline only. The vendor integrity
+check required CommonProgramFiles to point to the 32-bit Common Files directory
+in the server environment. No integrity check was disabled. Demo source SHA-256:
+`5243304e7c0289eb56b63359b4c2c8fd406ec39612dd513293abda3cb2e45538`.
+Reference SHA-256: `ae70a0f647ac3d404ed66eb014a0f876806b067ef38f0b07953a5a8233218888`.
+
+Canonical validation: `benchmarks/.local/validate-657da39ed663`. All four Feeder
+edits built before save and after reopening; the full demo sections and variable/
+configuration exports were verified without modifying the source or copy.
+
+Paid campaign `20261121T200704Z-5bbd9b33`, DeepSeek `deepseek-flash` mutable alias,
+high effort, A/B, one repetition, seed 1729, completed all 14 cases. The credential
+was supplied only to the parent process; raw credentials/evidence remain ignored.
+All ten Feeder cases and both weighing cases passed. Original mapping rubric
+`demo-io-mapping-1` rejected both correct table representations: module spacing,
+channel labels, annotations and grouped unmapped rows were too strict.
+
+Explicit `demo-io-mapping-2` formatting-only regrade accepted both mapping answers
+against the unchanged reference, producing A 7/7 and B 7/7 (14/14 total), while
+retaining original 6/7 per arm (12/14 total). Required facts/coverage were not
+relaxed. Wrong addresses, modules, channels and invented physical mappings have
+negative regression controls. Regrades bind the original response/summary,
+reference and scorer hashes; they make no API or CE calls. The v1 scorer is
+retained for audit. Six tool errors occurred in I/O case A; case B had none.
+Final validation: 76 offline tests, one existing symlink-privilege skip, passed;
+syntax and dependency checks passed. Logs: `tmp/benchmark-demo-final-frozen-tests.log`.
+All four campaigns' record/report checksums, PNG/provenance hashes, the original
+reference and regrade scorer hash were independently verified. The generated
+visualization was visually inspected; unknown usage remains unknown.
+
+Provider totals: 4,065,576 tokens, 107 requests, 164 tool calls, zero API retries.
+Summed model workflow time: 492.568 seconds, excluding setup and evaluation.
+
+```powershell
+# DEEPSEEK_API_KEY supplied to the parent process, never to the MCP child:
+ce-bench run --config benchmarks/local.json --condition A B --repeats 1 --seed 1729
+ce-bench regrade --results benchmarks/results --run-id 20261121T200704Z-5bbd9b33 --task io_mapping
+ce-bench archive --results benchmarks/results --run-id 20261121T200704Z-5bbd9b33 --archive benchmarks/archive
+ce-bench visualize --archive benchmarks/archive --output benchmarks/archive/overview.png
+```
+
+Sanitized archive, original/regraded scores, source/reference hashes, checksums,
+PNG and provenance metadata are stored together. The overview includes both
+new task columns, uses compact campaign labels, preserves unknown usage, and
+excludes read-only tasks from build denominators. The measured checkout was
+dirty; no clean or verified-commit claim is made. The first uncommitted archive
+render, superseded only for build-denominator metadata, is retained under ignored
+`benchmarks/.local/superseded-demo-archive-v1/`.
+
+
+## Earlier checkpoint: archive backlog and a CI regression (2026-11-21, after `c10a348`)
+
+**At that checkpoint, nothing newer than `20261121T114513Z-a78f24bc` was archived.**
+`benchmarks/archive/` held exactly those three campaigns; its index and graphics
+were mutually consistent, and the offline suite passed including archive-integrity
+and regrade tests.
 
 Complete local campaigns that are **not** archived (raw evidence stays under the
 ignored `benchmarks/results/`; harness revision `e7a1a5f`, `dirty: false` in each):

@@ -31,7 +31,8 @@
       ],
       "cwd": "..",
       "env": {
-        "CE_MCP_MANUALS_DIR": "E:\\GitHub\\control-expert-mcp\\manuals\\ce-16.4"
+        "CE_MCP_MANUALS_DIR": "E:\\GitHub\\control-expert-mcp\\manuals\\ce-16.4",
+        "CommonProgramFiles": "C:/Program Files (x86)/Common Files"
       },
       "documentation": false
     },
@@ -43,9 +44,12 @@
       ],
       "cwd": "..",
       "env": {
-        "CE_MCP_MANUALS_DIR": "E:\\GitHub\\control-expert-mcp\\manuals\\ce-16.4"
+        "CE_MCP_MANUALS_DIR": "E:\\GitHub\\control-expert-mcp\\manuals\\ce-16.4",
+        "CommonProgramFiles": "C:/Program Files (x86)/Common Files"
       },
       "documentation": true
     }
-  }
+  },
+  "demo_project": "../samples/demo_ControlExpert_M580.STU",
+  "io_mapping_reference": "../samples/demo_ControlExpert_M580_io_mapping.md"
 }
