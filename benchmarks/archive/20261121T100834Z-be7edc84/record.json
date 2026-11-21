@@ -1,0 +1,2727 @@
+{
+  "archive_version": 1,
+  "run_id": "20261121T100834Z-be7edc84",
+  "fingerprint": "141e0b002795406c8656005d24a8821ce78bb834957ee738b6c5fe6611369852",
+  "complete": true,
+  "unfinished_cases": [],
+  "scheduled_cases": 8,
+  "model": {
+    "id": "deepseek-flash",
+    "identity": "alias",
+    "reasoning_effort": "high",
+    "max_output_tokens": 12000
+  },
+  "provider": "deepseek",
+  "cpu": {
+    "part_number": "BMX P34 2020",
+    "version": "02.70"
+  },
+  "ce_version": "16.4",
+  "machine_sha256": "a41fca9484390d13b1ac9c53a119a7880bcbee96ebcb9a9c40ef26e7f2e738e7",
+  "harness": {
+    "revision": "dd3c8757b38dafb9eedbac11428ef42ae834ea9c",
+    "dirty": true,
+    "dirty_fingerprint": "6c8a99f783eb05815a339dc8f2963487ee4271e61a72204b217c7b64246cf665"
+  },
+  "dependencies": {
+    "control-expert-mcp": "0.9.0",
+    "mcp": "2.3.0",
+    "openai": "2.54.0",
+    "pywin32": "312"
+  },
+  "servers": {
+    "A": {
+      "source": {
+        "revision": "dd3c8757b38dafb9eedbac11428ef42ae834ea9c",
+        "dirty": true,
+        "dirty_fingerprint": "6c8a99f783eb05815a339dc8f2963487ee4271e61a72204b217c7b64246cf665"
+      },
+      "runtime_package_sha256": "91a42210f259583837b8e68f50543b2af6275d412d4921eebe2ca76804ec5dad",
+      "dependencies": {
+        "control-expert-mcp": "0.9.0",
+        "mcp": "2.3.0"
+      },
+      "documentation_available": false,
+      "corpus_sha256": "a1ec0bc44081b4ae58812c29cee112de3c0ca46d45854e6909a5b7cef7c1f1af",
+      "corpus_files": 47545,
+      "environment_sha256": "ec8cc2ffdf5336deaa8907f10c6016c738f434a935bc0f0da39f74ed68bcd7f3",
+      "verified_source_commit": "d94539a9068ae11474460caeb9c3224462138d7f",
+      "source_verification": {
+        "commit": "d94539a9068ae11474460caeb9c3224462138d7f",
+        "measured_package_sha256": "91a42210f259583837b8e68f50543b2af6275d412d4921eebe2ca76804ec5dad",
+        "raw_file_sha256": {
+          "bridge.py": "e37b63bab7b7f5df80a6c93eddaaa1667d4c46e11a6553399c71372c9e16abee",
+          "constants.py": "e33155aeeea3450efc32b627aed8fa582f66353a12e30b3fe5ca4a023b5a1814",
+          "diagnostics.py": "278c9c07ad9455eb995ad050b51f17f5a409b0cd53642e8d2c5108d6978fcd1e",
+          "documentation.py": "a47c5fe16129ad85c5a5b8d7acc9b4949471a688710b33d2c64d9d8c28b51dcb",
+          "lang_reference.py": "d16ff7f7ae7cdefd8bc76379f8f83ed522ca5c54bb630764568ea9642f80c287",
+          "modbus.py": "399dfa4b43232fe9e417faa1964e6eeb4b33e9feedd01b3f0e0b493d2fb3f776",
+          "prompts.py": "2c1eb3ad5b80799f42c2e5894daa08c728c958b44881bcd8df53563c490e3cd2",
+          "schema.py": "2cd4be856d76b0b7aadb224184b9f9de988438c21a65a8198318bef2fb5b5e6b",
+          "server.py": "b0c68983ac166b05a6e131a330abf23c93bdb0ee5c2c60a4bf3aa226fac0098a",
+          "__init__.py": "4e059d80d73810f6a8f292121b609237a0a52d540c78e5cee19cdb26949f5418",
+          "__main__.py": "4633ad8e486a021aea020d390e85b9e7e620e13c162667cd9abae6fea51d9379",
+          "benchmark/cli.py": "9c99017092538d180c8a171a6fdd702a2b5c3ff1482464caea67acc54936c1ee",
+          "benchmark/core.py": "90dc998b2652e5c265382c86269fe29386e0c2aba669639751dc226634bc61cc",
+          "benchmark/provider.py": "e3c49d8d30cb33b98f16b9e13a0032b57aac2656c8366e8d0f566ff94ec819c4",
+          "benchmark/report.py": "f6fe03bb29e1d2f9ae6c8712916fbf799a25feff7f85e25be101935d3855a456",
+          "benchmark/runner.py": "1032f33c9fd83679193204d46b2b9f8ecb320da4127f7b949e447668e3a9d501",
+          "benchmark/tasks.py": "cfbfa8bc8ed5cb67c54b7d7d08cb20568f0c62850eedfa67fda2c8d9cf6d69b4",
+          "benchmark/transport.py": "c6ebecbaecb3ff20dfdb8df8e3a02a07d3af8173fdba6b08215e8c94bdd902bc",
+          "benchmark/__init__.py": "a173de0f10a5859f25e6ce02f0096a7fdda53c148e68b80dfe69588fca1e50aa"
+        },
+        "canonical_file_sha256": {
+          "bridge.py": "52450a3606291a4e05b7b21bbaa4815992fe8d2e897265169f5ec9c682cab4cf",
+          "constants.py": "c3bb1ce5e53402e25fa0315e3d661dc4fe3fca27ad1a992edd11db3751e4247d",
+          "diagnostics.py": "278c9c07ad9455eb995ad050b51f17f5a409b0cd53642e8d2c5108d6978fcd1e",
+          "documentation.py": "a47c5fe16129ad85c5a5b8d7acc9b4949471a688710b33d2c64d9d8c28b51dcb",
+          "lang_reference.py": "03c549c2c48740c2ef20143168da27410e5fcf38aa22af84490fd3d9317a31e4",
+          "modbus.py": "a16e4d4cacbe75a384a201ac9998be5f5d0245fbf7dad94a2889d5befb0e7381",
+          "prompts.py": "6ca93b3eb71b2373c1649503d4ce425a3fc84c9c2c2b008274799648da1f98f8",
+          "schema.py": "13f17c29b86c620269cf46776d9e79b1ed8491478b9bc199f310f6da35366869",
+          "server.py": "6b7ceb9c686887363e5f6ca59d07ffda453a5fa5ce2dee102e2056939a768cf2",
+          "__init__.py": "b6869c761e63c1f6809bd72b4e8b92549d4264d171d4caf2a17311cbe345b788",
+          "__main__.py": "ddd60a1df996b2b744c45953165711e5afe2711f5f0249f4e98875e1342411df",
+          "benchmark/cli.py": "9c99017092538d180c8a171a6fdd702a2b5c3ff1482464caea67acc54936c1ee",
+          "benchmark/core.py": "90dc998b2652e5c265382c86269fe29386e0c2aba669639751dc226634bc61cc",
+          "benchmark/provider.py": "e3c49d8d30cb33b98f16b9e13a0032b57aac2656c8366e8d0f566ff94ec819c4",
+          "benchmark/report.py": "f6fe03bb29e1d2f9ae6c8712916fbf799a25feff7f85e25be101935d3855a456",
+          "benchmark/runner.py": "1032f33c9fd83679193204d46b2b9f8ecb320da4127f7b949e447668e3a9d501",
+          "benchmark/tasks.py": "cfbfa8bc8ed5cb67c54b7d7d08cb20568f0c62850eedfa67fda2c8d9cf6d69b4",
+          "benchmark/transport.py": "c6ebecbaecb3ff20dfdb8df8e3a02a07d3af8173fdba6b08215e8c94bdd902bc",
+          "benchmark/__init__.py": "a173de0f10a5859f25e6ce02f0096a7fdda53c148e68b80dfe69588fca1e50aa"
+        },
+        "method": "Measured runtime byte hashes matched before edits; every Git Python blob matched after CRLF/LF normalization."
+      }
+    },
+    "B": {
+      "source": {
+        "revision": "dd3c8757b38dafb9eedbac11428ef42ae834ea9c",
+        "dirty": true,
+        "dirty_fingerprint": "6c8a99f783eb05815a339dc8f2963487ee4271e61a72204b217c7b64246cf665"
+      },
+      "runtime_package_sha256": "91a42210f259583837b8e68f50543b2af6275d412d4921eebe2ca76804ec5dad",
+      "dependencies": {
+        "control-expert-mcp": "0.9.0",
+        "mcp": "2.3.0"
+      },
+      "documentation_available": true,
+      "corpus_sha256": "a1ec0bc44081b4ae58812c29cee112de3c0ca46d45854e6909a5b7cef7c1f1af",
+      "corpus_files": 47545,
+      "environment_sha256": "ec8cc2ffdf5336deaa8907f10c6016c738f434a935bc0f0da39f74ed68bcd7f3",
+      "verified_source_commit": "d94539a9068ae11474460caeb9c3224462138d7f",
+      "source_verification": {
+        "commit": "d94539a9068ae11474460caeb9c3224462138d7f",
+        "measured_package_sha256": "91a42210f259583837b8e68f50543b2af6275d412d4921eebe2ca76804ec5dad",
+        "raw_file_sha256": {
+          "bridge.py": "e37b63bab7b7f5df80a6c93eddaaa1667d4c46e11a6553399c71372c9e16abee",
+          "constants.py": "e33155aeeea3450efc32b627aed8fa582f66353a12e30b3fe5ca4a023b5a1814",
+          "diagnostics.py": "278c9c07ad9455eb995ad050b51f17f5a409b0cd53642e8d2c5108d6978fcd1e",
+          "documentation.py": "a47c5fe16129ad85c5a5b8d7acc9b4949471a688710b33d2c64d9d8c28b51dcb",
+          "lang_reference.py": "d16ff7f7ae7cdefd8bc76379f8f83ed522ca5c54bb630764568ea9642f80c287",
+          "modbus.py": "399dfa4b43232fe9e417faa1964e6eeb4b33e9feedd01b3f0e0b493d2fb3f776",
+          "prompts.py": "2c1eb3ad5b80799f42c2e5894daa08c728c958b44881bcd8df53563c490e3cd2",
+          "schema.py": "2cd4be856d76b0b7aadb224184b9f9de988438c21a65a8198318bef2fb5b5e6b",
+          "server.py": "b0c68983ac166b05a6e131a330abf23c93bdb0ee5c2c60a4bf3aa226fac0098a",
+          "__init__.py": "4e059d80d73810f6a8f292121b609237a0a52d540c78e5cee19cdb26949f5418",
+          "__main__.py": "4633ad8e486a021aea020d390e85b9e7e620e13c162667cd9abae6fea51d9379",
+          "benchmark/cli.py": "9c99017092538d180c8a171a6fdd702a2b5c3ff1482464caea67acc54936c1ee",
+          "benchmark/core.py": "90dc998b2652e5c265382c86269fe29386e0c2aba669639751dc226634bc61cc",
+          "benchmark/provider.py": "e3c49d8d30cb33b98f16b9e13a0032b57aac2656c8366e8d0f566ff94ec819c4",
+          "benchmark/report.py": "f6fe03bb29e1d2f9ae6c8712916fbf799a25feff7f85e25be101935d3855a456",
+          "benchmark/runner.py": "1032f33c9fd83679193204d46b2b9f8ecb320da4127f7b949e447668e3a9d501",
+          "benchmark/tasks.py": "cfbfa8bc8ed5cb67c54b7d7d08cb20568f0c62850eedfa67fda2c8d9cf6d69b4",
+          "benchmark/transport.py": "c6ebecbaecb3ff20dfdb8df8e3a02a07d3af8173fdba6b08215e8c94bdd902bc",
+          "benchmark/__init__.py": "a173de0f10a5859f25e6ce02f0096a7fdda53c148e68b80dfe69588fca1e50aa"
+        },
+        "canonical_file_sha256": {
+          "bridge.py": "52450a3606291a4e05b7b21bbaa4815992fe8d2e897265169f5ec9c682cab4cf",
+          "constants.py": "c3bb1ce5e53402e25fa0315e3d661dc4fe3fca27ad1a992edd11db3751e4247d",
+          "diagnostics.py": "278c9c07ad9455eb995ad050b51f17f5a409b0cd53642e8d2c5108d6978fcd1e",
+          "documentation.py": "a47c5fe16129ad85c5a5b8d7acc9b4949471a688710b33d2c64d9d8c28b51dcb",
+          "lang_reference.py": "03c549c2c48740c2ef20143168da27410e5fcf38aa22af84490fd3d9317a31e4",
+          "modbus.py": "a16e4d4cacbe75a384a201ac9998be5f5d0245fbf7dad94a2889d5befb0e7381",
+          "prompts.py": "6ca93b3eb71b2373c1649503d4ce425a3fc84c9c2c2b008274799648da1f98f8",
+          "schema.py": "13f17c29b86c620269cf46776d9e79b1ed8491478b9bc199f310f6da35366869",
+          "server.py": "6b7ceb9c686887363e5f6ca59d07ffda453a5fa5ce2dee102e2056939a768cf2",
+          "__init__.py": "b6869c761e63c1f6809bd72b4e8b92549d4264d171d4caf2a17311cbe345b788",
+          "__main__.py": "ddd60a1df996b2b744c45953165711e5afe2711f5f0249f4e98875e1342411df",
+          "benchmark/cli.py": "9c99017092538d180c8a171a6fdd702a2b5c3ff1482464caea67acc54936c1ee",
+          "benchmark/core.py": "90dc998b2652e5c265382c86269fe29386e0c2aba669639751dc226634bc61cc",
+          "benchmark/provider.py": "e3c49d8d30cb33b98f16b9e13a0032b57aac2656c8366e8d0f566ff94ec819c4",
+          "benchmark/report.py": "f6fe03bb29e1d2f9ae6c8712916fbf799a25feff7f85e25be101935d3855a456",
+          "benchmark/runner.py": "1032f33c9fd83679193204d46b2b9f8ecb320da4127f7b949e447668e3a9d501",
+          "benchmark/tasks.py": "cfbfa8bc8ed5cb67c54b7d7d08cb20568f0c62850eedfa67fda2c8d9cf6d69b4",
+          "benchmark/transport.py": "c6ebecbaecb3ff20dfdb8df8e3a02a07d3af8173fdba6b08215e8c94bdd902bc",
+          "benchmark/__init__.py": "a173de0f10a5859f25e6ce02f0096a7fdda53c148e68b80dfe69588fca1e50aa"
+        },
+        "method": "Measured runtime byte hashes matched before edits; every Git Python blob matched after CRLF/LF normalization."
+      }
+    }
+  },
+  "fixture_sha256": "88f39fb5d52df4dfacbb9e6a6bae0939cff6381932830aec3990ce8241c46a7f",
+  "rubric_version": "feeder-1",
+  "prompt_sha256": {
+    "inspect": "47b5d4b78bfd9535b3c950e662884e4f67bb972b13ec619d9cc8e3ad70c1b3b7",
+    "threshold": "2e0f696bd5b268a0d516bd60cecaa03d527c607c632ae5f4ee829f19dab0f25f",
+    "temperature": "ec3522af780feed05f7812ae58b58477b7be45efe14189e71afe5477c0a25d54",
+    "repair": "6e237c54b8f1935f6eba50933df23ff7fc28173bd0a7bb0d30b343fd7af44704"
+  },
+  "orientation_sha256": "0c5113862cdcd53bff0177aa4a8aae6682225b0234c2acc8bc846274b0437f46",
+  "contexts": {
+    "A": {
+      "inspect": "38e83b7083c5d98b7d5fc756c69eec53fc7806f10f4aa5133698cf53f72ac117",
+      "threshold": "15e19476c4af04b2f3becf63f7393e6641e50c07f3418de507017873f70bc864",
+      "temperature": "15e19476c4af04b2f3becf63f7393e6641e50c07f3418de507017873f70bc864",
+      "repair": "15e19476c4af04b2f3becf63f7393e6641e50c07f3418de507017873f70bc864"
+    },
+    "B": {
+      "inspect": "cc39ee747967ad7e609f30dbf2332caa34e7d0fc6be098babb96037d90f7ce1d",
+      "threshold": "385a652e17138be6e97554969a92e288966ec8590fb7d34af1be61259efbe713",
+      "temperature": "385a652e17138be6e97554969a92e288966ec8590fb7d34af1be61259efbe713",
+      "repair": "385a652e17138be6e97554969a92e288966ec8590fb7d34af1be61259efbe713"
+    }
+  },
+  "seed": 1729,
+  "schedule": [
+    {
+      "task": "repair",
+      "repeat": 0,
+      "condition": "B",
+      "case_id": "repair-000-B"
+    },
+    {
+      "task": "repair",
+      "repeat": 0,
+      "condition": "A",
+      "case_id": "repair-000-A"
+    },
+    {
+      "task": "temperature",
+      "repeat": 0,
+      "condition": "B",
+      "case_id": "temperature-000-B"
+    },
+    {
+      "task": "temperature",
+      "repeat": 0,
+      "condition": "A",
+      "case_id": "temperature-000-A"
+    },
+    {
+      "task": "threshold",
+      "repeat": 0,
+      "condition": "B",
+      "case_id": "threshold-000-B"
+    },
+    {
+      "task": "threshold",
+      "repeat": 0,
+      "condition": "A",
+      "case_id": "threshold-000-A"
+    },
+    {
+      "task": "inspect",
+      "repeat": 0,
+      "condition": "A",
+      "case_id": "inspect-000-A"
+    },
+    {
+      "task": "inspect",
+      "repeat": 0,
+      "condition": "B",
+      "case_id": "inspect-000-B"
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "repair-000-B",
+      "task": "repair",
+      "repeat": 0,
+      "condition": "B",
+      "fingerprint": "141e0b002795406c8656005d24a8821ce78bb834957ee738b6c5fe6611369852",
+      "status": "completed",
+      "failure_reason": null,
+      "cold_start": true,
+      "provider": "deepseek",
+      "requested_model": "deepseek-flash",
+      "returned_models": [
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash"
+      ],
+      "model_identity": "alias",
+      "startup_seconds": 1.0879107000000658,
+      "discovery_seconds": 0.011159800000314135,
+      "setup_seconds": 11.408162299994729,
+      "reset_seconds": 10.305465699995693,
+      "workflow_seconds": 36.07084639999812,
+      "total_seconds": 74.09001009999338,
+      "tool_calls": 12,
+      "tool_errors": 0,
+      "repair_cycles": 1,
+      "api_retries": 0,
+      "transport_retries": 0,
+      "model_requests": 10,
+      "usage": {
+        "requests": 10,
+        "tokens": {
+          "input_tokens": 88835,
+          "output_tokens": 3324,
+          "total_tokens": 92159,
+          "cached_input_tokens": 76928,
+          "reasoning_tokens": 1640
+        },
+        "known_partial_tokens": {
+          "input_tokens": 88835,
+          "output_tokens": 3324,
+          "total_tokens": 92159,
+          "cached_input_tokens": 76928,
+          "reasoning_tokens": 1640
+        }
+      },
+      "success": true,
+      "durable_completed": true,
+      "attempt_id": "attempt-b5999db6ca194740bece9cb9beb6232e",
+      "interaction_metrics": {
+        "model_request_seconds": {
+          "n": 10,
+          "known_n": 10,
+          "unknown_n": 0,
+          "median": 1.5927252000001317,
+          "p95": 8.004509300000791
+        },
+        "mcp_round_trip_seconds": {
+          "get_status": {
+            "n": 2,
+            "known_n": 2,
+            "unknown_n": 0,
+            "median": 0.01080530000035651,
+            "p95": 0.011921799996343907
+          },
+          "get_project_structure": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.05360189999919385,
+            "p95": 0.05360189999919385
+          },
+          "read_section": {
+            "n": 2,
+            "known_n": 2,
+            "unknown_n": 0,
+            "median": 0.07552769999892917,
+            "p95": 0.09190279999893392
+          },
+          "list_variables": {
+            "n": 2,
+            "known_n": 2,
+            "unknown_n": 0,
+            "median": 0.09582290000253124,
+            "p95": 0.10756780000519939
+          },
+          "build_project": {
+            "n": 2,
+            "known_n": 2,
+            "unknown_n": 0,
+            "median": 0.8837854499979585,
+            "p95": 1.489503099997819
+          },
+          "get_language_reference": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.0031860000017331913,
+            "p95": 0.0031860000017331913
+          },
+          "write_st_logic": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.25366879999637604,
+            "p95": 0.25366879999637604
+          },
+          "save_project": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 1.0113203000000794,
+            "p95": 1.0113203000000794
+          }
+        }
+      },
+      "validation": {
+        "scope": "pass",
+        "static_behavior": "pass",
+        "runtime_behavior": "unverified",
+        "compile_pass": true,
+        "declarations_pass": true,
+        "model_built": true,
+        "model_saved": true,
+        "success": true,
+        "obtained_source_through_mcp": true,
+        "evaluator_seconds": 20.09376599999814,
+        "build": {
+          "build_state": "built_ok",
+          "error_present": false,
+          "diagnostics_available": true,
+          "diagnostics_summary": {
+            "process_status": "succeeded",
+            "errors": 0,
+            "warnings": 0
+          },
+          "capture": {
+            "freshness": "changed",
+            "attribution": "unverified",
+            "scope": "snapshot",
+            "source_tab": "Build"
+          }
+        }
+      },
+      "artifact_sha256": {
+        "project.stu": "231ea68533f559ea73fc2ba3a756d02912dbc54081ec70a0a1492f621cab9357",
+        "saved-section.xml": "0e5ab0ba22017c81249c2aeab0d483ed33ea979de2029bd18c0bd1fe540f676c",
+        "saved-variables.xml": "a56a60bbefc541834d2674e174296a8055d6017452f9b9f39b742a560340b116"
+      }
+    },
+    {
+      "case_id": "repair-000-A",
+      "task": "repair",
+      "repeat": 0,
+      "condition": "A",
+      "fingerprint": "141e0b002795406c8656005d24a8821ce78bb834957ee738b6c5fe6611369852",
+      "status": "completed",
+      "failure_reason": null,
+      "cold_start": true,
+      "provider": "deepseek",
+      "requested_model": "deepseek-flash",
+      "returned_models": [
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash"
+      ],
+      "model_identity": "alias",
+      "startup_seconds": 1.1247922999973525,
+      "discovery_seconds": 0.012452999995730352,
+      "setup_seconds": 12.338494299998274,
+      "reset_seconds": 11.198123599999235,
+      "workflow_seconds": 23.012446500004444,
+      "total_seconds": 60.935015199997,
+      "tool_calls": 10,
+      "tool_errors": 0,
+      "repair_cycles": 1,
+      "api_retries": 0,
+      "transport_retries": 0,
+      "model_requests": 9,
+      "usage": {
+        "requests": 9,
+        "tokens": {
+          "input_tokens": 64407,
+          "output_tokens": 2539,
+          "total_tokens": 66946,
+          "cached_input_tokens": 56448,
+          "reasoning_tokens": 1392
+        },
+        "known_partial_tokens": {
+          "input_tokens": 64407,
+          "output_tokens": 2539,
+          "total_tokens": 66946,
+          "cached_input_tokens": 56448,
+          "reasoning_tokens": 1392
+        }
+      },
+      "success": true,
+      "durable_completed": true,
+      "attempt_id": "attempt-03b588e3c99c44e9b64654b563c3ccaf",
+      "interaction_metrics": {
+        "model_request_seconds": {
+          "n": 9,
+          "known_n": 9,
+          "unknown_n": 0,
+          "median": 1.5124039000002085,
+          "p95": 6.343741099997715
+        },
+        "mcp_round_trip_seconds": {
+          "get_status": {
+            "n": 2,
+            "known_n": 2,
+            "unknown_n": 0,
+            "median": 0.011341049998009112,
+            "p95": 0.012633099999220576
+          },
+          "get_project_structure": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.06153559999802383,
+            "p95": 0.06153559999802383
+          },
+          "read_section": {
+            "n": 2,
+            "known_n": 2,
+            "unknown_n": 0,
+            "median": 0.07058949999918696,
+            "p95": 0.0803070000038133
+          },
+          "list_variables": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.09666360000119312,
+            "p95": 0.09666360000119312
+          },
+          "build_project": {
+            "n": 2,
+            "known_n": 2,
+            "unknown_n": 0,
+            "median": 0.7026420999973197,
+            "p95": 1.1821646999960649
+          },
+          "write_st_logic": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.1747722000000067,
+            "p95": 0.1747722000000067
+          },
+          "save_project": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.9015747999947052,
+            "p95": 0.9015747999947052
+          }
+        }
+      },
+      "validation": {
+        "scope": "pass",
+        "static_behavior": "pass",
+        "runtime_behavior": "unverified",
+        "compile_pass": true,
+        "declarations_pass": true,
+        "model_built": true,
+        "model_saved": true,
+        "success": true,
+        "obtained_source_through_mcp": true,
+        "evaluator_seconds": 18.94475760000205,
+        "build": {
+          "build_state": "built_ok",
+          "error_present": false,
+          "diagnostics_available": true,
+          "diagnostics_summary": {
+            "process_status": "succeeded",
+            "errors": 0,
+            "warnings": 0
+          },
+          "capture": {
+            "freshness": "changed",
+            "attribution": "unverified",
+            "scope": "snapshot",
+            "source_tab": "Build"
+          }
+        }
+      },
+      "artifact_sha256": {
+        "project.stu": "fa38ecd6dc7db9cf8fb529931d9d6768e11b87d471c75466e8018107a1c5ab99",
+        "saved-section.xml": "5664dc1428461002decd87c08f6e229d6bd14c86ed838b1cc0b3975c48b377b8",
+        "saved-variables.xml": "f8dea7250dd6d99b05c25a620ac12f98640a0622a0f8e73507975917e6f8fd20"
+      }
+    },
+    {
+      "case_id": "temperature-000-B",
+      "task": "temperature",
+      "repeat": 0,
+      "condition": "B",
+      "fingerprint": "141e0b002795406c8656005d24a8821ce78bb834957ee738b6c5fe6611369852",
+      "status": "completed",
+      "failure_reason": null,
+      "cold_start": true,
+      "provider": "deepseek",
+      "requested_model": "deepseek-flash",
+      "returned_models": [
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash"
+      ],
+      "model_identity": "alias",
+      "startup_seconds": 1.129038799997943,
+      "discovery_seconds": 0.011836899997433648,
+      "setup_seconds": 11.54072989999986,
+      "reset_seconds": 10.396217800000159,
+      "workflow_seconds": 19.918886599996767,
+      "total_seconds": 58.14117740000074,
+      "tool_calls": 10,
+      "tool_errors": 0,
+      "repair_cycles": 0,
+      "api_retries": 0,
+      "transport_retries": 0,
+      "model_requests": 8,
+      "usage": {
+        "requests": 8,
+        "tokens": {
+          "input_tokens": 58743,
+          "output_tokens": 2006,
+          "total_tokens": 60749,
+          "cached_input_tokens": 51328,
+          "reasoning_tokens": 822
+        },
+        "known_partial_tokens": {
+          "input_tokens": 58743,
+          "output_tokens": 2006,
+          "total_tokens": 60749,
+          "cached_input_tokens": 51328,
+          "reasoning_tokens": 822
+        }
+      },
+      "success": true,
+      "durable_completed": true,
+      "attempt_id": "attempt-ac1d5cf83cdb4e4a83b67f693ccb90dc",
+      "interaction_metrics": {
+        "model_request_seconds": {
+          "n": 8,
+          "known_n": 8,
+          "unknown_n": 0,
+          "median": 1.2389423999993596,
+          "p95": 6.501985299997614
+        },
+        "mcp_round_trip_seconds": {
+          "get_status": {
+            "n": 2,
+            "known_n": 2,
+            "unknown_n": 0,
+            "median": 0.008940949999669101,
+            "p95": 0.009479500004090369
+          },
+          "get_project_structure": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.04637100000400096,
+            "p95": 0.04637100000400096
+          },
+          "read_section": {
+            "n": 2,
+            "known_n": 2,
+            "unknown_n": 0,
+            "median": 0.07641130000047269,
+            "p95": 0.10815000000002328
+          },
+          "list_variables": {
+            "n": 2,
+            "known_n": 2,
+            "unknown_n": 0,
+            "median": 0.11218449999796576,
+            "p95": 0.15643619999900693
+          },
+          "write_st_logic": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.2139132000011159,
+            "p95": 0.2139132000011159
+          },
+          "build_project": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 1.032193399994867,
+            "p95": 1.032193399994867
+          },
+          "save_project": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.8425872000007075,
+            "p95": 0.8425872000007075
+          }
+        }
+      },
+      "validation": {
+        "scope": "pass",
+        "static_behavior": "pass",
+        "runtime_behavior": "unverified",
+        "compile_pass": true,
+        "declarations_pass": true,
+        "model_built": true,
+        "model_saved": true,
+        "success": true,
+        "obtained_source_through_mcp": true,
+        "evaluator_seconds": 20.103798600001028,
+        "build": {
+          "build_state": "built_ok",
+          "error_present": false,
+          "diagnostics_available": true,
+          "diagnostics_summary": {
+            "process_status": "succeeded",
+            "errors": 0,
+            "warnings": 0
+          },
+          "capture": {
+            "freshness": "changed",
+            "attribution": "unverified",
+            "scope": "snapshot",
+            "source_tab": "Build"
+          }
+        }
+      },
+      "artifact_sha256": {
+        "project.stu": "e2a1560df081ae3d2272ef2e8baa7b464f2ab5565c09456f70748464594c7fdb",
+        "saved-section.xml": "3b77de0d68dfb37f74c7e5f43709b40126ef012295a642953f1fef631e42d741",
+        "saved-variables.xml": "c9955b5cca1013bf00012a7ecb62e8982e520837dee1e60c37b00fea1ceeec4d"
+      }
+    },
+    {
+      "case_id": "temperature-000-A",
+      "task": "temperature",
+      "repeat": 0,
+      "condition": "A",
+      "fingerprint": "141e0b002795406c8656005d24a8821ce78bb834957ee738b6c5fe6611369852",
+      "status": "completed",
+      "failure_reason": null,
+      "cold_start": true,
+      "provider": "deepseek",
+      "requested_model": "deepseek-flash",
+      "returned_models": [
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash"
+      ],
+      "model_identity": "alias",
+      "startup_seconds": 1.08642520000285,
+      "discovery_seconds": 0.011709400001564063,
+      "setup_seconds": 12.154689200004213,
+      "reset_seconds": 11.052921800001059,
+      "workflow_seconds": 17.748672200003057,
+      "total_seconds": 55.98093810000137,
+      "tool_calls": 10,
+      "tool_errors": 0,
+      "repair_cycles": 0,
+      "api_retries": 0,
+      "transport_retries": 0,
+      "model_requests": 8,
+      "usage": {
+        "requests": 8,
+        "tokens": {
+          "input_tokens": 55326,
+          "output_tokens": 1556,
+          "total_tokens": 56882,
+          "cached_input_tokens": 46848,
+          "reasoning_tokens": 470
+        },
+        "known_partial_tokens": {
+          "input_tokens": 55326,
+          "output_tokens": 1556,
+          "total_tokens": 56882,
+          "cached_input_tokens": 46848,
+          "reasoning_tokens": 470
+        }
+      },
+      "success": true,
+      "durable_completed": true,
+      "attempt_id": "attempt-0f7654e59b0046e19296cdbdd8748447",
+      "interaction_metrics": {
+        "model_request_seconds": {
+          "n": 8,
+          "known_n": 8,
+          "unknown_n": 0,
+          "median": 1.274980250000226,
+          "p95": 3.5789090000034776
+        },
+        "mcp_round_trip_seconds": {
+          "get_status": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.009316499999840744,
+            "p95": 0.009316499999840744
+          },
+          "get_project_structure": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.04653419999522157,
+            "p95": 0.04653419999522157
+          },
+          "read_section": {
+            "n": 2,
+            "known_n": 2,
+            "unknown_n": 0,
+            "median": 0.06228689999989001,
+            "p95": 0.07761020000179997
+          },
+          "get_language_reference": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.002507199998944998,
+            "p95": 0.002507199998944998
+          },
+          "list_variables": {
+            "n": 2,
+            "known_n": 2,
+            "unknown_n": 0,
+            "median": 0.07254465000005439,
+            "p95": 0.07470409999950789
+          },
+          "write_st_logic": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.24077140000008512,
+            "p95": 0.24077140000008512
+          },
+          "build_project": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 1.1607800999991014,
+            "p95": 1.1607800999991014
+          },
+          "save_project": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.8515794999984792,
+            "p95": 0.8515794999984792
+          }
+        }
+      },
+      "validation": {
+        "scope": "pass",
+        "static_behavior": "pass",
+        "runtime_behavior": "unverified",
+        "compile_pass": true,
+        "declarations_pass": true,
+        "model_built": true,
+        "model_saved": true,
+        "success": true,
+        "obtained_source_through_mcp": true,
+        "evaluator_seconds": 19.55377249999583,
+        "build": {
+          "build_state": "built_ok",
+          "error_present": false,
+          "diagnostics_available": true,
+          "diagnostics_summary": {
+            "process_status": "succeeded",
+            "errors": 0,
+            "warnings": 0
+          },
+          "capture": {
+            "freshness": "changed",
+            "attribution": "unverified",
+            "scope": "snapshot",
+            "source_tab": "Build"
+          }
+        }
+      },
+      "artifact_sha256": {
+        "project.stu": "ef19f0d19012b657907a9ad99ad72c4582d2368b6005a90e18f7887ab598bd8a",
+        "saved-section.xml": "e168d76a4e405457937bdebc5aa6985ab3ab3f933d53d673e63f50216081ea35",
+        "saved-variables.xml": "a54d45ece3cb7a1a83cff77a4aa3c5a29c5555b0b7b744e92dea9fc7c34e51b7"
+      }
+    },
+    {
+      "case_id": "threshold-000-B",
+      "task": "threshold",
+      "repeat": 0,
+      "condition": "B",
+      "fingerprint": "141e0b002795406c8656005d24a8821ce78bb834957ee738b6c5fe6611369852",
+      "status": "completed",
+      "failure_reason": null,
+      "cold_start": true,
+      "provider": "deepseek",
+      "requested_model": "deepseek-flash",
+      "returned_models": [
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash"
+      ],
+      "model_identity": "alias",
+      "startup_seconds": 1.1537777999983518,
+      "discovery_seconds": 0.012119700004404876,
+      "setup_seconds": 11.838112999997975,
+      "reset_seconds": 10.669048999996448,
+      "workflow_seconds": 21.041752599994652,
+      "total_seconds": 59.359855399998196,
+      "tool_calls": 9,
+      "tool_errors": 0,
+      "repair_cycles": 0,
+      "api_retries": 0,
+      "transport_retries": 0,
+      "model_requests": 9,
+      "usage": {
+        "requests": 9,
+        "tokens": {
+          "input_tokens": 64579,
+          "output_tokens": 2277,
+          "total_tokens": 66856,
+          "cached_input_tokens": 57600,
+          "reasoning_tokens": 1177
+        },
+        "known_partial_tokens": {
+          "input_tokens": 64579,
+          "output_tokens": 2277,
+          "total_tokens": 66856,
+          "cached_input_tokens": 57600,
+          "reasoning_tokens": 1177
+        }
+      },
+      "success": true,
+      "durable_completed": true,
+      "attempt_id": "attempt-f30231f089f2413ca618c4cd21494001",
+      "interaction_metrics": {
+        "model_request_seconds": {
+          "n": 9,
+          "known_n": 9,
+          "unknown_n": 0,
+          "median": 1.1037295000060112,
+          "p95": 4.386813400000392
+        },
+        "mcp_round_trip_seconds": {
+          "get_status": {
+            "n": 2,
+            "known_n": 2,
+            "unknown_n": 0,
+            "median": 0.009190550001221709,
+            "p95": 0.009872800001176074
+          },
+          "get_project_structure": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.049070900000515394,
+            "p95": 0.049070900000515394
+          },
+          "read_section": {
+            "n": 2,
+            "known_n": 2,
+            "unknown_n": 0,
+            "median": 0.06925689999843598,
+            "p95": 0.06934139999793842
+          },
+          "list_variables": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.06851840000308584,
+            "p95": 0.06851840000308584
+          },
+          "write_st_logic": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.20729749999736669,
+            "p95": 0.20729749999736669
+          },
+          "build_project": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 1.4620099999956437,
+            "p95": 1.4620099999956437
+          },
+          "save_project": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.9998808000018471,
+            "p95": 0.9998808000018471
+          }
+        }
+      },
+      "validation": {
+        "scope": "pass",
+        "static_behavior": "pass",
+        "runtime_behavior": "unverified",
+        "compile_pass": true,
+        "declarations_pass": true,
+        "model_built": true,
+        "model_saved": true,
+        "success": true,
+        "obtained_source_through_mcp": true,
+        "evaluator_seconds": 19.90753499999846,
+        "build": {
+          "build_state": "built_ok",
+          "error_present": false,
+          "diagnostics_available": true,
+          "diagnostics_summary": {
+            "process_status": "succeeded",
+            "errors": 0,
+            "warnings": 0
+          },
+          "capture": {
+            "freshness": "changed",
+            "attribution": "unverified",
+            "scope": "snapshot",
+            "source_tab": "Build"
+          }
+        }
+      },
+      "artifact_sha256": {
+        "project.stu": "c3aa4827bfcdcbab606e9662a4c28abf30f38d6bbc12a988f3dfce7656858d94",
+        "saved-section.xml": "04966851814f0f8a6c0664fd11abc1a6be0c52361c4e002cfc09ad9ccab62751",
+        "saved-variables.xml": "20f51afe6e886222f22c3eee3156dfe98fd23130c6c00a25b0db6efcdf35cd33"
+      }
+    },
+    {
+      "case_id": "threshold-000-A",
+      "task": "threshold",
+      "repeat": 0,
+      "condition": "A",
+      "fingerprint": "141e0b002795406c8656005d24a8821ce78bb834957ee738b6c5fe6611369852",
+      "status": "completed",
+      "failure_reason": null,
+      "cold_start": true,
+      "provider": "deepseek",
+      "requested_model": "deepseek-flash",
+      "returned_models": [
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash"
+      ],
+      "model_identity": "alias",
+      "startup_seconds": 1.4437293999944814,
+      "discovery_seconds": 0.015144299999519717,
+      "setup_seconds": 12.43211059999885,
+      "reset_seconds": 10.969383499999822,
+      "workflow_seconds": 19.87760949999938,
+      "total_seconds": 61.17611609999585,
+      "tool_calls": 10,
+      "tool_errors": 0,
+      "repair_cycles": 0,
+      "api_retries": 0,
+      "transport_retries": 0,
+      "model_requests": 8,
+      "usage": {
+        "requests": 8,
+        "tokens": {
+          "input_tokens": 57243,
+          "output_tokens": 2132,
+          "total_tokens": 59375,
+          "cached_input_tokens": 49536,
+          "reasoning_tokens": 1042
+        },
+        "known_partial_tokens": {
+          "input_tokens": 57243,
+          "output_tokens": 2132,
+          "total_tokens": 59375,
+          "cached_input_tokens": 49536,
+          "reasoning_tokens": 1042
+        }
+      },
+      "success": true,
+      "durable_completed": true,
+      "attempt_id": "attempt-553e2ea2d1a44f1c8f7d1493bcc6b869",
+      "interaction_metrics": {
+        "model_request_seconds": {
+          "n": 8,
+          "known_n": 8,
+          "unknown_n": 0,
+          "median": 1.1297551999996358,
+          "p95": 7.155729899997823
+        },
+        "mcp_round_trip_seconds": {
+          "get_status": {
+            "n": 2,
+            "known_n": 2,
+            "unknown_n": 0,
+            "median": 0.008600549997936469,
+            "p95": 0.008700399994268082
+          },
+          "get_project_structure": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.04837589999806369,
+            "p95": 0.04837589999806369
+          },
+          "read_section": {
+            "n": 2,
+            "known_n": 2,
+            "unknown_n": 0,
+            "median": 0.06649520000064513,
+            "p95": 0.08759199999622069
+          },
+          "list_variables": {
+            "n": 2,
+            "known_n": 2,
+            "unknown_n": 0,
+            "median": 0.08334884999931091,
+            "p95": 0.10185959999944316
+          },
+          "write_st_logic": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.18956440000329167,
+            "p95": 0.18956440000329167
+          },
+          "build_project": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 1.0043817999976454,
+            "p95": 1.0043817999976454
+          },
+          "save_project": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.8300204000042868,
+            "p95": 0.8300204000042868
+          }
+        }
+      },
+      "validation": {
+        "scope": "pass",
+        "static_behavior": "pass",
+        "runtime_behavior": "unverified",
+        "compile_pass": true,
+        "declarations_pass": true,
+        "model_built": true,
+        "model_saved": true,
+        "success": true,
+        "obtained_source_through_mcp": true,
+        "evaluator_seconds": 22.213866199999757,
+        "build": {
+          "build_state": "built_ok",
+          "error_present": false,
+          "diagnostics_available": true,
+          "diagnostics_summary": {
+            "process_status": "succeeded",
+            "errors": 0,
+            "warnings": 0
+          },
+          "capture": {
+            "freshness": "changed",
+            "attribution": "unverified",
+            "scope": "snapshot",
+            "source_tab": "Build"
+          }
+        }
+      },
+      "artifact_sha256": {
+        "project.stu": "5bb127a5efd319aa2efe05482a006d69b0015c73db4995c66b439c6a897e2ca4",
+        "saved-section.xml": "0e878e1452d9287db0d6595486f014e2def51d4dccf5fa593b725d86496c20ff",
+        "saved-variables.xml": "6d68116995ce4e9053c9a8e2c7f102df5609bb6e4e569911190a92440193507b"
+      }
+    },
+    {
+      "case_id": "inspect-000-A",
+      "task": "inspect",
+      "repeat": 0,
+      "condition": "A",
+      "fingerprint": "141e0b002795406c8656005d24a8821ce78bb834957ee738b6c5fe6611369852",
+      "status": "completed",
+      "failure_reason": null,
+      "cold_start": true,
+      "provider": "deepseek",
+      "requested_model": "deepseek-flash",
+      "returned_models": [
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash"
+      ],
+      "model_identity": "alias",
+      "startup_seconds": 1.268316000001505,
+      "discovery_seconds": 0.012366599999950267,
+      "setup_seconds": 14.166167600000335,
+      "reset_seconds": 12.882404199997836,
+      "workflow_seconds": 6.5539921000017785,
+      "total_seconds": 50.87758780000149,
+      "tool_calls": 4,
+      "tool_errors": 0,
+      "repair_cycles": 0,
+      "api_retries": 0,
+      "transport_retries": 0,
+      "model_requests": 4,
+      "usage": {
+        "requests": 4,
+        "tokens": {
+          "input_tokens": 11984,
+          "output_tokens": 713,
+          "total_tokens": 12697,
+          "cached_input_tokens": 7808,
+          "reasoning_tokens": 393
+        },
+        "known_partial_tokens": {
+          "input_tokens": 11984,
+          "output_tokens": 713,
+          "total_tokens": 12697,
+          "cached_input_tokens": 7808,
+          "reasoning_tokens": 393
+        }
+      },
+      "success": false,
+      "durable_completed": true,
+      "attempt_id": "attempt-00e0a321f6a045bca56593df1867e7e0",
+      "interaction_metrics": {
+        "model_request_seconds": {
+          "n": 4,
+          "known_n": 4,
+          "unknown_n": 0,
+          "median": 1.277668349997839,
+          "p95": 2.811154399998486
+        },
+        "mcp_round_trip_seconds": {
+          "get_status": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.012108900002203882,
+            "p95": 0.012108900002203882
+          },
+          "get_project_structure": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.07063200000266079,
+            "p95": 0.07063200000266079
+          },
+          "read_section": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.08434810000471771,
+            "p95": 0.08434810000471771
+          },
+          "list_variables": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.13647040000068955,
+            "p95": 0.13647040000068955
+          }
+        }
+      },
+      "validation": {
+        "rubric": "feeder-1",
+        "answer_pass": false,
+        "scope": "pass",
+        "static_behavior": null,
+        "runtime_behavior": "unverified",
+        "compile_pass": null,
+        "success": false,
+        "obtained_source_through_mcp": true,
+        "evaluator_seconds": 23.165298100000655
+      },
+      "artifact_sha256": {
+        "project.stu": "cfb293ce7b5448cafd684def45de4c8a19bac91cf003157d47968ecb52a763d6",
+        "saved-section.xml": "e239fc8985576ef7b2bf17897901b0249ed212be0a2ce307d3f0d519d7eb16aa",
+        "saved-variables.xml": "d5b704d04f53e9cd8d3d7d5730126a89cc2cece722d9c38fbac03e2b3340bcb5"
+      }
+    },
+    {
+      "case_id": "inspect-000-B",
+      "task": "inspect",
+      "repeat": 0,
+      "condition": "B",
+      "fingerprint": "141e0b002795406c8656005d24a8821ce78bb834957ee738b6c5fe6611369852",
+      "status": "completed",
+      "failure_reason": null,
+      "cold_start": true,
+      "provider": "deepseek",
+      "requested_model": "deepseek-flash",
+      "returned_models": [
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash"
+      ],
+      "model_identity": "alias",
+      "startup_seconds": 1.3631708999964758,
+      "discovery_seconds": 0.011304499996185768,
+      "setup_seconds": 14.15823879999516,
+      "reset_seconds": 12.78087609999784,
+      "workflow_seconds": 6.4457602000038605,
+      "total_seconds": 49.559970199996314,
+      "tool_calls": 3,
+      "tool_errors": 0,
+      "repair_cycles": 0,
+      "api_retries": 0,
+      "transport_retries": 0,
+      "model_requests": 3,
+      "usage": {
+        "requests": 3,
+        "tokens": {
+          "input_tokens": 8856,
+          "output_tokens": 740,
+          "total_tokens": 9596,
+          "cached_input_tokens": 4864,
+          "reasoning_tokens": 446
+        },
+        "known_partial_tokens": {
+          "input_tokens": 8856,
+          "output_tokens": 740,
+          "total_tokens": 9596,
+          "cached_input_tokens": 4864,
+          "reasoning_tokens": 446
+        }
+      },
+      "success": false,
+      "durable_completed": true,
+      "attempt_id": "attempt-d6ade1c6ec6844399eeb4bdce75ba5d0",
+      "interaction_metrics": {
+        "model_request_seconds": {
+          "n": 3,
+          "known_n": 3,
+          "unknown_n": 0,
+          "median": 1.2694801999969059,
+          "p95": 4.168083299999125
+        },
+        "mcp_round_trip_seconds": {
+          "get_status": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.01721720000205096,
+            "p95": 0.01721720000205096
+          },
+          "get_project_structure": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.07426899999700254,
+            "p95": 0.07426899999700254
+          },
+          "read_section": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.08339829999749782,
+            "p95": 0.08339829999749782
+          }
+        }
+      },
+      "validation": {
+        "rubric": "feeder-1",
+        "answer_pass": false,
+        "scope": "pass",
+        "static_behavior": null,
+        "runtime_behavior": "unverified",
+        "compile_pass": null,
+        "success": false,
+        "obtained_source_through_mcp": true,
+        "evaluator_seconds": 22.01586849999876
+      },
+      "artifact_sha256": {
+        "project.stu": "cfb293ce7b5448cafd684def45de4c8a19bac91cf003157d47968ecb52a763d6",
+        "saved-section.xml": "a3cd1dd77262951d72ef9182b804dda56ca6ea3e0c135abca15bf522af505310",
+        "saved-variables.xml": "568d7f8f374162c036277ee5b72346d286170360af7fe4d55f381bc7c3aa536a"
+      }
+    }
+  ],
+  "conditions": {
+    "A": {
+      "overall": {
+        "cases": 4,
+        "completion": {
+          "pass": 4,
+          "n": 4,
+          "verified_n": 4,
+          "rate_all": 1.0
+        },
+        "accepted": {
+          "pass": 3,
+          "n": 4,
+          "verified_n": 4,
+          "rate_all": 0.75
+        },
+        "build": {
+          "pass": 3,
+          "n": 3,
+          "verified_n": 3,
+          "rate_all": 1.0
+        },
+        "static_behavior": {
+          "pass": 3,
+          "n": 3,
+          "verified_n": 3,
+          "rate_all": 1.0
+        },
+        "runtime_behavior": {
+          "pass": 0,
+          "n": 3,
+          "verified_n": 0,
+          "rate_all": 0.0
+        },
+        "all_attempts": {
+          "workflow_seconds": {
+            "n": 4,
+            "known_n": 4,
+            "unknown_n": 0,
+            "median": 18.81314085000122,
+            "p95": 23.012446500004444
+          },
+          "input_tokens": {
+            "n": 4,
+            "known_n": 4,
+            "unknown_n": 0,
+            "median": 56284.5,
+            "p95": 64407
+          },
+          "output_tokens": {
+            "n": 4,
+            "known_n": 4,
+            "unknown_n": 0,
+            "median": 1844.0,
+            "p95": 2539
+          },
+          "total_tokens": {
+            "n": 4,
+            "known_n": 4,
+            "unknown_n": 0,
+            "median": 58128.5,
+            "p95": 66946
+          }
+        },
+        "accepted_attempts": {
+          "workflow_seconds": {
+            "n": 3,
+            "known_n": 3,
+            "unknown_n": 0,
+            "median": 19.87760949999938,
+            "p95": 23.012446500004444
+          },
+          "input_tokens": {
+            "n": 3,
+            "known_n": 3,
+            "unknown_n": 0,
+            "median": 57243,
+            "p95": 64407
+          },
+          "output_tokens": {
+            "n": 3,
+            "known_n": 3,
+            "unknown_n": 0,
+            "median": 2132,
+            "p95": 2539
+          },
+          "total_tokens": {
+            "n": 3,
+            "known_n": 3,
+            "unknown_n": 0,
+            "median": 59375,
+            "p95": 66946
+          }
+        },
+        "known_partial_tokens": {
+          "input_tokens": 188960,
+          "output_tokens": 6940,
+          "total_tokens": 195900
+        },
+        "tool_errors": 0,
+        "repair_cycles": 1,
+        "statuses": {
+          "completed": 4
+        }
+      },
+      "tasks": {
+        "inspect": {
+          "cases": 1,
+          "completion": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "accepted": {
+            "pass": 0,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 0.0
+          },
+          "build": {
+            "pass": 0,
+            "n": 0,
+            "verified_n": 0,
+            "rate_all": null
+          },
+          "static_behavior": {
+            "pass": 0,
+            "n": 0,
+            "verified_n": 0,
+            "rate_all": null
+          },
+          "runtime_behavior": {
+            "pass": 0,
+            "n": 0,
+            "verified_n": 0,
+            "rate_all": null
+          },
+          "all_attempts": {
+            "workflow_seconds": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 6.5539921000017785,
+              "p95": 6.5539921000017785
+            },
+            "input_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 11984,
+              "p95": 11984
+            },
+            "output_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 713,
+              "p95": 713
+            },
+            "total_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 12697,
+              "p95": 12697
+            }
+          },
+          "accepted_attempts": {
+            "workflow_seconds": {
+              "n": 0,
+              "known_n": 0,
+              "unknown_n": 0,
+              "median": null,
+              "p95": null
+            },
+            "input_tokens": {
+              "n": 0,
+              "known_n": 0,
+              "unknown_n": 0,
+              "median": null,
+              "p95": null
+            },
+            "output_tokens": {
+              "n": 0,
+              "known_n": 0,
+              "unknown_n": 0,
+              "median": null,
+              "p95": null
+            },
+            "total_tokens": {
+              "n": 0,
+              "known_n": 0,
+              "unknown_n": 0,
+              "median": null,
+              "p95": null
+            }
+          },
+          "known_partial_tokens": {
+            "input_tokens": 11984,
+            "output_tokens": 713,
+            "total_tokens": 12697
+          },
+          "tool_errors": 0,
+          "repair_cycles": 0,
+          "statuses": {
+            "completed": 1
+          }
+        },
+        "repair": {
+          "cases": 1,
+          "completion": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "accepted": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "build": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "static_behavior": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "runtime_behavior": {
+            "pass": 0,
+            "n": 1,
+            "verified_n": 0,
+            "rate_all": 0.0
+          },
+          "all_attempts": {
+            "workflow_seconds": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 23.012446500004444,
+              "p95": 23.012446500004444
+            },
+            "input_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 64407,
+              "p95": 64407
+            },
+            "output_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 2539,
+              "p95": 2539
+            },
+            "total_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 66946,
+              "p95": 66946
+            }
+          },
+          "accepted_attempts": {
+            "workflow_seconds": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 23.012446500004444,
+              "p95": 23.012446500004444
+            },
+            "input_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 64407,
+              "p95": 64407
+            },
+            "output_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 2539,
+              "p95": 2539
+            },
+            "total_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 66946,
+              "p95": 66946
+            }
+          },
+          "known_partial_tokens": {
+            "input_tokens": 64407,
+            "output_tokens": 2539,
+            "total_tokens": 66946
+          },
+          "tool_errors": 0,
+          "repair_cycles": 1,
+          "statuses": {
+            "completed": 1
+          }
+        },
+        "temperature": {
+          "cases": 1,
+          "completion": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "accepted": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "build": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "static_behavior": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "runtime_behavior": {
+            "pass": 0,
+            "n": 1,
+            "verified_n": 0,
+            "rate_all": 0.0
+          },
+          "all_attempts": {
+            "workflow_seconds": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 17.748672200003057,
+              "p95": 17.748672200003057
+            },
+            "input_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 55326,
+              "p95": 55326
+            },
+            "output_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 1556,
+              "p95": 1556
+            },
+            "total_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 56882,
+              "p95": 56882
+            }
+          },
+          "accepted_attempts": {
+            "workflow_seconds": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 17.748672200003057,
+              "p95": 17.748672200003057
+            },
+            "input_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 55326,
+              "p95": 55326
+            },
+            "output_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 1556,
+              "p95": 1556
+            },
+            "total_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 56882,
+              "p95": 56882
+            }
+          },
+          "known_partial_tokens": {
+            "input_tokens": 55326,
+            "output_tokens": 1556,
+            "total_tokens": 56882
+          },
+          "tool_errors": 0,
+          "repair_cycles": 0,
+          "statuses": {
+            "completed": 1
+          }
+        },
+        "threshold": {
+          "cases": 1,
+          "completion": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "accepted": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "build": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "static_behavior": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "runtime_behavior": {
+            "pass": 0,
+            "n": 1,
+            "verified_n": 0,
+            "rate_all": 0.0
+          },
+          "all_attempts": {
+            "workflow_seconds": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 19.87760949999938,
+              "p95": 19.87760949999938
+            },
+            "input_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 57243,
+              "p95": 57243
+            },
+            "output_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 2132,
+              "p95": 2132
+            },
+            "total_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 59375,
+              "p95": 59375
+            }
+          },
+          "accepted_attempts": {
+            "workflow_seconds": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 19.87760949999938,
+              "p95": 19.87760949999938
+            },
+            "input_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 57243,
+              "p95": 57243
+            },
+            "output_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 2132,
+              "p95": 2132
+            },
+            "total_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 59375,
+              "p95": 59375
+            }
+          },
+          "known_partial_tokens": {
+            "input_tokens": 57243,
+            "output_tokens": 2132,
+            "total_tokens": 59375
+          },
+          "tool_errors": 0,
+          "repair_cycles": 0,
+          "statuses": {
+            "completed": 1
+          }
+        }
+      }
+    },
+    "B": {
+      "overall": {
+        "cases": 4,
+        "completion": {
+          "pass": 4,
+          "n": 4,
+          "verified_n": 4,
+          "rate_all": 1.0
+        },
+        "accepted": {
+          "pass": 3,
+          "n": 4,
+          "verified_n": 4,
+          "rate_all": 0.75
+        },
+        "build": {
+          "pass": 3,
+          "n": 3,
+          "verified_n": 3,
+          "rate_all": 1.0
+        },
+        "static_behavior": {
+          "pass": 3,
+          "n": 3,
+          "verified_n": 3,
+          "rate_all": 1.0
+        },
+        "runtime_behavior": {
+          "pass": 0,
+          "n": 3,
+          "verified_n": 0,
+          "rate_all": 0.0
+        },
+        "all_attempts": {
+          "workflow_seconds": {
+            "n": 4,
+            "known_n": 4,
+            "unknown_n": 0,
+            "median": 20.48031959999571,
+            "p95": 36.07084639999812
+          },
+          "input_tokens": {
+            "n": 4,
+            "known_n": 4,
+            "unknown_n": 0,
+            "median": 61661.0,
+            "p95": 88835
+          },
+          "output_tokens": {
+            "n": 4,
+            "known_n": 4,
+            "unknown_n": 0,
+            "median": 2141.5,
+            "p95": 3324
+          },
+          "total_tokens": {
+            "n": 4,
+            "known_n": 4,
+            "unknown_n": 0,
+            "median": 63802.5,
+            "p95": 92159
+          }
+        },
+        "accepted_attempts": {
+          "workflow_seconds": {
+            "n": 3,
+            "known_n": 3,
+            "unknown_n": 0,
+            "median": 21.041752599994652,
+            "p95": 36.07084639999812
+          },
+          "input_tokens": {
+            "n": 3,
+            "known_n": 3,
+            "unknown_n": 0,
+            "median": 64579,
+            "p95": 88835
+          },
+          "output_tokens": {
+            "n": 3,
+            "known_n": 3,
+            "unknown_n": 0,
+            "median": 2277,
+            "p95": 3324
+          },
+          "total_tokens": {
+            "n": 3,
+            "known_n": 3,
+            "unknown_n": 0,
+            "median": 66856,
+            "p95": 92159
+          }
+        },
+        "known_partial_tokens": {
+          "input_tokens": 221013,
+          "output_tokens": 8347,
+          "total_tokens": 229360
+        },
+        "tool_errors": 0,
+        "repair_cycles": 1,
+        "statuses": {
+          "completed": 4
+        }
+      },
+      "tasks": {
+        "inspect": {
+          "cases": 1,
+          "completion": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "accepted": {
+            "pass": 0,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 0.0
+          },
+          "build": {
+            "pass": 0,
+            "n": 0,
+            "verified_n": 0,
+            "rate_all": null
+          },
+          "static_behavior": {
+            "pass": 0,
+            "n": 0,
+            "verified_n": 0,
+            "rate_all": null
+          },
+          "runtime_behavior": {
+            "pass": 0,
+            "n": 0,
+            "verified_n": 0,
+            "rate_all": null
+          },
+          "all_attempts": {
+            "workflow_seconds": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 6.4457602000038605,
+              "p95": 6.4457602000038605
+            },
+            "input_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 8856,
+              "p95": 8856
+            },
+            "output_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 740,
+              "p95": 740
+            },
+            "total_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 9596,
+              "p95": 9596
+            }
+          },
+          "accepted_attempts": {
+            "workflow_seconds": {
+              "n": 0,
+              "known_n": 0,
+              "unknown_n": 0,
+              "median": null,
+              "p95": null
+            },
+            "input_tokens": {
+              "n": 0,
+              "known_n": 0,
+              "unknown_n": 0,
+              "median": null,
+              "p95": null
+            },
+            "output_tokens": {
+              "n": 0,
+              "known_n": 0,
+              "unknown_n": 0,
+              "median": null,
+              "p95": null
+            },
+            "total_tokens": {
+              "n": 0,
+              "known_n": 0,
+              "unknown_n": 0,
+              "median": null,
+              "p95": null
+            }
+          },
+          "known_partial_tokens": {
+            "input_tokens": 8856,
+            "output_tokens": 740,
+            "total_tokens": 9596
+          },
+          "tool_errors": 0,
+          "repair_cycles": 0,
+          "statuses": {
+            "completed": 1
+          }
+        },
+        "repair": {
+          "cases": 1,
+          "completion": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "accepted": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "build": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "static_behavior": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "runtime_behavior": {
+            "pass": 0,
+            "n": 1,
+            "verified_n": 0,
+            "rate_all": 0.0
+          },
+          "all_attempts": {
+            "workflow_seconds": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 36.07084639999812,
+              "p95": 36.07084639999812
+            },
+            "input_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 88835,
+              "p95": 88835
+            },
+            "output_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 3324,
+              "p95": 3324
+            },
+            "total_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 92159,
+              "p95": 92159
+            }
+          },
+          "accepted_attempts": {
+            "workflow_seconds": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 36.07084639999812,
+              "p95": 36.07084639999812
+            },
+            "input_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 88835,
+              "p95": 88835
+            },
+            "output_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 3324,
+              "p95": 3324
+            },
+            "total_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 92159,
+              "p95": 92159
+            }
+          },
+          "known_partial_tokens": {
+            "input_tokens": 88835,
+            "output_tokens": 3324,
+            "total_tokens": 92159
+          },
+          "tool_errors": 0,
+          "repair_cycles": 1,
+          "statuses": {
+            "completed": 1
+          }
+        },
+        "temperature": {
+          "cases": 1,
+          "completion": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "accepted": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "build": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "static_behavior": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "runtime_behavior": {
+            "pass": 0,
+            "n": 1,
+            "verified_n": 0,
+            "rate_all": 0.0
+          },
+          "all_attempts": {
+            "workflow_seconds": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 19.918886599996767,
+              "p95": 19.918886599996767
+            },
+            "input_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 58743,
+              "p95": 58743
+            },
+            "output_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 2006,
+              "p95": 2006
+            },
+            "total_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 60749,
+              "p95": 60749
+            }
+          },
+          "accepted_attempts": {
+            "workflow_seconds": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 19.918886599996767,
+              "p95": 19.918886599996767
+            },
+            "input_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 58743,
+              "p95": 58743
+            },
+            "output_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 2006,
+              "p95": 2006
+            },
+            "total_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 60749,
+              "p95": 60749
+            }
+          },
+          "known_partial_tokens": {
+            "input_tokens": 58743,
+            "output_tokens": 2006,
+            "total_tokens": 60749
+          },
+          "tool_errors": 0,
+          "repair_cycles": 0,
+          "statuses": {
+            "completed": 1
+          }
+        },
+        "threshold": {
+          "cases": 1,
+          "completion": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "accepted": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "build": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "static_behavior": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "runtime_behavior": {
+            "pass": 0,
+            "n": 1,
+            "verified_n": 0,
+            "rate_all": 0.0
+          },
+          "all_attempts": {
+            "workflow_seconds": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 21.041752599994652,
+              "p95": 21.041752599994652
+            },
+            "input_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 64579,
+              "p95": 64579
+            },
+            "output_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 2277,
+              "p95": 2277
+            },
+            "total_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 66856,
+              "p95": 66856
+            }
+          },
+          "accepted_attempts": {
+            "workflow_seconds": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 21.041752599994652,
+              "p95": 21.041752599994652
+            },
+            "input_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 64579,
+              "p95": 64579
+            },
+            "output_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 2277,
+              "p95": 2277
+            },
+            "total_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 66856,
+              "p95": 66856
+            }
+          },
+          "known_partial_tokens": {
+            "input_tokens": 64579,
+            "output_tokens": 2277,
+            "total_tokens": 66856
+          },
+          "tool_errors": 0,
+          "repair_cycles": 0,
+          "statuses": {
+            "completed": 1
+          }
+        }
+      }
+    }
+  },
+  "paired_differences": {
+    "repair:workflow_seconds:B_minus_A": {
+      "n": 1,
+      "known_n": 1,
+      "unknown_n": 0,
+      "median": 13.058399899993674,
+      "p95": 13.058399899993674
+    },
+    "repair:total_tokens:B_minus_A": {
+      "n": 1,
+      "known_n": 1,
+      "unknown_n": 0,
+      "median": 25213,
+      "p95": 25213
+    },
+    "temperature:workflow_seconds:B_minus_A": {
+      "n": 1,
+      "known_n": 1,
+      "unknown_n": 0,
+      "median": 2.1702143999937107,
+      "p95": 2.1702143999937107
+    },
+    "temperature:total_tokens:B_minus_A": {
+      "n": 1,
+      "known_n": 1,
+      "unknown_n": 0,
+      "median": 3867,
+      "p95": 3867
+    },
+    "threshold:workflow_seconds:B_minus_A": {
+      "n": 1,
+      "known_n": 1,
+      "unknown_n": 0,
+      "median": 1.1641430999952718,
+      "p95": 1.1641430999952718
+    },
+    "threshold:total_tokens:B_minus_A": {
+      "n": 1,
+      "known_n": 1,
+      "unknown_n": 0,
+      "median": 7481,
+      "p95": 7481
+    },
+    "inspect:workflow_seconds:B_minus_A": {
+      "n": 1,
+      "known_n": 1,
+      "unknown_n": 0,
+      "median": -0.10823189999791794,
+      "p95": -0.10823189999791794
+    },
+    "inspect:total_tokens:B_minus_A": {
+      "n": 1,
+      "known_n": 1,
+      "unknown_n": 0,
+      "median": -3101,
+      "p95": -3101
+    }
+  },
+  "limitations": [
+    "Small repetition counts are exploratory, not statistically strong comparisons.",
+    "Static recognized-subset acceptance; PLC runtime behavior remains unverified.",
+    "API client/model experiment, distinct from ChatGPT UI.",
+    "Dirty source fingerprints identify uncommitted code; do not label them a clean revision.",
+    "Mutable provider alias: matching model IDs do not guarantee identical weights over time."
+  ],
+  "inspection_regrades": [
+    {
+      "case_id": "inspect-000-A",
+      "attempt_id": "attempt-00e0a321f6a045bca56593df1867e7e0",
+      "fingerprint": "141e0b002795406c8656005d24a8821ce78bb834957ee738b6c5fe6611369852",
+      "prior_rubric": "feeder-1",
+      "prior_success": false,
+      "rubric": "feeder-2",
+      "success": true,
+      "summary_sha256": "6a7ff87d610ae8148606677216c91784333d989b8a4f2734ed008da87b9ab809",
+      "response_sha256": "16c2e7863f27d125072beca105b6a847fcc804b8bbe075ce221a0f4599fd234d",
+      "validation": {
+        "rubric": "feeder-2",
+        "checks": {
+          "location": true,
+          "initialization_event": true,
+          "initialization_expression": true,
+          "decrement_event": true,
+          "full": true,
+          "empty": true,
+          "temperature": true
+        },
+        "answer_pass": true,
+        "scope": "pass",
+        "compile_pass": null,
+        "runtime_behavior": "unverified",
+        "static_behavior": null,
+        "obtained_source_through_mcp": true,
+        "success": true
+      },
+      "method": "Answer-only deterministic regrade; original saved-artifact scope/read evidence retained. No API or CE calls."
+    },
+    {
+      "case_id": "inspect-000-B",
+      "attempt_id": "attempt-d6ade1c6ec6844399eeb4bdce75ba5d0",
+      "fingerprint": "141e0b002795406c8656005d24a8821ce78bb834957ee738b6c5fe6611369852",
+      "prior_rubric": "feeder-1",
+      "prior_success": false,
+      "rubric": "feeder-2",
+      "success": true,
+      "summary_sha256": "a603371d8461e4874f3b9dcd2767d6b275d97015ace25e26b2534f68c89164cf",
+      "response_sha256": "a9c41b66014879cb796a6c1818b09dcab9eba775c962df2bb02905610815d542",
+      "validation": {
+        "rubric": "feeder-2",
+        "checks": {
+          "location": true,
+          "initialization_event": true,
+          "initialization_expression": true,
+          "decrement_event": true,
+          "full": true,
+          "empty": true,
+          "temperature": true
+        },
+        "answer_pass": true,
+        "scope": "pass",
+        "compile_pass": null,
+        "runtime_behavior": "unverified",
+        "static_behavior": null,
+        "obtained_source_through_mcp": true,
+        "success": true
+      },
+      "method": "Answer-only deterministic regrade; original saved-artifact scope/read evidence retained. No API or CE calls."
+    }
+  ],
+  "regraded_conditions": {
+    "feeder-2": {
+      "A": {
+        "cases": 4,
+        "completion": {
+          "pass": 4,
+          "n": 4,
+          "verified_n": 4,
+          "rate_all": 1.0
+        },
+        "accepted": {
+          "pass": 4,
+          "n": 4,
+          "verified_n": 4,
+          "rate_all": 1.0
+        },
+        "build": {
+          "pass": 3,
+          "n": 3,
+          "verified_n": 3,
+          "rate_all": 1.0
+        },
+        "static_behavior": {
+          "pass": 3,
+          "n": 3,
+          "verified_n": 3,
+          "rate_all": 1.0
+        },
+        "runtime_behavior": {
+          "pass": 0,
+          "n": 3,
+          "verified_n": 0,
+          "rate_all": 0.0
+        },
+        "all_attempts": {
+          "workflow_seconds": {
+            "n": 4,
+            "known_n": 4,
+            "unknown_n": 0,
+            "median": 18.81314085000122,
+            "p95": 23.012446500004444
+          },
+          "input_tokens": {
+            "n": 4,
+            "known_n": 4,
+            "unknown_n": 0,
+            "median": 56284.5,
+            "p95": 64407
+          },
+          "output_tokens": {
+            "n": 4,
+            "known_n": 4,
+            "unknown_n": 0,
+            "median": 1844.0,
+            "p95": 2539
+          },
+          "total_tokens": {
+            "n": 4,
+            "known_n": 4,
+            "unknown_n": 0,
+            "median": 58128.5,
+            "p95": 66946
+          }
+        },
+        "accepted_attempts": {
+          "workflow_seconds": {
+            "n": 4,
+            "known_n": 4,
+            "unknown_n": 0,
+            "median": 18.81314085000122,
+            "p95": 23.012446500004444
+          },
+          "input_tokens": {
+            "n": 4,
+            "known_n": 4,
+            "unknown_n": 0,
+            "median": 56284.5,
+            "p95": 64407
+          },
+          "output_tokens": {
+            "n": 4,
+            "known_n": 4,
+            "unknown_n": 0,
+            "median": 1844.0,
+            "p95": 2539
+          },
+          "total_tokens": {
+            "n": 4,
+            "known_n": 4,
+            "unknown_n": 0,
+            "median": 58128.5,
+            "p95": 66946
+          }
+        },
+        "known_partial_tokens": {
+          "input_tokens": 188960,
+          "output_tokens": 6940,
+          "total_tokens": 195900
+        },
+        "tool_errors": 0,
+        "repair_cycles": 1,
+        "statuses": {
+          "completed": 4
+        }
+      },
+      "B": {
+        "cases": 4,
+        "completion": {
+          "pass": 4,
+          "n": 4,
+          "verified_n": 4,
+          "rate_all": 1.0
+        },
+        "accepted": {
+          "pass": 4,
+          "n": 4,
+          "verified_n": 4,
+          "rate_all": 1.0
+        },
+        "build": {
+          "pass": 3,
+          "n": 3,
+          "verified_n": 3,
+          "rate_all": 1.0
+        },
+        "static_behavior": {
+          "pass": 3,
+          "n": 3,
+          "verified_n": 3,
+          "rate_all": 1.0
+        },
+        "runtime_behavior": {
+          "pass": 0,
+          "n": 3,
+          "verified_n": 0,
+          "rate_all": 0.0
+        },
+        "all_attempts": {
+          "workflow_seconds": {
+            "n": 4,
+            "known_n": 4,
+            "unknown_n": 0,
+            "median": 20.48031959999571,
+            "p95": 36.07084639999812
+          },
+          "input_tokens": {
+            "n": 4,
+            "known_n": 4,
+            "unknown_n": 0,
+            "median": 61661.0,
+            "p95": 88835
+          },
+          "output_tokens": {
+            "n": 4,
+            "known_n": 4,
+            "unknown_n": 0,
+            "median": 2141.5,
+            "p95": 3324
+          },
+          "total_tokens": {
+            "n": 4,
+            "known_n": 4,
+            "unknown_n": 0,
+            "median": 63802.5,
+            "p95": 92159
+          }
+        },
+        "accepted_attempts": {
+          "workflow_seconds": {
+            "n": 4,
+            "known_n": 4,
+            "unknown_n": 0,
+            "median": 20.48031959999571,
+            "p95": 36.07084639999812
+          },
+          "input_tokens": {
+            "n": 4,
+            "known_n": 4,
+            "unknown_n": 0,
+            "median": 61661.0,
+            "p95": 88835
+          },
+          "output_tokens": {
+            "n": 4,
+            "known_n": 4,
+            "unknown_n": 0,
+            "median": 2141.5,
+            "p95": 3324
+          },
+          "total_tokens": {
+            "n": 4,
+            "known_n": 4,
+            "unknown_n": 0,
+            "median": 63802.5,
+            "p95": 92159
+          }
+        },
+        "known_partial_tokens": {
+          "input_tokens": 221013,
+          "output_tokens": 8347,
+          "total_tokens": 229360
+        },
+        "tool_errors": 0,
+        "repair_cycles": 1,
+        "statuses": {
+          "completed": 4
+        }
+      }
+    }
+  }
+}
