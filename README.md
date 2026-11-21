@@ -178,6 +178,9 @@ claude mcp add control-expert -- C:\path\to\control-expert-mcp\.venv\Scripts\pyt
 | `new_project` | Create a project for a CPU (e.g. `BMX P34 2020` + `02.70`) |
 | `save_project` / `close_project` | Persist / close (close discards unless `save=true`) |
 | `build_project` / `analyze_project` | Build or analyze; returns resulting build state |
+| `get_documentation_status` | Local manual conversion/index health, warnings, versions, freshness |
+| `search_manuals` | Ranked manual excerpts and citations, including IEC symbol search |
+| `get_manual_topic` | Original indexed Markdown by topic ID, with section selection and pagination |
 | `get_project_structure` | Tasks, sections (+language), events, fct modules |
 | `list_variables` | Variables with type/comment/address/initial value |
 | `create_variable` / `update_variable` / `delete_variable` | Variable editing |
@@ -334,65 +337,117 @@ access violation on the validation host and is explicitly disabled. Generated ve
 and local reports are ignored by Git. The converter does not use COM or PLC access.
 The `consult_installed_manuals` MCP prompt describes this workflow.
 
-### Proposed MCP documentation service
+### MCP documentation service
 
-The converter and `consult_installed_manuals` prompt are implemented. The following
-service is a design for the next implementation; these additional tools are not
-registered yet. It will serve the local Markdown corpus through the existing MCP
-server, including when no Control Expert application is open.
+The existing MCP server serves converted manuals without opening Control Expert
+or connecting to a PLC. Conversion and SQLite FTS5 indexing are explicit local
+preparation commands; requests never convert, index, or download documentation.
 
-| Operation | Proposed interface | Result |
-| --- | --- | --- |
-| Corpus health | `get_documentation_status()` | Installed corpus/version, indexed sources, failures, warnings, and index freshness. |
-| Search | `search_manuals(query, library?, language?, limit=8)` | Ranked topic IDs, short excerpts, headings, and citations. |
-| Function/block details | `get_function_reference(name, library?, cpu_family?)` | Exact matches, parameter/type tables, behavior, constraints, examples, and diagram references from the manual. Ambiguous names return candidates. |
-| Topic retrieval | `get_manual_topic(topic_id, section?, cursor?, max_chars=12000)` | Original Markdown, source metadata, related topics, and an explicit continuation cursor. |
-| Language documentation | Extend `get_language_reference(language, topic?, include_manuals=false)` | Preserve the current authoring guide/example response by default; optionally attach matching vendor language topics and citations. |
+```powershell
+.venv\Scripts\python.exe tools/index_ce_help.py --manuals-dir manuals/ce-16.4
+$env:CE_MCP_MANUALS_DIR = (Resolve-Path manuals/ce-16.4).Path
+.venv\Scripts\python.exe -m control_expert_mcp
+```
 
-**Index and retrieval.** Add a local SQLite FTS5 index built by a separate
-`tools/index_ce_help.py` command after conversion. Read only successful sources
-listed in `manifest.json`, never arbitrary Markdown elsewhere in the repository.
-Use source-relative IDs so citations survive rebuilding. Index topic titles,
-section headings, IEC symbols, library names, source versions, and body text.
-Normalize inline HTML anchors and Markdown escapes for search/symbol extraction,
-while preserving the original Markdown for retrieval.
-Prioritize exact symbol/title matches before full-text rank; keep underscores in
-symbols such as `READ_VAR`. Initial retrieval needs no embeddings or cloud calls.
+Set `CE_MCP_MANUALS_DIR` in the MCP client's server environment too. The development
+default is `manuals/ce-16.4` relative to the package's repository; packaged
+installations should configure an explicit corpus directory. SQLite must support
+FTS5, as in the validated Windows Python installation.
 
-Split topics at headings with size limits; preserve complete parameter tables,
-code blocks, warnings, and applicability statements. Each chunk retains its
-parent topic and PDF page or CHM anchor. Deduplicate repeated content for ranking
-while retaining every source/version relationship. Distinguish the **16.4 source
-installation** from a manual's own stated publication version; older library
-documentation must remain identifiable. CPU applicability is reported only when
-supported by the cited text, not inferred from a successful search.
+For a wheel installation, the same explicit indexer is available as
+`python -m control_expert_mcp.documentation --manuals-dir <corpus-directory>`.
 
-**Resources and citations.** Expose a small `ce-help://catalog` resource and URI
-templates `ce-help://topic/{topic_id}` and `ce-help://asset/{asset_id}`. Do not list
-every topic in the resource catalog. Tools provide discovery for clients that use
-tool calling; resources provide reusable Markdown and selected diagram images.
-Every response includes the book title, source path, source hash, topic ID,
-heading/anchor or PDF page, corpus language, and resource URI. Fetch diagrams on
-demand rather than attaching every image to a function response. Unsupported
-image formats remain identified as assets instead of pretending to be readable.
+| Tool | Result |
+| --- | --- |
+| `get_documentation_status()` | Corpus, installation version, indexed counts, failures, warnings and freshness. |
+| `search_manuals(query, library="", language="", limit=8, manual_version="", installation_version="")` | Ranked topic IDs, excerpts, section cursors, citations and alternate citations for identical source topics. |
+| `get_manual_topic(topic_id, section="", cursor=0, max_chars=12000)` | Original Markdown, source citation, overlapping headings/anchors/pages and continuation cursor. |
 
-**Lifecycle and boundaries.** Build/update the index explicitly and publish it
-atomically; MCP requests use read-only connections, one per worker thread.
-Compare the manifest/converter fingerprint to detect stale indexes and report
-missing conversion/index steps clearly. Configure the corpus with
-`CE_MCP_MANUALS_DIR`, allowing packaged installations to use an explicit data
-directory. Asset/topic lookups resolve manifest IDs within that directory and
-reject traversal or symlink escapes. Manual contents are reference data and are
-never interpreted as instructions to execute tools. Documentation access needs
-no COM session, PLC connection, or online-access flag.
+`language` filters corpus language (`en`, `it`, etc.), not ST/LD/FBD. `library`
+matches explicit manifest metadata or a book-title substring. Version filters are
+exact; missing metadata does not match. Queries are literal words/symbols, not FTS
+operators (up to 512 characters, limit 1–50). Exact headings and symbol prefixes
+rank before weighted full-text results. Search considers at most 1,000 candidate
+passages and returns one hit per topic, grouping identical source-hash/topic-path
+pairs with alternate citations.
 
-**Client workflow and acceptance.** Search or resolve a function, fetch the
-relevant sections/diagram, consult the existing language authoring guide, then
-write/import/build using the existing tools. Add a guided MCP prompt for that
-sequence. Validate `TON`, `READ_VAR`, ST edge handling, and an ambiguous symbol;
-also test citations, version filters, pagination, missing/stale corpora, image
-retrieval, traversal rejection, and MCP stdio round trips. Implementation order:
-index/search/topic retrieval, then function/language lookup, then image resources.
+Call `get_documentation_status`, `search_manuals("TON")`, then `get_manual_topic`
+with the returned topic ID and cursor. `section` selects an exact heading or CHM
+anchor; ambiguous headings require a cursor instead. Cursors are character offsets
+within the topic, or within the selected section if supplied. Continue with
+`next_cursor` and identical topic/section arguments until it is null. `max_chars`
+is 1–24,000; `sections` describes headings overlapping the returned page.
+
+The index reads only successful (`converted`/`cached`) sources and Markdown outputs
+listed in `manifest.json`. Stable topic IDs derive from source-relative paths.
+Heading-based passages are split at paragraph boundaries with a 6,000-character
+target, keeping individual tables and fenced code together even when they exceed
+that target. Retrieval preserves original Markdown, tables, code, links, image
+references, warnings and applicability statements. Search normalizes HTML anchors
+and Markdown escapes and preserves underscores in symbols such as `READ_VAR`.
+
+Citations include book title, original source path/hash, converted topic path/hash,
+topic ID, heading/anchor or PDF page, language, converter fingerprint and warnings.
+Installation version comes from manifest `installation_version`, or the explicitly
+named Control Expert version in the installation path. It never populates the
+manual version. Optional per-manual fields `manual_version`, `document_revision`,
+`language`, and `library` are preserved without guessing. The converter does not
+automatically extract publication versions/revisions: unknown fields are null,
+and the original publication text remains retrievable. CPU applicability and
+installed-block availability are never inferred from a manual match.
+
+Index updates build a temporary database and publish it atomically. Requests use
+independent read-only connections. A full manifest hash (including converter
+fingerprints) detects stale indexes; retrieval refuses stale data until reindexed.
+Freshness means alignment with that conversion manifest, not a fresh scan of the
+vendor installation or every exported file on each request. Rerun conversion after
+vendor updates and indexing after conversion or metadata changes. Missing/corrupt
+indexes report preparation steps. On Windows, if an active reader prevents atomic
+replacement, retry indexing after requests finish; the previous index is retained.
+
+Indexing rejects traversal and symlink escapes outside each manual directory.
+Retrieval uses opaque topic IDs and stored snapshots, never caller-supplied paths.
+Manual contents are reference data, never tool-execution instructions. Generated
+manuals/indexes stay local and excluded from Git and distributions.
+
+The `consult_installed_manuals` prompt guides discovery, retrieval, citations,
+language-reference consultation and edit/build validation. Offline CI uses synthetic
+text and mocked COM responses. Real manuals and the M580 demo are local-only inputs.
+Structured block lookup, optional vendor results in `get_language_reference`,
+`ce-help://` resources and diagram/image retrieval remain future extensions.
+
+### Build diagnostics and their limits
+
+`build_project` and `analyze_project` retain `build_state`, `error` when present,
+and raw `output`. They add parsed `diagnostics` with severity, code, task/section,
+line/column location and original message for recognized lines. Unknown fields
+are null; unrecognized/localized formats remain in raw output. An empty parsed
+list does not establish that output contains no errors.
+`diagnostics_summary` preserves recognized English process-summary counts (or
+null); these can include uncoded warnings absent from the parsed diagnostic list.
+
+`diagnostics_available` distinguishes a readable (even empty) Build tab from
+unavailable output (`output=null`). `diagnostics_capture` reports operation,
+source tab, read errors, observed freshness (`changed`, `unchanged`, `unknown`)
+and scope (`snapshot` or `appended`). `diagnostics_output` is an observed appended
+suffix when detectable, otherwise the full snapshot. Build/analyze never fall
+back to Import/export or User errors tabs. Identical output can be a repeated
+successful build or old output: attribution remains `unverified`, even when text
+changes, because the output API supplies no operation identifier. Check
+`build_state` and `error` along with capture metadata before attempting repairs.
+
+Local validation on 2026-11-21 used Windows/Python 3.11.5, licensed Control Expert
+16.4, and a disposable copy of `demo_ControlExpert_M580.stu` (BME P58 3040,
+firmware 03.20). Analyze and full build succeeded with the demo's existing single
+network warning. An ST section referencing an undefined symbol produced E1061
+with task/section and line/column; deleting that temporary section restored
+`built_ok`. A repeated full build returned identical output and correctly reported
+`freshness="unchanged"`. The original demo's SHA-256 remained unchanged. No PLC
+connection or transfer occurred. The local runner/report are in the ignored
+`tmp/validate_documentation_m580.py` and `tmp/documentation-m580-check/report.json`.
+The installed 16.4 corpus indexed 280 manuals / 22,550 topics; `TON`, `READ_VAR`
+and Structured Text searches and topic retrieval were exercised. CI uses
+`python -m unittest discover -s tools -p "test_*.py"` with synthetic sources only.
 
 ## Troubleshooting
 

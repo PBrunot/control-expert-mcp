@@ -3,6 +3,9 @@ recursive-include samples *.json
 include tools/check_distribution.py
 include tools/check_ce_automation.py
 include tools/export_ce_help.py
+include tools/index_ce_help.py
+include tools/test_documentation.py
+include tools/test_diagnostics.py
 include tools/requirements-help.txt
 include tools/test_export_ce_help.py
 include tools/test_mcp_runtime.py

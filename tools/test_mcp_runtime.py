@@ -4,7 +4,9 @@ from concurrent.futures import ThreadPoolExecutor
 from importlib.metadata import version
 import json
 import os
+from pathlib import Path
 import sys
+import tempfile
 import time
 from types import SimpleNamespace
 import unittest
@@ -15,9 +17,39 @@ from mcp.client.stdio import stdio_client
 from pymodbus.client import ModbusTcpClient
 
 from control_expert_mcp.modbus import ModbusClient
+from control_expert_mcp.documentation import build_index
 
 
 class MCPRuntimeTests(unittest.IsolatedAsyncioTestCase):
+    async def test_manual_tools_over_stdio_without_application(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            (root / "topic.md").write_text('# TON\n\nSynthetic timer reference.\n', encoding="utf-8")
+            (root / "manifest.json").write_text(json.dumps({"manuals": [
+                {"status": "converted", "source": "test.chm", "folder": ".",
+                 "title": "Test", "outputs": ["topic.md"], "warnings": []},
+            ]}), encoding="utf-8")
+            build_index(root)
+            parameters = StdioServerParameters(command=sys.executable,
+                args=["-m", "control_expert_mcp"],
+                env={**os.environ, "CE_MCP_ENABLE_ONLINE": "0", "CE_MCP_MANUALS_DIR": str(root)})
+            async with stdio_client(parameters) as (read, write):
+                async with ClientSession(read, write) as session:
+                    await session.initialize()
+                    status = await session.call_tool("get_documentation_status", {})
+                    self.assertTrue(json.loads(status.content[0].text)["ready"])
+                    result = await session.call_tool("search_manuals", {"query": "TON"})
+                    self.assertFalse(result.is_error)
+                    topic = json.loads(result.content[0].text)["results"][0]
+                    response = await session.call_tool("get_manual_topic", {"topic_id": topic["topic_id"]})
+                    self.assertFalse(response.is_error)
+                    self.assertIn("Synthetic timer reference", json.loads(response.content[0].text)["markdown"])
+                    status = await session.call_tool("get_status", {})
+                    self.assertEqual(json.loads(status.content[0].text)["session"], "no application open")
+                    error = await session.call_tool("get_manual_topic", {"topic_id": "../secret"})
+                    self.assertTrue(error.is_error)
+                    self.assertIn("Invalid topic ID", error.content[0].text)
+
     async def test_stdio_tools_resources_and_prompts(self):
         environment = {**os.environ, "CE_MCP_ENABLE_ONLINE": "0"}
         parameters = StdioServerParameters(command=sys.executable,

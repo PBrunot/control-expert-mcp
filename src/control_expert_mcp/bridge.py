@@ -23,6 +23,7 @@ from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Callable
 
 from . import constants as C
+from .diagnostics import diagnostic_capture
 
 log = logging.getLogger(__name__)
 
@@ -465,6 +466,7 @@ class ControlExpertBridge:
 
     def _do_build(self, rebuild_all: bool) -> dict:
         proj = self._project(write=True)
+        before = self._do_capture_build_output()
         error: str | None = None
         fell_back = False
         try:
@@ -481,9 +483,12 @@ class ControlExpertBridge:
             # (whose EXCEPINFO carries only the generic "Process failed" summary),
             # so check both sources. The actionable recovery is always a full
             # rebuild — do it automatically instead of surfacing a dead-end error.
+            failed_capture = diagnostic_capture(before, self._do_capture_build_output(), "build")
             if not rebuild_all and (
                 _is_build_changes_unavailable(exc)
-                or "build changes" in self._do_read_output_window().lower()
+                or (failed_capture["diagnostics_capture"]["freshness"] == "changed" and
+                    "build changes function not available" in
+                    (failed_capture["diagnostics_output"] or "").lower())
             ):
                 error = None
                 fell_back = True
@@ -501,7 +506,7 @@ class ControlExpertBridge:
             )
         if error:
             result["error"] = error
-        result["output"] = self._do_read_output_window()
+        result.update(diagnostic_capture(before, self._do_capture_build_output(), "build"))
         return result
 
     def get_project_setting(self, ident: str) -> dict:
@@ -550,6 +555,7 @@ class ControlExpertBridge:
 
     def _do_analyze(self) -> dict:
         proj = self._project(write=True)
+        before = self._do_capture_build_output()
         error: str | None = None
         try:
             proj.Analyze()
@@ -560,8 +566,29 @@ class ControlExpertBridge:
         }
         if error:
             result["error"] = error
-        result["output"] = self._do_read_output_window()
+        result.update(diagnostic_capture(before, self._do_capture_build_output(), "analyze"))
         return result
+
+    def _do_capture_build_output(self) -> dict:
+        """Read only the Build tab; never attribute Import/export or User errors to builds."""
+        errors = []
+        try:
+            ow = self._wrap(self._get_prop(self._ensure_app(), "OutputWindow"))
+        except Exception as exc:
+            return {"available": False, "tab": None, "output": None,
+                    "read_errors": [_format_com_error(exc)]}
+        for tab in ("Build", "build"):
+            try:
+                content = self._get_prop(ow, "GetContentsAsString", tab)
+                if content is None:
+                    errors.append(f"{tab}: no output returned")
+                    continue
+                if isinstance(content, (list, tuple)):
+                    content = "\n".join(str(line) for line in content)
+                return {"available": True, "tab": tab, "output": str(content), "read_errors": errors}
+            except Exception as exc:
+                errors.append(f"{tab}: {_format_com_error(exc)}")
+        return {"available": False, "tab": None, "output": None, "read_errors": errors}
 
     def _do_read_output_window(self) -> str | None:
         """Read build/import diagnostics. GetContentsAsString takes the output
