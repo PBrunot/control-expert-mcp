@@ -1,5 +1,47 @@
 # Benchmark implementation checkpoint
 
+## Later runs, archive backlog and a CI regression (2026-11-21, after `c10a348`)
+
+**Nothing has been archived since `20261121T114513Z-a78f24bc`.** `benchmarks/archive/`
+still holds exactly those three campaigns, and its `index.json`, `README.md`,
+`overview.png` and `overview.metadata.json` remain mutually consistent; the offline
+suite passes, including the archive-integrity and regrade tests.
+
+Complete local campaigns that are **not** archived (raw evidence stays under the
+ignored `benchmarks/results/`; harness revision `e7a1a5f`, `dirty: false` in each):
+
+| Run | Suite | Provider / model | Cases | Result |
+|---|---|---|---|---|
+| `20261121T131404Z-b2cc4984` | five offline tasks, A/B | openai `gpt-5.5-2026-04-23`, medium | 10/10 | all accepted |
+| `20261121T130812Z-opc-461b35db` | `ce-bench opc`, live | openai `gpt-5.5-2026-04-23`, medium | 3/3 | all passed, restoration verified |
+| `20261121T130930Z-opc-44a5e26e` | `ce-bench opc`, live | openai `gpt-5.5-2026-04-23`, medium | 3/3 | all passed, restoration verified |
+| `20261121T131110Z-opc-d434b70f` | `ce-bench opc`, live | deepseek `deepseek-flash` (alias), high | 3/3 | all passed, restoration verified |
+
+`20261121T130836Z-opc-68604681` is a single positive-case smoke run of the same OPC
+suite. Archive publication needs one documented campaign per provider and model, so
+the two duplicate OpenAI OPC runs should not both be published; `archive` refuses a
+run with missing cases unless `--allow-incomplete` is given, and a live OPC campaign
+additionally requires verified restoration.
+
+Incomplete campaigns, which have no `outcome.json` and no report:
+
+- `20261121T132745Z-6e9d154f` (deepseek) stopped after 1 of 10 scheduled cases.
+- `20261121T133045Z-756e0589` (deepseek, run against the separate clean checkout
+  `control-expert-mcp-benchmark-e7a1a5`) completed 5 of 10 cases: `temperature-000-A`
+  was interrupted mid-request (6 model requests, 5 responses, no `summary.json`), and
+  `repair`/`inspect` never started. Neither the workspace nor the per-user guard holds
+  `TAINTED.json`, so `resume` is permitted without `recover`, and the clean checkout
+  still exists. A `ControlExpert.exe` instance started at 13:31 remains running.
+
+Offline CI regression at tag `v0.9.1` (`dfc6111`): all five Python jobs failed in
+`Run offline regression tests` with `ModuleNotFoundError: No module named 'httpx'` in
+`test_benchmark.RuntimeTests.test_connection_retries_preserve_requests_and_do_not_replay_writes`
+and `test_connection_retry_limit_and_non_connection_errors`. The workflow installed
+`".[test]"`, which omits the `benchmark` extra supplying `openai` and therefore
+`httpx`. `7317605` installs `".[benchmark,test]"` for both the checkout and the
+isolated wheel, and CI and Publish have passed at every commit since, up to `c7b5e62`.
+The README offline-check commands now state the same requirement.
+
 ## Fresh DeepSeek five-task campaign (2026-11-21)
 
 Committed implementation, retry policy and prior sanitized results as

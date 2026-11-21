@@ -59,7 +59,7 @@ Availability depends on the installed Control Expert version, license, hardware 
 | Python | 3.11 or newer, as declared in `pyproject.toml` |
 | Control Expert | Licensed local installation of EcoStruxure Control Expert or Unity Pro; validated with versions 14.0 and 16.4 |
 | Automation interface | Registered UDE COM broker (`PSBroker.PServerBroker.1`) |
-| MCP client | A client supporting stdio servers, such as Claude Desktop, Claude Code, or VS Code with GitHub Copilot |
+| MCP client | A client supporting stdio servers, such as Claude Desktop, Claude Code, VS Code with GitHub Copilot, OpenAI Codex CLI, or DeepSeek Harness (DSH) |
 
 Run the server on the **same machine as Control Expert**. DCOM remoting is not configured. The UDE automation server ships with Control Expert; the separate UDE package is only needed for its documentation. Python dependencies are installed with the package.
 
@@ -144,6 +144,56 @@ Add the server to `.vscode/mcp.json`. See [samples/vscode-mcp.json](samples/vsco
   }
 }
 ```
+
+### OpenAI Codex CLI
+
+Codex reads stdio servers from `%USERPROFILE%\.codex\config.toml` (or the directory named by `CODEX_HOME`). Register the server once:
+
+```powershell
+codex mcp add control-expert --env CE_MCP_ENABLE_ONLINE=0 -- control-expert-mcp
+codex mcp list
+```
+
+The command writes the equivalent TOML, which can also be edited by hand:
+
+```toml
+[mcp_servers.control-expert]
+command = "control-expert-mcp"
+
+[mcp_servers.control-expert.env]
+CE_MCP_ENABLE_ONLINE = "0"
+```
+
+For a source installation, set `command` to the absolute `.venv\Scripts\python.exe` path and add `args = ["-m", "control_expert_mcp"]`. Remove the entry with `codex mcp remove control-expert`.
+
+Codex loads `AGENTS.md` from the repository root and its parent directories, so this repository's [AGENTS.md](AGENTS.md) applies without extra configuration. State which `.stu` to work on in the prompt; project state belongs to the server session, not to Codex's working directory. The first operation on a large project can take 30–120 seconds, so raise the client's tool timeout when a call is cut short (see [Troubleshooting](#troubleshooting)).
+
+### DeepSeek Harness (DSH)
+
+DSH composes every capability as a plugin row, so each MCP server is one `@deepseek-ai/dsh-mcp-client` row. Add it to a profile's user patch layer — `%USERPROFILE%\.dsh\profiles\<profile>\cordis.patch.yml`, or `%USERPROFILE%\.dsh\cordis.patch.yml` to apply it to every profile. Both files are a top-level YAML array of patch entries; an entry carrying an `insert` list appends rows:
+
+```yaml
+- insert:
+    - id: mcp-control-expert
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        serverName: control-expert
+        transport: stdio
+        command: control-expert-mcp
+        args: []
+        env:
+          CE_MCP_ENABLE_ONLINE: '0'
+```
+
+`serverName` namespaces the tools, which reach the model as `mcp__control-expert__<tool>`, for example `mcp__control-expert__open_project`. The client launches the server with a scrubbed environment, so every variable the server needs — `CE_MCP_ENABLE_ONLINE`, `CE_MCP_OPC_PYTHON`, `CE_MCP_MANUALS_DIR`, `CE_MCP_SCHEMA_DIR` — must be declared in `env`. For a source installation, set `command` to the absolute `.venv\Scripts\python.exe` path with `args: ['-m', 'control_expert_mcp']`.
+
+Check the composed tree without booting it:
+
+```powershell
+dsh --profile web --dump-config
+```
+
+The `mcp-control-expert` row appears in the dump, and the tool list exposes the `mcp__control-expert__` entries at session start. A row that never activates is reported at boot. The package ships with `dsh`; if a profile cannot resolve it, install it with `dsh plugin --profile web add @deepseek-ai/dsh-mcp-client`. DSH also loads this repository's [AGENTS.md](AGENTS.md) as workspace instructions.
 
 ## Configuration
 
@@ -383,10 +433,12 @@ The DDT Mirror application has moved to a separate repository.
 ### Offline checks
 
 ```powershell
-.venv\Scripts\python.exe -m pip install -e ".[test]"
+.venv\Scripts\python.exe -m pip install -e ".[benchmark,test]"
 .venv\Scripts\python.exe -m compileall -q src
 .venv\Scripts\python.exe -m unittest discover -s tools -p "test_*.py"
 ```
+
+The `benchmark` extra is required for the full suite: the provider retry tests import `openai` (and therefore `httpx`), and the archive tests render the overview image when `matplotlib` is present. Installing only `.[test]` fails those tests with `ModuleNotFoundError: No module named 'httpx'`. The same extra is needed for an installed wheel, for example `pip install "control_expert_mcp-<version>-py3-none-any.whl[benchmark,test]"`.
 
 [CI](.github/workflows/ci.yml) runs offline regression tests on Windows with Python 3.11–3.15, validates distributions, and tests the installed wheel in an isolated environment. These checks use synthetic documentation and mocked COM responses; they do not validate licensed COM integration or PLC runtime behavior.
 
