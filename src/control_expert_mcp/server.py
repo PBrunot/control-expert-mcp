@@ -195,6 +195,8 @@ def open_project(path: str) -> dict:
     Supports .stu (native project), .sta (archive), and .xef/.zef (XML exchange
     format, imported into a fresh application). Any previously open project is
     closed without saving. Opening can take 30-120 s for large projects.
+    Archives are restored into an unsaved application; save with an explicit
+    .stu path to keep a working copy.
     """
     return ce.open_project(path)
 
@@ -669,7 +671,13 @@ def export_xml(kind: str, task: str = "", name: str = "") -> dict:
 @mcp.tool()
 def export_project(path: str) -> dict:
     """Export the full application to a .xef or .zef XML exchange file —
-    useful for backup, diffing, or migrating between Control Expert versions."""
+    useful for backup, diffing, or migrating between Control Expert versions.
+
+    If Control Expert requires ZEF (e.g. M580), an .xef request automatically
+    exports to the same basename with .zef instead. Always use the returned
+    'exported' path. ZEF is a ZIP archive containing unitpro.xef and DTM data.
+    An existing fallback .zef is not overwritten; request it explicitly to replace it.
+    """
     return ce.export_project(path)
 
 

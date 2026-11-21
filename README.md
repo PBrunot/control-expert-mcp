@@ -42,6 +42,14 @@ Inspired by [tiaportal-mcp](https://github.com/heilingbrunner/tiaportal-mcp). Th
 ## Features
 
 - **Project management:** create projects using installed CPU catalog entries; open and save `.stu` / `.sta`; import and export `.xef` / `.zef`.
+
+Opening `.sta` restores the archive into an unsaved application using UDE `OpenArchive`;
+use `save_project` with an explicit `.stu` path for the working copy.
+Before COM activation, the bridge restores missing Windows `CommonProgramFiles`,
+`CommonProgramFiles(x86)` and `CommonProgramW6432` paths from the registry. MCP
+launchers may strip these variables, causing PServer startup to fail its integrity
+check even though desktop Control Expert works. An already running broker retains
+its launch environment and must be restarted after correcting these paths.
 - **Program authoring:** inspect and edit ST, LD, FBD, SFC, and IL sections. Write ST directly or import Control Expert exchange XML for graphical languages, variables, DFBs, and DDTs.
 - **Hardware configuration:** inspect buses, drops, racks, and modules; add, replace, or remove supported hardware; change the CPU.
 - **Communications:** manage DTMs, device addresses, M580 Modbus scan requests, CPU Ethernet services, and Premium/Quantum logical networks.
@@ -242,6 +250,12 @@ An empty diagnostic list does **not** prove a clean build. Check `build_state`, 
 ## Tool reference
 
 Tools are registered in [server.py](src/control_expert_mcp/server.py). The client exposes their full argument schemas and descriptions.
+
+`export_project` retries an unsupported `.xef` export as `.zef` when Control Expert
+requires it (for example, M580). Use the returned `exported` path. ZEF is a ZIP
+archive containing `unitpro.xef` and DTM data. An existing fallback `.zef` is
+protected; choose a new basename or explicitly request that `.zef` path to replace
+it. The `export_project_backup` prompt describes this offline workflow.
 
 | Area | Tools |
 | --- | --- |

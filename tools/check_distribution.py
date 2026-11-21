@@ -14,7 +14,8 @@ PACKAGE = "control_expert_mcp"
 HELPERS = {
     "check_distribution.py", "check_ce_automation.py", "export_ce_help.py",
     "requirements-help.txt", "test_export_ce_help.py", "test_mcp_runtime.py",
-    "index_ce_help.py", "test_documentation.py", "test_diagnostics.py",
+    "index_ce_help.py", "test_documentation.py", "test_diagnostics.py", "test_project_open.py",
+    "test_project_export.py",
     "test_benchmark.py", "benchmark_fake_server.py",
     "test_benchmark_archive.py", "test_benchmark_alarms.py",
     "test_opc.py", "check_opc.py",

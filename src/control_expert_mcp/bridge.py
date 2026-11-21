@@ -73,6 +73,8 @@ def _format_com_error(exc: Exception) -> str:
                 detail = str(excepinfo[2]).strip()
             parts = [p for p in (detail, text) if p]
             msg = " — ".join(parts) if parts else "COM error"
+            if excepinfo and len(excepinfo) > 5 and excepinfo[5]:
+                msg += f" (server SCODE 0x{excepinfo[5] & 0xFFFFFFFF:08X})"
             return f"{msg} (HRESULT 0x{hresult & 0xFFFFFFFF:08X})" if hresult is not None else msg
     except Exception:
         pass
@@ -86,6 +88,33 @@ def _is_build_changes_unavailable(exc: Exception) -> bool:
     HRESULT 0x80020009 (DISP_E_EXCEPTION), but that code is generic, so we also
     require the descriptive text to avoid masking a genuine build failure."""
     return "build changes" in _format_com_error(exc).lower()
+
+
+def _restore_windows_com_environment() -> None:
+    """Restore standard paths scrubbed by MCP launchers before COM activation."""
+    if os.name != "nt":
+        return
+    import struct
+    import winreg
+
+    common_names = ("CommonProgramFiles", "CommonProgramFiles(x86)", "CommonProgramW6432")
+    if all(os.environ.get(name) for name in common_names):
+        return
+    try:
+        with winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,
+                            r"SOFTWARE\Microsoft\Windows\CurrentVersion", 0,
+                            winreg.KEY_READ | winreg.KEY_WOW64_64KEY) as key:
+            native = winreg.QueryValueEx(key, "CommonFilesDir")[0]
+            try:
+                x86 = winreg.QueryValueEx(key, "CommonFilesDir (x86)")[0]
+            except FileNotFoundError:
+                x86 = native
+        paths = (native if struct.calcsize("P") == 8 else x86, x86, native)
+        for name, path in zip(common_names, paths):
+            if not os.environ.get(name):
+                os.environ[name] = path
+    except OSError as exc:
+        log.warning("Could not restore CommonProgramFiles paths for COM: %s", exc)
 
 
 def _read_text_file(path: str) -> str:
@@ -173,6 +202,7 @@ class ControlExpertBridge:
     def _broker():
         import win32com.client
 
+        _restore_windows_com_environment()
         try:
             return win32com.client.Dispatch(BROKER_PROGID)
         except Exception as exc:
@@ -301,8 +331,11 @@ class ControlExpertBridge:
         ext = os.path.splitext(path)[1].lower()
         self._do_close(False)
         broker = self._broker()
-        if ext in (".stu", ".sta"):
+        if ext == ".stu":
             self._app = broker.OpenApplication(path)
+        elif ext == ".sta":
+            self._app = broker.NewApplication()
+            self._app.OpenArchive(path, "")
         elif ext in (".xef", ".zef"):
             self._app = broker.NewApplication()
             self._app.ImportProject(path)
@@ -311,7 +344,9 @@ class ControlExpertBridge:
                 f"Unsupported project file extension '{ext}'. "
                 "Use .stu/.sta (native) or .xef/.zef (XML exchange)."
             )
-        self._project_path = path if ext in (".stu", ".sta") else None
+        # Restored archives have no native filename. Require an explicit .stu
+        # SaveAs rather than accidentally saving over the source archive.
+        self._project_path = path if ext == ".stu" else None
         proj = self._project(write=False)
         return {"opened": path, "project": self._project_info(proj)}
 
@@ -1382,13 +1417,35 @@ class ControlExpertBridge:
         return self._run(self._do_export_project, path)
 
     def _do_export_project(self, path: str) -> dict:
+        import pywintypes
+
         path = os.path.abspath(path)
         ext = os.path.splitext(path)[1].lower()
         if ext not in (".xef", ".zef"):
             raise CEError("export_project path must end in .xef or .zef")
         proj = self._project(write=False)
         os.makedirs(os.path.dirname(path), exist_ok=True)
-        proj.Export(path, C.EXPORT_PROJECT_FULL)
+        try:
+            proj.Export(path, C.EXPORT_PROJECT_FULL)
+        except pywintypes.com_error as exc:
+            # M580 rejects plain XEF with this vendor SCODE. Match the code,
+            # not the localized error text, and leave unrelated failures alone.
+            info = exc.excepinfo
+            scode = info[5] if info and len(info) > 5 else None
+            if ext != ".xef" or scode is None or (scode & 0xFFFFFFFF) != 0xA8A72CF4:
+                raise
+            actual_path = os.path.splitext(path)[0] + ".zef"
+            if os.path.exists(actual_path):
+                raise CEError(
+                    f"This project requires ZEF export, but fallback destination already "
+                    f"exists: {actual_path}. Choose another path or explicitly export to .zef."
+                ) from None
+            proj.Export(actual_path, C.EXPORT_PROJECT_FULL)
+            return {
+                "exported": actual_path,
+                "requested": path,
+                "note": "Control Expert requires ZEF for this project; exported a ZEF archive instead of XEF.",
+            }
         return {"exported": path}
 
     # ------------------------------------------------------------ public: UI

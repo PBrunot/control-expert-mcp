@@ -20,6 +20,36 @@ from __future__ import annotations
 
 def register_prompts(mcp) -> None:
     @mcp.prompt()
+    def export_project_backup() -> str:
+        """Export the loaded application using its supported exchange format."""
+        return (
+            "Call get_status, then export_project with a new .xef or .zef destination. "
+            "If Control Expert rejects XEF because the project requires ZEF (e.g. M580), "
+            "the bridge retries with the same basename and .zef extension. Always read "
+            "the returned exported path; do not assume the requested filename exists. "
+            "An existing fallback ZEF is protected: choose a new basename or explicitly "
+            "request that .zef path to replace it. ZEF is ZIP: inspect unitpro.xef for "
+            "logic and retain the whole archive for DTM data. For inline source only, "
+            "use read_section or export_xml instead. Export is offline; no PLC connection is needed."
+        )
+
+    @mcp.prompt()
+    def inspect_project_archive() -> str:
+        """Restore and inspect a Control Expert archive offline."""
+        return (
+            "Call open_project with the .sta archive path, then get_status and "
+            "get_project_structure to inspect it offline. The bridge uses "
+            "NewApplication followed by OpenArchive, not broker.OpenApplication. "
+            "Restored archives have no native filename; if saving is requested, "
+            "use save_project with an explicit .stu working-copy path. If even "
+            "NewApplication fails with server SCODE 0x80040909, inspect the local "
+            "CommonControlExpert/ucmerr.log and IntegrityCheck.err. Missing Windows "
+            "CommonProgramFiles paths can break the vendor integrity check; the "
+            "bridge restores missing values before activation, but a broker already "
+            "launched with an incomplete environment needs a restart."
+        )
+
+    @mcp.prompt()
     def benchmark_opc_live() -> str:
         """Evaluate model reads/writes using the simple OFS/PLC Simulator fixture."""
         return (

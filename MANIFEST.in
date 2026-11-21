@@ -6,6 +6,8 @@ include tools/export_ce_help.py
 include tools/index_ce_help.py
 include tools/test_documentation.py
 include tools/test_diagnostics.py
+include tools/test_project_open.py
+include tools/test_project_export.py
 include tools/requirements-help.txt
 include tools/test_export_ce_help.py
 include tools/test_mcp_runtime.py
