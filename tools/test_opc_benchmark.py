@@ -3,6 +3,7 @@
 import unittest
 from control_expert_mcp.benchmark.opc import cases, expected, grade, LiveMCP
 from control_expert_mcp.benchmark.core import environment
+from control_expert_mcp.benchmark.report import aggregate
 
 
 class GradingTests(unittest.TestCase):
@@ -40,6 +41,13 @@ class GradingTests(unittest.TestCase):
         self.assertEqual(environment(condition)['CE_MCP_ENABLE_ONLINE'], '0')
         mcp = LiveMCP(condition, {}, None, 'Demo')
         self.assertEqual(mcp.server_environment()['CE_MCP_ENABLE_ONLINE'], '1')
+
+    def test_live_cases_are_not_reported_as_failed_compilation(self):
+        report = aggregate([{'task': 'opc_positive', 'status': 'completed', 'success': True,
+                             'validation': {'runtime_behavior': 'pass'}}])
+        self.assertEqual(report['build']['n'], 0)
+        self.assertEqual(report['static_behavior']['n'], 0)
+        self.assertEqual(report['runtime_behavior']['pass'], 1)
 
 
 class DispatchTests(unittest.IsolatedAsyncioTestCase):

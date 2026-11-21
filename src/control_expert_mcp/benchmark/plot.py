@@ -58,6 +58,7 @@ def visualize_archive(archive: Path, output: Path, scoring: str = "latest") -> P
     preferred = ["inspect", "threshold", "temperature", "repair", "alarms"]
     task_names = {task for row in rows for task in row["tasks"]}
     tasks = [task for task in preferred if task in task_names] + sorted(task_names - set(preferred))
+    task_labels = ["OPC " + task[4:] if task.startswith("opc_") else task.title() for task in tasks]
     height = 5.2 + .85 * len(rows)
     with plt.rc_context({"font.family": "DejaVu Sans", "font.size": 10, "axes.titlesize": 12,
                          "figure.facecolor": "#f6f8fc", "axes.facecolor": "white"}):
@@ -90,7 +91,7 @@ def visualize_archive(archive: Path, output: Path, scoring: str = "latest") -> P
                             texts[y][x] = f"{values[y, x]:.1f}" + ("*" if measure["unknown_n"] else "")
             maximum = 1 if kind == "acceptance" else max(1, float(np.nanmax(values)) if np.any(~np.isnan(values)) else 1)
             axis.imshow(values, aspect="auto", cmap=cmap, vmin=0, vmax=maximum)
-            axis.set_xticks(range(len(tasks)), [task.title() for task in tasks], rotation=25, ha="right")
+            axis.set_xticks(range(len(tasks)), task_labels, rotation=25, ha="right")
             axis.set_yticks(range(len(rows)), labels if index == 0 else [""] * len(rows))
             axis.tick_params(length=0, pad=10)
             axis.set_title(title, loc="left", pad=16, fontweight="bold")
@@ -101,7 +102,7 @@ def visualize_archive(archive: Path, output: Path, scoring: str = "latest") -> P
             for y in range(len(rows)):
                 for x in range(len(tasks)):
                     color = "white" if not np.isnan(values[y, x]) and values[y, x] > (.8 if kind == "acceptance" else .6 * maximum) else "#172033"
-                    axis.text(x, y, texts[y][x], ha="center", va="center", color=color, fontweight="bold", fontsize=11)
+                    axis.text(x, y, texts[y][x], ha="center", va="center", color=color, fontweight="bold", fontsize=9 if len(tasks) > 5 else 11)
             for spine in axis.spines.values():
                 spine.set_visible(False)
         table_axis = fig.add_subplot(grid[1, :])
@@ -112,7 +113,7 @@ def visualize_archive(archive: Path, output: Path, scoring: str = "latest") -> P
             original = row["original"]["accepted"]["pass"]
             active = overall["accepted"]["pass"]
             table.append([row["condition"] + " · " + row["run_id"][:15], f"{original} → {active} / {overall['cases']}",
-                          f"{overall['build']['pass']}/{overall['build']['n']}", str(overall["tool_errors"]),
+                          f"{overall['build']['pass']}/{overall['build']['n']}" if overall['build']['n'] else "n/a", str(overall["tool_errors"]),
                           f"{overall['all_attempts']['total_tokens']['known_n']}/{overall['cases']}"])
         artist = table_axis.table(cellText=table, colLabels=["Condition / campaign", "Accepted: original → view", "Builds: pass / edits", "Tool errors", "Known token samples"],
                                   loc="center", cellLoc="center", colWidths=[.3, .25, .2, .1, .15])
