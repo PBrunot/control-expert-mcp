@@ -2,38 +2,37 @@
 
 ## Project Structure & Module Organization
 
-`src/control_expert_mcp/` contains the Python MCP server. `server.py` registers tools; `bridge.py` handles Control Expert COM automation; `modbus.py` provides live value access; `schema.py` validates exchange XML. Workflow prompts live in `prompts.py`, with language examples in `lang_reference.py` and enums in `constants.py`.
+`src/control_expert_mcp/` contains the server: `server.py` registers tools; `bridge.py` handles COM; `opc.py`/`opc_worker.py` provide symbolic live access; `modbus.py` handles located values; `live_access.py` manages consent; `schema.py` validates XML. Workflow prompts live in `prompts.py`; benchmark code lives in `benchmark/`.
 
-`samples/` contains MCP client configurations. `tools/` holds diagnostic scripts, `lang_refs/` XML examples, and numbered `bigtest/` integration workflows. The DDT Mirror application has moved to a separate repository.
+`tools/` contains regression tests and diagnostics; `tools/lang_refs/` holds XML examples; `tools/bigtest/` contains integration workflows. `samples/` holds client configurations and Markdown inspection examples. `benchmarks/` holds benchmark configuration and archive guidance. DDT Mirror is maintained separately.
 
 ## Build, Test, and Development Commands
 
-Use Python 3.10+ on Windows with a licensed local Control Expert installation for COM integration.
+Use Python 3.11+; COM integration requires Windows and licensed Control Expert. Create `.venv` with `python -m venv .venv`, then activate it with `.venv\Scripts\Activate.ps1`. Commands below assume activation:
 
-- `python -m venv .venv`: create the development environment.
-- `.venv\Scripts\python.exe -m pip install -e .`: install the package and dependencies for development.
-- `.venv\Scripts\python.exe -m control_expert_mcp`: start the MCP stdio server; the installed `control-expert-mcp` command is equivalent.
-- `.venv\Scripts\python.exe -m compileall -q src`: check Python syntax without exercising COM.
-- From `tools/`, run `..\.venv\Scripts\python.exe validate_templates.py` to exercise template import/build validation against Control Expert. Inspect its setup before running.
+- `python -m pip install -e ".[benchmark,test]"`: install development dependencies.
+- `python -m control_expert_mcp`: start the stdio server.
+- `python -m unittest discover -s tools -p "test_*.py" -v`: run offline regressions.
+- `python -m compileall -q src`: check syntax.
 
-Packaging uses setuptools through `pyproject.toml`.
+For packaging, install `build` and `twine`, run `python -m build --outdir tmp/release-check` into a fresh directory, then `python -m twine check --strict tmp/release-check/*` and `python tools/check_distribution.py --dist-dir tmp/release-check`.
 
 ## Coding Style & Naming Conventions
 
-Follow existing Python style: four-space indentation, `snake_case` functions/modules, `PascalCase` classes, and `UPPER_CASE` constants. Use type hints and concise docstrings for public helpers. No formatter or lint configuration is currently declared.
+Use four-space indentation, `snake_case` functions/modules, `PascalCase` classes, type hints, and concise docstrings. No formatter or linter is configured.
 
-Keep COM calls on the bridge's dedicated STA worker thread and preserve session write-token handling. For every new capability, add or extend an MCP prompt describing the validated tool sequence and relevant gotchas.
+Keep COM on its dedicated STA worker and preserve write-token handling. Add or extend workflow prompts for new capabilities.
 
 ## Testing Guidelines
 
-No automated test framework or coverage threshold is configured. Validate changed behavior with focused scripts and Control Expert import/analyze/build round trips. Record CPU/version, prerequisites, commands, and results. Existing integration scripts use numbered names such as `01_inventory.py`; they require local reference data and may modify projects or terminate Control Expert processes. Review them before execution.
+Use `unittest` with `tools/test_*.py`; no coverage threshold is configured. CI tests Windows/Python 3.11–3.15 and validates isolated wheel installation. Review integration scripts before execution: they may modify projects or terminate Control Expert. For COM changes, validate import/analyze/build round trips and record CPU/version, prerequisites, commands, and results.
 
-Whenever a benchmark run is archived, regenerate the archive visualization and its metadata with `ce-bench visualize`, verify archive/image integrity, and include the updated data, graphic, and metadata together in the results commit. Never leave the visualization pointing at an older set of archived runs.
+When archiving benchmarks, regenerate graphics and metadata with `ce-bench visualize`, verify integrity, and commit data, graphics, and metadata together.
 
 ## Commit & Pull Request Guidelines
 
-Use concise, descriptive commit subjects; history includes optional component prefixes such as `gitignore:` and `Web UI:`. Explain behavior changes, link relevant issues, and document validation and environment limitations in pull requests. Update README tool documentation and workflow prompts when capabilities change.
+Use concise subjects with optional component prefixes. PRs should explain behavior, link issues, and report validation/limitations. Update README and prompts for capability changes. Releases require matching `pyproject.toml` versions and `vX.Y.Z` tags; publishing a GitHub release triggers validated PyPI publication.
 
 ## Security & Configuration
 
-Keep online access opt-in through `CE_MCP_ENABLE_ONLINE=1`; validate against a simulator or supervised test bench. Never commit customer exports, proprietary reference data, vendor binaries, or generated project archives; respect `.gitignore`. Set `CE_MCP_SCHEMA_DIR` when schemas need an explicit installation path.
+`CE_MCP_ENABLE_ONLINE=1` exposes live tools but does not grant session consent. Configure live access explicitly; prefer OPC, confirm OFS availability, and obtain approval before closed-loop writes. Use a simulator or supervised bench. Never commit customer data, vendor binaries, or generated project archives. Respect `.gitignore`; use `CE_MCP_SCHEMA_DIR` for explicit schema paths.
