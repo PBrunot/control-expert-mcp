@@ -11,7 +11,7 @@ not guessable from the tool description alone (an env flag, a manual GUI step,
 an ordering constraint, an addressing rule). A good prompt turns an hour of
 trial-and-error into one slash command. See README "Extending the server".
 
-All functions return a plain instruction string (FastMCP delivers it as the
+All functions return a plain instruction string (MCPServer delivers it as the
 prompt's user message). Register them with register_prompts(mcp).
 """
 
@@ -19,6 +19,24 @@ from __future__ import annotations
 
 
 def register_prompts(mcp) -> None:
+    @mcp.prompt()
+    def consult_installed_manuals() -> str:
+        """Export and consult the locally installed Control Expert help as Markdown."""
+        return (
+            "Goal: consult the installed Control Expert documentation before editing a project.\n\n"
+            "1. In the control-expert-mcp repository, read manuals/ce-16.4/README.md. "
+            "This local generated index links the English CHM topics, PDFs, and standalone HTML.\n"
+            "2. If missing, install tools/requirements-help.txt into the development venv, "
+            "install 7-Zip, and run .venv/Scripts/python.exe tools/export_ce_help.py. "
+            "Use --install-dir for another installation; --languages en is the default. "
+            "This is a local CLI workflow requiring filesystem/shell access, not an MCP tool.\n"
+            "3. Search the Markdown topics; retain source paths and PDF page numbers when citing. "
+            "Review manifest.json for failures or pages without native text. Compare complex "
+            "tables and diagrams with the installed original when needed.\n"
+            "4. Keep generated manuals local and out of Git. Incremental reruns skip unchanged "
+            "sources; --force regenerates them. Conversion never connects to a PLC."
+        )
+
     @mcp.prompt()
     def commission_simulator() -> str:
         """Bring the open project up and running on the Control Expert PLC simulator."""

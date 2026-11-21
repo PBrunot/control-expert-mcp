@@ -3,20 +3,30 @@ name = "control-expert-mcp"
 version = "0.9.0"
 description = "MCP server exposing EcoStruxure Control Expert (Unity Pro) to AI agents via the UDE COM automation API"
 readme = "README.md"
-requires-python = ">=3.10"
-license = { text = "MIT" }
+requires-python = ">=3.11"
+license = "MIT"
 dependencies = [
-    "mcp>=1.2.0",
-    "pywin32>=306; sys_platform == 'win32'",
-    "pymodbus>=3.5,<4",
-    "lxml>=5.0",
+    "mcp>=2.3.0,<3",
+    "pywin32>=312; sys_platform == 'win32'",
+    "pymodbus>=3.16.2,<4",
+    "lxml>=6.1.3,<7",
 ]
+
+[project.optional-dependencies]
+test = [
+    "beautifulsoup4>=4.15,<5",
+    "markdownify>=1.2.4,<2",
+]
+
+[project.urls]
+Repository = "https://github.com/PBrunot/control-expert-mcp"
+Issues = "https://github.com/PBrunot/control-expert-mcp/issues"
 
 [project.scripts]
 control-expert-mcp = "control_expert_mcp.server:main"
 
 [build-system]
-requires = ["setuptools>=68"]
+requires = ["setuptools>=84.2.1"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]

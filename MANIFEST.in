@@ -1,0 +1,13 @@
+include README.md pyproject.toml MANIFEST.in
+recursive-include samples *.json
+include tools/check_distribution.py
+include tools/check_ce_automation.py
+include tools/export_ce_help.py
+include tools/requirements-help.txt
+include tools/test_export_ce_help.py
+include tools/test_mcp_runtime.py
+prune manuals
+prune tmp
+prune tools/bigtest
+prune tools/lang_refs
+global-exclude __pycache__ *.py[cod]

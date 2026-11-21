@@ -1,5 +1,6 @@
 # Python
 .venv/
+.venv-latest/
 venv/
 __pycache__/
 *.py[cod]
@@ -48,6 +49,10 @@ master_control_params.xml
 
 # Vendor extracts
 tools/pdf_images/
+
+# Generated local copies of installed Schneider help and validation artifacts
+/manuals/
+/tmp/
 
 # Editor / OS
 .vscode/

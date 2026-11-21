@@ -1,0 +1,5 @@
+# Optional dependencies for export_ce_help.py; separate from the MCP runtime.
+beautifulsoup4>=4.15,<5
+markdownify>=1.2.4,<2
+# PyMuPDF 2.x includes the Markdown API previously supplied by pymupdf4llm.
+pymupdf>=2.1,<3

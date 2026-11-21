@@ -9,10 +9,15 @@ from __future__ import annotations
 import logging
 import os
 import sys
+from functools import wraps
+from inspect import iscoroutinefunction
 
-from mcp.server.fastmcp import FastMCP
+from importlib.metadata import version
 
-from .bridge import ControlExpertBridge
+from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ResourceNotFoundError, ToolError
+
+from .bridge import CEError, ControlExpertBridge
 from .modbus import ModbusClient, ModbusError, parse_address
 from .prompts import register_prompts
 from . import schema as ce_schema
@@ -24,8 +29,37 @@ logging.basicConfig(
 )
 log = logging.getLogger("control-expert-mcp")
 
-mcp = FastMCP(
+
+class ControlExpertMCPServer(MCPServer):
+    """Preserve actionable expected errors under MCP 2.x's error policy."""
+
+    def tool(self, *args, **kwargs):
+        register = super().tool(*args, **kwargs)
+        expected = (CEError, ModbusError, ce_schema.SchemaError, ValueError)
+
+        def decorate(function):
+            if iscoroutinefunction(function):
+                @wraps(function)
+                async def checked(*args, **kwargs):
+                    try:
+                        return await function(*args, **kwargs)
+                    except expected as exc:
+                        raise ToolError(str(exc)) from None
+            else:
+                @wraps(function)
+                def checked(*args, **kwargs):
+                    try:
+                        return function(*args, **kwargs)
+                    except expected as exc:
+                        raise ToolError(str(exc)) from None
+            return register(checked)
+
+        return decorate
+
+
+mcp = ControlExpertMCPServer(
     "Control Expert",
+    version=version("control-expert-mcp"),
     instructions=(
         "Automates a local EcoStruxure Control Expert (Unity Pro) installation. "
         "Typical flow: open_project (or new_project) -> inspect with "
@@ -46,10 +80,6 @@ mcp = FastMCP(
         "rediscovering these flows."
     ),
 )
-
-# FastMCP doesn't forward a version to the low-level server, so its serverInfo
-# would otherwise report the mcp SDK version; set the real package version.
-mcp._mcp_server.version = "0.9.0"
 
 ce = ControlExpertBridge()
 mb = ModbusClient()
@@ -315,7 +345,7 @@ def _language_reference_resource(language: str) -> str:
 
     ref = REFERENCES.get(language.upper())
     if ref is None:
-        raise ValueError(f"Unknown language '{language}'. Use one of {sorted(REFERENCES)}.")
+        raise ResourceNotFoundError(f"Unknown language '{language}'. Use one of {sorted(REFERENCES)}.")
     parts = [ref["guide"]]
     if ref.get("example"):
         parts.append("\nVALIDATED EXAMPLE (imports and builds with 0 errors):\n")

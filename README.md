@@ -24,17 +24,109 @@ AI agent (Claude, Copilot, ...) ──MCP/stdio──> control-expert-mcp ──
 
 ## Requirements
 
-- Windows with **EcoStruxure Control Expert** (or Unity Pro) installed and licensed — tested against **Control Expert 14.0**, but any version that registers `PSBroker.PServerBroker.1` should work (the UDE automation server ships with Control Expert itself; the separate UDE package is only needed for documentation)
-- **Python 3.10+** with `pywin32`
+- Windows with **EcoStruxure Control Expert** (or Unity Pro) installed and licensed — validated with **Control Expert 14.0 and 16.4**. Other versions registering `PSBroker.PServerBroker.1` may work (the UDE automation server ships with Control Expert itself; the separate UDE package is only needed for documentation)
+- **Python 3.11+** with `pywin32`
 - The server must run **on the same machine** as Control Expert (DCOM remoting is possible but not configured here)
 
 ## Install
 
 ```powershell
 cd control-expert-mcp
-python -m venv .venv
+py -3.11 -m venv .venv
 .venv\Scripts\pip install -e .
 ```
+
+## Distribution, CI, and PyPI releases
+
+The distribution is a Python wheel with the `control-expert-mcp` console command.
+Users need Windows, Python 3.11+, and a licensed local Control Expert installation.
+Control Expert itself and its installed manuals remain local to each user.
+
+### Install a downloaded release
+
+Download the wheel from the `python-distributions` artifact of a successful GitHub
+Actions run, then install it into a dedicated environment:
+
+```powershell
+py -3.11 -m venv C:\Tools\control-expert-mcp
+C:\Tools\control-expert-mcp\Scripts\python.exe -m pip install .\control_expert_mcp-0.9.0-py3-none-any.whl
+```
+
+Configure the MCP client with that environment's Python executable and
+`["-m", "control_expert_mcp"]`, as shown below. Pip downloads the required Python
+dependencies; a disconnected installation also needs a compatible dependency
+wheelhouse prepared on a connected Windows machine.
+
+After the first PyPI release, users can install `control-expert-mcp==0.9.0` instead
+of a wheel path. Clients with [uv](https://docs.astral.sh/uv/guides/tools/) available
+can launch an isolated, versioned installation directly:
+
+```json
+{
+  "mcpServers": {
+    "control-expert": {
+      "command": "uvx",
+      "args": ["--python", "3.11", "--from", "control-expert-mcp==0.9.0", "control-expert-mcp"],
+      "env": {"CE_MCP_ENABLE_ONLINE": "0"}
+    }
+  }
+}
+```
+
+### Continuous integration and local release checks
+
+[CI](.github/workflows/ci.yml) runs offline regression tests on Windows with
+Python 3.11–3.15 for pushes, pull requests, and manual runs. It then builds the
+source archive and wheel, checks metadata with Twine, audits archive contents,
+and runs the tests against the installed wheel in a fresh environment outside the
+checkout. Successful runs retain the distributions as artifacts for 14 days.
+No Control Expert installation, manual corpus, PLC, or simulator is required;
+licensed COM integration remains a local check using `tools/check_ce_automation.py`.
+
+To reproduce the package checks locally, use a fresh output directory:
+
+```powershell
+.venv\Scripts\python.exe -m pip install ".[test]" build twine
+.venv\Scripts\python.exe -m unittest discover -s tools -p "test_*.py"
+.venv\Scripts\python.exe -m build --outdir dist/0.9.0
+.venv\Scripts\python.exe -m twine check --strict dist/0.9.0/*
+.venv\Scripts\python.exe tools/check_distribution.py --dist-dir dist/0.9.0
+```
+
+`MANIFEST.in` includes selected helpers and sample configurations in the source
+archive. The wheel contains the runtime package. The archive audit rejects
+unexpected files, including generated manuals, scratch data, customer projects,
+and vendor extracts. Both artifacts use the version from `pyproject.toml`.
+
+### Publish through the configured PyPI account
+
+[publish.yml](.github/workflows/publish.yml) uses
+[PyPI Trusted Publishing](https://docs.pypi.org/trusted-publishers/using-a-publisher/)
+with short-lived GitHub OIDC credentials. Its pending publisher is configured for:
+
+| PyPI setting | Value |
+| --- | --- |
+| Project | `control-expert-mcp` |
+| GitHub owner | `PBrunot` |
+| Repository | `control-expert-mcp` |
+| Workflow filename | `publish.yml` |
+| Environment | `(Any)` currently; the production job uses `pypi` |
+
+A pending publisher creates the project on its first successful upload; it does
+not reserve the name in advance. No PyPI API token is needed in repository secrets.
+
+1. Commit and push the implementation, tests, and workflow files to the repository.
+2. Let CI pass. Set a new version in `pyproject.toml` for each subsequent release.
+3. Create and push a matching tag, such as `v0.9.0`, then publish a GitHub Release
+   for that tag. The publish workflow runs the full CI pipeline again and uploads
+   its validated artifacts to PyPI. Production publication rejects a tag that
+   differs from the wheel's version.
+4. Verify the project on PyPI and test installation into a clean environment.
+
+Manual workflow dispatch defaults to **TestPyPI**. Testing there requires a
+separate account/pending publisher on TestPyPI for the same repository and workflow;
+its job uses the `testpypi` environment. A manual production run must select the
+matching release tag and choose `pypi`. Published version filenames cannot be reused.
 
 ## Hook up an AI client
 
@@ -196,6 +288,111 @@ Write a prompt for anything a client **cannot guess from the tool description al
 - Put the **gotcha** in the prompt text explicitly (the steps that cost *you* time while building it).
 - Mirror the validated sequence (tool names + argument shapes), and reference related prompts by name.
 - Keep the standing orientation in the server `instructions` string short; put step-by-step recipes in prompts.
+
+## Local automation checks and Markdown manuals
+
+The COM bridge was validated with **Control Expert 16.4** using an offline M340
+`BMX P34 2020` / `02.70` scratch project: create, import ST and a variable, build
+with zero errors/warnings, save, export XEF, reopen, and read the variable back.
+The server uses the MCP 2.x `MCPServer` API. COM remains on its dedicated STA
+thread, and shared Modbus calls are serialized for concurrent MCP handlers.
+
+```powershell
+.venv\Scripts\python.exe tools/check_ce_automation.py
+# Optional: create/build/delete a disposable project; never connects to a PLC.
+.venv\Scripts\python.exe tools/check_ce_automation.py --exercise-project --report manuals/ce-16.4/automation-check.json
+```
+
+Convert locally installed help into searchable Markdown (Windows, Python 3.11+,
+and [7-Zip](https://www.7-zip.org/) required for CHM extraction):
+
+```powershell
+.venv\Scripts\python.exe -m pip install -e . -r tools/requirements-help.txt
+.venv\Scripts\python.exe tools/export_ce_help.py --list
+.venv\Scripts\python.exe tools/export_ce_help.py --languages en --jobs 4
+.venv\Scripts\python.exe -m unittest discover -s tools -p "test_*.py"
+```
+
+The default installation is
+`C:\Program Files (x86)\Schneider Electric\EcoStruxure Control Expert 16.4`.
+Use `--install-dir` and `--output` to override either path. The default output is
+`manuals/ce-16.4/README.md`, linking each manual's `_index.md`, topic files, and
+images. `manifest.json` records source SHA-256 hashes, dependency versions,
+warnings, and failures. Unchanged completed sources are skipped on reruns;
+`--force` regenerates them, and repeatable `--include baselib.chm` filters sources.
+The process exits nonzero if any source fails, and partial exports can be resumed.
+
+English help and documents without language-specific directories are included by
+default. Use `--languages en it` or `--languages all` for additional installed
+languages. CHM exports preserve topic anchors, table-of-contents entries, and
+cross-manual links where the target book is installed in the same help directory.
+HTML scripts are not executed. PDF conversion retains page markers and extracted
+images; complex layout and tables may need comparison with the originals. OCR is
+disabled, and pages without native text are reported. PyMuPDF 2.x uses its
+native-text engine here; the optional ONNX layout engine triggered a native
+access violation on the validation host and is explicitly disabled. Generated vendor manuals
+and local reports are ignored by Git. The converter does not use COM or PLC access.
+The `consult_installed_manuals` MCP prompt describes this workflow.
+
+### Proposed MCP documentation service
+
+The converter and `consult_installed_manuals` prompt are implemented. The following
+service is a design for the next implementation; these additional tools are not
+registered yet. It will serve the local Markdown corpus through the existing MCP
+server, including when no Control Expert application is open.
+
+| Operation | Proposed interface | Result |
+| --- | --- | --- |
+| Corpus health | `get_documentation_status()` | Installed corpus/version, indexed sources, failures, warnings, and index freshness. |
+| Search | `search_manuals(query, library?, language?, limit=8)` | Ranked topic IDs, short excerpts, headings, and citations. |
+| Function/block details | `get_function_reference(name, library?, cpu_family?)` | Exact matches, parameter/type tables, behavior, constraints, examples, and diagram references from the manual. Ambiguous names return candidates. |
+| Topic retrieval | `get_manual_topic(topic_id, section?, cursor?, max_chars=12000)` | Original Markdown, source metadata, related topics, and an explicit continuation cursor. |
+| Language documentation | Extend `get_language_reference(language, topic?, include_manuals=false)` | Preserve the current authoring guide/example response by default; optionally attach matching vendor language topics and citations. |
+
+**Index and retrieval.** Add a local SQLite FTS5 index built by a separate
+`tools/index_ce_help.py` command after conversion. Read only successful sources
+listed in `manifest.json`, never arbitrary Markdown elsewhere in the repository.
+Use source-relative IDs so citations survive rebuilding. Index topic titles,
+section headings, IEC symbols, library names, source versions, and body text.
+Normalize inline HTML anchors and Markdown escapes for search/symbol extraction,
+while preserving the original Markdown for retrieval.
+Prioritize exact symbol/title matches before full-text rank; keep underscores in
+symbols such as `READ_VAR`. Initial retrieval needs no embeddings or cloud calls.
+
+Split topics at headings with size limits; preserve complete parameter tables,
+code blocks, warnings, and applicability statements. Each chunk retains its
+parent topic and PDF page or CHM anchor. Deduplicate repeated content for ranking
+while retaining every source/version relationship. Distinguish the **16.4 source
+installation** from a manual's own stated publication version; older library
+documentation must remain identifiable. CPU applicability is reported only when
+supported by the cited text, not inferred from a successful search.
+
+**Resources and citations.** Expose a small `ce-help://catalog` resource and URI
+templates `ce-help://topic/{topic_id}` and `ce-help://asset/{asset_id}`. Do not list
+every topic in the resource catalog. Tools provide discovery for clients that use
+tool calling; resources provide reusable Markdown and selected diagram images.
+Every response includes the book title, source path, source hash, topic ID,
+heading/anchor or PDF page, corpus language, and resource URI. Fetch diagrams on
+demand rather than attaching every image to a function response. Unsupported
+image formats remain identified as assets instead of pretending to be readable.
+
+**Lifecycle and boundaries.** Build/update the index explicitly and publish it
+atomically; MCP requests use read-only connections, one per worker thread.
+Compare the manifest/converter fingerprint to detect stale indexes and report
+missing conversion/index steps clearly. Configure the corpus with
+`CE_MCP_MANUALS_DIR`, allowing packaged installations to use an explicit data
+directory. Asset/topic lookups resolve manifest IDs within that directory and
+reject traversal or symlink escapes. Manual contents are reference data and are
+never interpreted as instructions to execute tools. Documentation access needs
+no COM session, PLC connection, or online-access flag.
+
+**Client workflow and acceptance.** Search or resolve a function, fetch the
+relevant sections/diagram, consult the existing language authoring guide, then
+write/import/build using the existing tools. Add a guided MCP prompt for that
+sequence. Validate `TON`, `READ_VAR`, ST edge handling, and an ambiguous symbol;
+also test citations, version filters, pagination, missing/stale corpora, image
+retrieval, traversal rejection, and MCP stdio round trips. Implementation order:
+index/search/topic retrieval, then function/language lookup, then image resources.
 
 ## Troubleshooting
 

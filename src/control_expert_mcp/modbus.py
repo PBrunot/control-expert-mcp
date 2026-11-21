@@ -24,8 +24,10 @@ Addressing: %M{i} -> coil i; %MW{i} -> holding register i;
 
 from __future__ import annotations
 
+from functools import wraps
 import re
 import struct
+from threading import RLock
 from typing import Any
 
 # IEC types that occupy two 16-bit registers when mapped to %MW.
@@ -91,10 +93,20 @@ def _encode(value: Any, iec_type: str, family: str, low_first: bool) -> list[int
     return [lo, hi] if low_first else [hi, lo]
 
 
+def _serialized(method):
+    """Protect the shared synchronous connection from concurrent MCP handlers."""
+    @wraps(method)
+    def locked(self, *args, **kwargs):
+        with self._lock:
+            return method(self, *args, **kwargs)
+    return locked
+
+
 class ModbusClient:
     """Holds one Modbus TCP connection plus decode settings."""
 
     def __init__(self) -> None:
+        self._lock = RLock()
         self._client: Any = None
         self.host: str | None = None
         self.port: int = 502
@@ -103,6 +115,7 @@ class ModbusClient:
 
     # ------------------------------------------------------------- lifecycle
 
+    @_serialized
     def connect(self, host: str, port: int, unit: int, word_order: str) -> dict:
         from pymodbus.client import ModbusTcpClient
 
@@ -119,6 +132,7 @@ class ModbusClient:
             )
         return self.status()
 
+    @_serialized
     def disconnect(self) -> dict:
         if self._client is not None:
             try:
@@ -128,6 +142,7 @@ class ModbusClient:
             self._client = None
         return {"connected": False}
 
+    @_serialized
     def status(self) -> dict:
         return {
             "connected": self._client is not None and bool(self._client.connected),
@@ -144,6 +159,7 @@ class ModbusClient:
 
     # ------------------------------------------------------------ read/write
 
+    @_serialized
     def read_one(self, address: str, iec_type: str) -> Any:
         client = self._ensure()
         family, offset, bit = parse_address(address)
@@ -160,6 +176,7 @@ class ModbusClient:
             return bool((rr.registers[0] >> bit) & 1)
         return _decode(list(rr.registers), iec_type, family, self.low_first)
 
+    @_serialized
     def write_one(self, address: str, iec_type: str, value: Any) -> None:
         client = self._ensure()
         family, offset, bit = parse_address(address)
