@@ -49,6 +49,8 @@ def regrade_inspection(results: Path, run_id: str, task: str = "inspect") -> Pat
             if task == "io_mapping":
                 value["reference_sha256"] = digest(reference_path.read_bytes())
                 value["grader_sha256"] = digest(Path(__file__).with_name("demo.py").read_bytes())
+                value["grader_dependencies"] = {name: digest(Path(__file__).with_name(name).read_bytes())
+                                                for name in ("demo.py", "mapping_grade.py")}
             path = output / case["case_id"] / (summary_path.parent.name + ".json")
             if path.exists() and read_json(path) != value:
                 raise ValueError("Regrade already exists with different evidence; use a new rubric version")

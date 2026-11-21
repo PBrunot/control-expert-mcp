@@ -32,7 +32,7 @@ reference answer is private to the evaluator and never included in model context
   scores identifier discovery only; explanation semantics remain unverified.
 - `io_mapping`: "Produce a table linking application signals to I/O addresses or
   device-DDT fields, modules, and channels. Flag signals without a physical
-  mapping." Rubric `demo-io-mapping-2` uses the saved answer as ground truth.
+  mapping." Rubric `demo-io-mapping-3` uses the approved saved reference as ground truth.
   It checks all 11 physical instances in Markdown table rows (signal, address or
   DDT, module type, channel), both internal-memory instances, 14 representative
   unmapped process signals, and unmapped Robot_one data. It rejects physical
@@ -40,10 +40,17 @@ reference answer is private to the evaluator and never included in model context
   and device-DDT leaf expansion are not automatically scored. Unsupported table
   representations remain unverified. This is a narrow deterministic rubric,
   not a semantic judge. Equivalent module spacing, channel labels/ranges or counts,
-  signal annotations and explicitly grouped unmapped rows are supported. The
-  original `demo-io-mapping-1` scorer is retained for audit of the first campaign.
+  signal annotations and explicitly grouped unmapped rows are supported. Version 3
+  also recognizes direction labels such as `Output 3`, memory declarations in
+  prose, and device-DDT channel facts from a separate hardware table joined by
+  explicit slot and module. It does not infer channels from the module name.
+  Contradictory physical rows fail even when a correct row also exists.
+  Results include per-check `matched`, `missing`, or `incorrect` status, coverage,
+  and evidence hashes; missing facts cannot silently become passes. Coverage is
+  diagnostic, while acceptance still requires every check to pass. Versions 1
+  and 2 remain available for audit, and saved historical grades remain unchanged.
 
-An explicit formatting-only answer regrade preserves original summaries and
+An explicit deterministic answer regrade preserves original summaries and
 responses, validates their hashes and the original reference hash, and makes
 no provider or Control Expert calls:
 

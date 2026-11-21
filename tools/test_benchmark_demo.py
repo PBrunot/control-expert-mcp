@@ -16,6 +16,62 @@ REFERENCE = Path(__file__).resolve().parents[1] / "samples/demo_ControlExpert_M5
 
 
 class DemoTests(unittest.IsolatedAsyncioTestCase):
+    def test_mapping_v3_prose_memory_and_direction_channel_labels(self):
+        reference = REFERENCE.read_text(encoding="utf-8-sig")
+        lines = []
+        for line in reference.splitlines():
+            row = table_rows(line) if line.startswith('|') else []
+            if row and row[0][0] in {'current_position', 'recipe'}:
+                continue
+            if row and len(row[0]) >= 7 and row[0][5].startswith('physical') and row[0][4].isdigit():
+                cells = line.split('|')
+                cells[5] = ' Output ' + row[0][4] if row[0][2].startswith('%q') else ' Analog input ' + row[0][4]
+                line = '|'.join(cells)
+            lines.append(line)
+        answer = '\n'.join(lines) + '\nCurrent_position (%MW10) and recipe (%MW100) are memory locations, not physical I/O.'
+        grade = io_mapping_grade(answer, reference)
+        self.assertTrue(grade['answer_pass'], grade['missing'])
+        self.assertEqual(grade['coverage']['matched'], grade['coverage']['required'])
+        self.assertFalse(io_mapping_grade(answer.replace('%MW10)', '%MW11)'), reference)['answer_pass'])
+
+    def test_mapping_v3_conflicts_cannot_be_rescued_by_correct_rows(self):
+        reference = REFERENCE.read_text(encoding="utf-8-sig")
+        for bad in ('%Q0.3.30 | BMXDDO1602 | 3', '%Q0.3.3 | BMXDDO1602 | 15',
+                    '%Q0.3.3 | slot 6 BMXDDO1602 | 3', '%Q0.3.3 | BMXDDI3202K | 3',
+                    '%Q0.3.3 | BMXDDO16020 | 3'):
+            with self.subTest(bad=bad):
+                answer = reference + '\n\n| Signal | Address | Module | Channel |\n|---|---|---|---|\n| Machine_running | ' + bad + ' |\n'
+                grade = io_mapping_grade(answer, reference)
+                self.assertFalse(grade['answer_pass'])
+                self.assertTrue('physical:machine_running' in grade['incorrect']
+                                or 'physical:machine_running' in grade['missing'])
+
+    def test_mapping_v3_explicit_hardware_join_and_missing_diagnostics(self):
+        reference = REFERENCE.read_text(encoding="utf-8-sig")
+        lines = []
+        for line in reference.splitlines():
+            row = table_rows(line) if line.startswith('|') else []
+            if row and len(row[0]) >= 7 and row[0][5] == 'physical device ddt':
+                cells = line.split('|'); cells[5] = ' module image '; line = '|'.join(cells)
+            lines.append(line)
+        answer = '\n'.join(lines)
+        self.assertTrue(io_mapping_grade(answer, reference)['answer_pass'])
+        self.assertTrue(io_mapping_grade(reference.replace('0–31', '0 to 31'), reference)['answer_pass'])
+        # A different module slot cannot supply the missing device channel facts.
+        answer = answer.replace('| 5 | BMXDDI3202K', '| 9 | BMXDDI3202K')
+        grade = io_mapping_grade(answer, reference)
+        self.assertFalse(grade['answer_pass'])
+        self.assertIn('physical:ddi3202k_0_5', grade['missing'])
+        self.assertEqual(grade['facts']['physical:ddi3202k_0_5']['status'], 'missing')
+
+    def test_mapping_v3_omissions_remain_failures(self):
+        reference = REFERENCE.read_text(encoding="utf-8-sig")
+        answer = reference.replace('Belt_running', 'Unrelated_signal')
+        grade = io_mapping_grade(answer, reference)
+        self.assertFalse(grade['answer_pass'])
+        self.assertIn('unmapped:belt_running', grade['missing'])
+        self.assertNotIn('unmapped:belt_running', grade['incorrect'])
+
     def test_weighing_identifiers(self):
         self.assertTrue(weighing_grade("Weighing_Material_A and Weighing_Material_B")["answer_pass"])
         self.assertFalse(weighing_grade("Weighing_Material_A only")["answer_pass"])
@@ -124,7 +180,7 @@ class DemoTests(unittest.IsolatedAsyncioTestCase):
                        "snapshot": {"config": {"io_mapping_reference": str(ref)},
                                     "demo_inputs": {"io_mapping_reference": digest(ref.read_bytes())}}})
             regrade_inspection(root, "run", "io_mapping")
-            row = regraded_row(attempt / "summary.json", "demo-io-mapping-2")
+            row = regraded_row(attempt / "summary.json", "demo-io-mapping-3")
             self.assertTrue(row["success"])
             self.assertEqual(read_json(attempt / "summary.json"), summary)
             ref.write_text(reference + "changed", encoding="utf-8")
@@ -132,7 +188,7 @@ class DemoTests(unittest.IsolatedAsyncioTestCase):
                 regrade_inspection(root, "run", "io_mapping")
             (attempt / "final-response.txt").write_text("changed", encoding="utf-8")
             with self.assertRaises(ValueError):
-                regraded_row(attempt / "summary.json", "demo-io-mapping-2")
+                regraded_row(attempt / "summary.json", "demo-io-mapping-3")
 
     def test_read_only_cases_are_excluded_from_build_denominators(self):
         rows = [{"task": task, "status": "completed", "success": True,

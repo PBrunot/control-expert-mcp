@@ -1,5 +1,85 @@
 # Benchmark implementation checkpoint
 
+## Deterministic I/O regrades (2026-11-21)
+
+Added `demo-io-mapping-3`: normalized row-local physical facts, exact addresses,
+module/slot/channel contradiction checks, explicit slot/module joins to hardware
+channel tables, memory declarations in prose, and per-check matched/missing/
+incorrect diagnostics with coverage and evidence hashes. Versions 1 and 2 remain
+available for audit. Regrade provenance binds both scorer modules as well as the
+unchanged reference, response and original summary. No LLM or CE calls were made.
+
+Regraded saved Luna campaign `20261121T211320Z-ec8c65a1`: A matches 23/29 checks,
+B 22/29. Both lack device-DDT channel coverage and the explicitly required
+Forming, Belt_running and Material_picked_off unmapped classifications; B also
+omits Robot_one. These are omissions, not conflicting physical claims. Overall
+acceptance remains A 6/7, B 6/7 (12/14).
+
+Regraded preceding GPT-5.5 campaign `20261121T204037Z-e4c05842`: mapping A matches
+14/29 checks and remains rejected; mapping B matches 29/29 and now passes using
+the explicit hardware-table join. Overall observed acceptance changes from 4/7
+to 5/7. This campaign remains incomplete (7/14 scheduled cases attempted),
+including the original HTTP 429 failure; no paid run was resumed.
+
+Both original scores and v2/v3 regrades are archived together. Prior uncommitted
+archive snapshots are preserved under ignored `benchmarks/.local/` directories.
+The current GPT-5.5 snapshot is
+`archive/20261121T204037Z-e4c05842-partial-200738467d/`. Archive index, overview
+PNG and provenance metadata were regenerated together. The existing DeepSeek
+answers also pass v3 as a regression control; their committed archive is unchanged.
+Final validation: 80 offline tests passed (one existing symlink-privilege skip),
+syntax compilation passed, all 12 archived record/report checksums and plot
+provenance hashes passed, and both scorer-module hashes matched the saved regrades.
+The regenerated overview was visually inspected. Test log:
+`tmp/grader-v3-final-tests.log`.
+
+## Luna complete rerun (2026-11-21)
+
+Campaign `20261121T211320Z-ec8c65a1` completed all 14 offline cases using OpenAI
+`gpt-6-luna` (mutable alias), medium effort, A/B, one repetition, seed 1729.
+Both arms accepted 6/7: inspection, threshold, temperature, repair, alarms and
+weighing passed; I/O mapping failed in both arms. The explicit
+`demo-io-mapping-2` regrade also rejects both mapping answers. Original evidence
+is retained. All eight editing cases built successfully. Three tool errors
+occurred (A: two, B: one); zero API retries and no missing usage samples.
+
+Provider totals: 131 requests, 117 tool calls, 1,424,471 input tokens (1,177,257
+cached), 21,772 output tokens, 1,446,243 total tokens. Summed model workflow time
+was 326.014 seconds, excluding setup/evaluation. At the verified Standard Luna
+rates ($0.10/M input, $0.01/M cached input, $0.50/M output), those token counts
+estimate $0.04738 before cache-write charges, other adjustments or taxes. This
+is a usage-based estimate, not an invoice total.
+
+The launch removed incidental `CODEX_TOOL_CALL_ID` before the initial snapshot
+to prevent the previous resume mismatch. No harness code was changed. The
+measured checkout was dirty with earlier archive/checkpoint changes.
+Sanitized records, reports, checksums, index, comparison files, overview PNG
+and provenance metadata were regenerated together; raw evidence stays ignored.
+The overview was visually inspected. Four archive regression tests and all
+archived record/report checksums passed.
+
+## OpenAI partial rerun (2026-11-21, after `c17ace0`)
+
+Ran the current seven-task offline suite with OpenAI `gpt-5.5-2026-04-23`,
+medium effort, A/B, one repetition, seed 1729. Campaign
+`20261121T204037Z-e4c05842` stopped on HTTP 429 (`RateLimitError`) at alarms A.
+Seven of 14 scheduled cases have durable results: four accepted (threshold and
+temperature in both arms), two rejected I/O mapping answers, and one provider
+failure. Seven cases remain unattempted. The explicit `demo-io-mapping-2`
+regrade also rejects both mapping answers; original evidence is retained.
+
+A resume attempt made no paid requests: immutable fingerprint validation
+rejected the changed `CODEX_TOOL_CALL_ID` environment hash. Source and model
+settings were unchanged. No fingerprint guard was bypassed and no new campaign
+was started. Future runs should stabilize or exclude this incidental environment
+variable before capturing their initial fingerprints.
+
+Sanitized partial results are archived under
+`archive/20261121T204037Z-e4c05842-partial-c2d66c173b/`, explicitly marked
+incomplete. Archive stats/index, comparison files, overview PNG and provenance
+metadata were regenerated together. Raw evidence and credentials remain ignored.
+The overview was visually inspected; archive checksum tests passed.
+
 ## M580 weighing and I/O mapping (2026-11-21)
 
 Added two optional read-only tasks using disposable copies of the full M580

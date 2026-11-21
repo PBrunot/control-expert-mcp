@@ -108,7 +108,7 @@ def _mapping_rows(text: str) -> list[tuple[list[str], int, bool]]:
     return result
 
 
-def io_mapping_grade(answer: str, reference: str) -> dict:
+def io_mapping_grade_v2(answer: str, reference: str) -> dict:
     """Reference facts with equivalent Markdown formatting and grouped flags.
 
     Module whitespace, channel prefixes/ranges, signal annotations and table
@@ -181,3 +181,9 @@ def io_mapping_grade(answer: str, reference: str) -> dict:
     return {"rubric": "demo-io-mapping-2", "checks": {k: bool(v) for k, v in checks.items()},
             "answer_pass": all(checks.values()),
             "limitation": "Reference-table subset; no semantic or exhaustive channel-leaf verification"}
+
+
+def io_mapping_grade(answer: str, reference: str) -> dict:
+    """Grade normalized mapping facts with explicit coverage diagnostics."""
+    from .mapping_grade import grade_mapping
+    return grade_mapping(answer, reference)
