@@ -8,6 +8,8 @@ English · [Italiano](README.it.md)
 
 Connect an MCP client to a local **EcoStruxure Control Expert** (Unity Pro) installation. Inspect, create, edit, and build PLC projects through Schneider Electric's UDE COM automation API.
 
+The foundation is Control Expert's **Unity Developer Edition (UDE)** interface: this server exposes its project engineering operations to MCP clients. Schneider Electric's [public Control Expert V16 documentation](https://www.se.com/us/en/download/document/EcoStruxureControlExpert_EN/) identifies UDE as the API for automating engineering tasks; the detailed API reference is installed locally in Control Expert's `Extra` folder.
+
 This is an experimental project for LLM-assisted PLC programming and debugging.
 
 [PyPI](https://pypi.org/project/control-expert-mcp/) · [Detailed guide](docs/guide.md) · [Benchmarks](benchmarks/README.md)
@@ -148,6 +150,6 @@ See [AGENTS.md](AGENTS.md) for repository conventions, the [development guide](d
 
 ## License and credits
 
-MIT, as declared in [pyproject.toml](pyproject.toml). Forked from [apexsotjo-blip/control-expert-mcp](https://github.com/apexsotjo-blip/control-expert-mcp) and inspired by [tiaportal-mcp](https://github.com/heilingbrunner/tiaportal-mcp).
+This repository is a fork of [apexsotjo-blip/control-expert-mcp](https://github.com/apexsotjo-blip/control-expert-mcp), with additional work by Pascal Brunot. The upstream repository did not include a license file, so the MIT license in this fork applies to Pascal Brunot's contributions and does not relicense upstream contributions or third-party materials. See [LICENSE](LICENSE) and the upstream repository history for provenance. This project is also inspired by [tiaportal-mcp](https://github.com/heilingbrunner/tiaportal-mcp).
 
 Not affiliated with or endorsed by Schneider Electric. Control Expert and Unity Pro software, licenses, and documentation are supplied separately.

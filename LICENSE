@@ -2,6 +2,12 @@ MIT License
 
 Copyright (c) 2026 Pascal Brunot
 
+This project is a fork of control-expert-mcp by apexsotjo-blip. The upstream
+project did not include a license file. The MIT license below applies to the
+copyrightable contributions by Pascal Brunot in this fork; it does not relicense
+upstream contributions or third-party materials. See the upstream project at
+https://github.com/apexsotjo-blip/control-expert-mcp for its source and history.
+
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights

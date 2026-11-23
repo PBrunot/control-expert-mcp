@@ -8,6 +8,8 @@
 
 Collega un client MCP a un'installazione locale di **EcoStruxure Control Expert** (Unity Pro). Esplora, crea, modifica e compila progetti PLC tramite l'API di automazione COM UDE di Schneider Electric.
 
+La base del progetto è l'interfaccia **Unity Developer Edition (UDE)** di Control Expert: questo server rende disponibili ai client MCP le operazioni di progettazione del progetto. La [documentazione pubblica Schneider Electric di Control Expert V16](https://www.se.com/us/en/download/document/EcoStruxureControlExpert_EN/) identifica UDE come API per automatizzare le attività di progettazione; il riferimento API dettagliato è installato localmente nella cartella `Extra` di Control Expert.
+
 È un progetto sperimentale per la programmazione e il debug di PLC con l'assistenza di modelli linguistici.
 
 [PyPI](https://pypi.org/project/control-expert-mcp/) · [Guida dettagliata (inglese)](docs/guide.md) · [Benchmark (inglese)](benchmarks/README.md)
@@ -150,6 +152,6 @@ Consultare [AGENTS.md](AGENTS.md) per le convenzioni del repository, la [guida a
 
 ## Licenza e riconoscimenti
 
-MIT, come dichiarato in [pyproject.toml](pyproject.toml). Derivato da [apexsotjo-blip/control-expert-mcp](https://github.com/apexsotjo-blip/control-expert-mcp) e ispirato a [tiaportal-mcp](https://github.com/heilingbrunner/tiaportal-mcp).
+Questo repository è un fork di [apexsotjo-blip/control-expert-mcp](https://github.com/apexsotjo-blip/control-expert-mcp), con contributi aggiuntivi di Pascal Brunot. Il repository originale non includeva un file di licenza; la licenza MIT di questo fork si applica ai contributi di Pascal Brunot e non modifica la licenza dei contributi upstream o dei materiali di terze parti. Consultare [LICENSE](LICENSE) e la cronologia del repository upstream per la provenienza. Il progetto è inoltre ispirato a [tiaportal-mcp](https://github.com/heilingbrunner/tiaportal-mcp).
 
 Il progetto non è affiliato né approvato da Schneider Electric. Software, licenze e documentazione di Control Expert e Unity Pro sono forniti separatamente.
