@@ -58,6 +58,34 @@ reference answer is private to the evaluator and never included in model context
   not borrow module context across tables or classify sibling sections as unmapped.
   Regrades evaluate saved replies without adding facts.
 
+### I/O mapping answer format
+
+The model's task prompt includes the output contract from
+`IO_MAPPING_OUTPUT_FORMAT` in `benchmark/demo.py`. The final answer must contain
+`## Application signal inventory` and a Markdown table with these exact columns:
+
+| Signal | Type | Address or DDT | Module | Channel | Status | Meaning | Executable sections |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+
+Use one global instance per row, exact identifiers, and repeat every mapping fact
+on each row. Module cells use `Rack <number>, slot <number>: <exact module part number>`;
+channels use decimal indices or inclusive ASCII ranges (`0-7`). Status is one of
+`PHYSICAL INPUT`, `PHYSICAL OUTPUT`, `PHYSICAL CHANNEL STRUCTURE`,
+`PHYSICAL DEVICE DDT`, `INTERNAL MEMORY`, `CPU COMMUNICATION DDT`, `UNMAPPED`,
+or `UNKNOWN`. Internal memory retains its `%MW` address with `-` for module/channel;
+unmapped instances use `-` for address/module/channel. Unknown evidence must be
+explained rather than guessed. Hardware binding and executable use are separate.
+
+Keep parent instances in the inventory; expand process/robot members separately
+under `## Structured signal members`, using the same columns and fully qualified
+identifiers. Optional device-DDT leaf rows go under `## Device-DDT channel fields`
+with the same columns. Do not group identifiers, use `same`, wrap tables in code
+fences, or put literal pipes/newlines inside cells. Prose may supplement the tables
+but must not supply facts missing from them. The contract does not expose reference
+answers or change rubric 6 acceptance; the grader still supports older saved reply
+layouts. Prompt changes affect campaign fingerprints, so compare new campaigns
+separately from campaigns using the earlier unconstrained prompt.
+
 An explicit deterministic answer regrade preserves original summaries and
 responses, validates their hashes and the original reference hash, and makes
 no provider or Control Expert calls:

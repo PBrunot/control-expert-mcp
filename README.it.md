@@ -114,6 +114,25 @@ La ricerca nei manuali funziona senza una sessione COM o una connessione al PLC.
 
 Altri casi sono nella [guida alla risoluzione dei problemi](docs/guide.md#troubleshooting), in inglese. Segnalare problemi riproducibili su [GitHub Issues](https://github.com/PBrunot/control-expert-mcp/issues), includendo versioni, chiamate agli strumenti ed errori privi di dati sensibili.
 
+## Benchmark
+
+La suite offline valuta sette attività: ispezione del progetto, modifiche alla
+logica di soglia e temperatura, riparazione di errori, allarmi con isteresi,
+analisi della pesatura e mappatura I/O. Ogni attività viene eseguita su una copia
+temporanea del progetto in due condizioni: senza e con la ricerca nei manuali
+installati. Le modifiche vengono riaperte e compilate in modo indipendente; le
+risposte di ispezione sono valutate con criteri deterministici, incluso un formato
+Markdown fisso per la mappatura I/O. Un test separato sul simulatore M580 verifica
+tramite OFS OPC DA che `TEST_LLM` venga incrementato una volta al secondo.
+
+![Panoramica dei benchmark: accettazione, correttezza mappatura I/O, tempi e token](benchmarks/archive/overview.png)
+
+I risultati sono esplorativi: l'accettazione nei test offline non dimostra il
+corretto funzionamento del PLC durante l'esecuzione. Consultare la [guida ai
+benchmark](benchmarks/README.md) per definizioni, punteggi, configurazione e limiti,
+e i [risultati archiviati](benchmarks/archive/README.md) per i rapporti delle
+singole esecuzioni. La documentazione è in inglese.
+
 ## Sviluppo
 
 ```powershell
@@ -128,8 +147,6 @@ py -3.11 -m venv .venv
 Per un'installazione da sorgente, configurare il client MCP con il percorso assoluto di `.venv\Scripts\python.exe` e gli argomenti `["-m", "control_expert_mcp"]`.
 
 Consultare [AGENTS.md](AGENTS.md) per le convenzioni del repository, la [guida allo sviluppo](docs/guide.md#development-and-validation) per architettura e verifiche di integrazione, e [creazione dei pacchetti e rilasci](docs/guide.md#packaging-and-releases) per i comandi di distribuzione. Questi riferimenti sono in inglese. Esaminare gli script di integrazione prima di eseguirli: possono modificare progetti o terminare Control Expert.
-
-La valutazione dei modelli è facoltativa ed è descritta nella [guida ai benchmark](benchmarks/README.md), in inglese. I risultati sono esplorativi e non dimostrano il corretto funzionamento del PLC durante l'esecuzione.
 
 ## Licenza e riconoscimenti
 

@@ -3,9 +3,40 @@ from __future__ import annotations
 
 import re
 
+IO_MAPPING_OUTPUT_FORMAT = """Output format (required in the final answer):
+Use a Markdown section named "## Application signal inventory" containing one
+pipe-delimited table with exactly these columns, in this order:
+| Signal | Type | Address or DDT | Module | Channel | Status | Meaning | Executable sections |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+Write one row per global application instance, including generated state instances
+and unmapped instances. Use exact identifiers in Signal; do not group identifiers,
+abbreviate names, use ditto/same cells, or replace rows with prose or lists.
+Repeat all mapping facts on each row. Use the exact declared %I/%Q/%CH/%MW address
+or device-DDT instance/field in Address or DDT. For physical mappings, Module must
+contain "Rack <number>, slot <number>: <exact module part number>" and Channel must
+be a decimal index or inclusive ASCII range such as "0-7". Do not infer channel
+ranges solely from a module part number. For module-owned device DDTs, include the
+instance row with its hardware binding and full channel range even if unused.
+Use one of these Status values: PHYSICAL INPUT, PHYSICAL OUTPUT,
+PHYSICAL CHANNEL STRUCTURE, PHYSICAL DEVICE DDT, INTERNAL MEMORY,
+CPU COMMUNICATION DDT, UNMAPPED, UNKNOWN. INTERNAL MEMORY retains its %MW address
+and uses "-" for Module and Channel. UNMAPPED uses "-" for Address or DDT, Module
+and Channel. CPU communication interfaces are not field I/O channels. UNKNOWN
+means evidence is insufficient; explain missing evidence in Meaning rather than
+inventing a mapping. Use "-" for other absent values and "No executable reference
+found" when appropriate in Executable sections; application use is separate from
+hardware binding. Expand structured process/robot members in a separate
+"## Structured signal members" table with the same columns and fully qualified
+identifiers, retaining the parent instance in the inventory. If reporting device-DDT
+channel fields, use a separate "## Device-DDT channel fields" table with the same
+columns. Keep each row on one line, with no literal pipe characters or line breaks
+inside cells. Do not wrap tables in code fences. Put optional explanatory prose
+outside tables; the tables must contain all mapping and classification facts.
+"""
+
 DEMO_PROMPTS = {
     "weighing": "Explain how material weighing starts, stops, and advances to mixing. Identify the relevant conditions and variables.",
-    "io_mapping": "Produce a table linking application signals to I/O addresses or device-DDT fields, modules, and channels. Cover the complete application-signal inventory, including unmapped signals. For module-owned device DDTs, report the hardware binding and channel range separately from whether application logic uses their fields. Flag signals without a physical mapping.",
+    "io_mapping": "Produce a table linking application signals to I/O addresses or device-DDT fields, modules, and channels. Cover the complete application-signal inventory, including unmapped signals. For module-owned device DDTs, report the hardware binding and channel range separately from whether application logic uses their fields. Flag signals without a physical mapping.\n\n" + IO_MAPPING_OUTPUT_FORMAT,
 }
 DEMO_ORIENTATION = (
     "Inspect only the already-open disposable M580 demo project through MCP. Offline only. "

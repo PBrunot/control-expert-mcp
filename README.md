@@ -114,6 +114,23 @@ Manual search works without a COM session or PLC connection. Convert your locall
 
 More cases are in the [troubleshooting guide](docs/guide.md#troubleshooting). Report reproducible problems in [GitHub Issues](https://github.com/PBrunot/control-expert-mcp/issues), with versions, tool calls, and sanitized errors.
 
+## Benchmarks
+
+The offline suite covers seven tasks: project inspection, threshold and temperature
+logic changes, fault repair, gated hysteresis alarms, weighing analysis, and I/O
+mapping. Each task runs on a disposable project copy in two conditions: without
+and with installed-manual search. Edits are independently reopened and built;
+inspection answers use deterministic grading, including a fixed Markdown table
+format for I/O mappings. A separate M580 simulator test checks that `TEST_LLM`
+increments once per second through OFS OPC DA observations.
+
+![Benchmark overview: acceptance, I/O mapping correctness, time, and token usage](benchmarks/archive/overview.png)
+
+Results are exploratory; offline acceptance does not establish PLC runtime
+correctness. See the [benchmark guide](benchmarks/README.md) for test definitions,
+scoring, setup, and limitations, and the [archived results](benchmarks/archive/README.md)
+for individual run reports.
+
 ## Development
 
 ```powershell
@@ -128,8 +145,6 @@ py -3.11 -m venv .venv
 For a source installation, point the MCP client to the absolute `.venv\Scripts\python.exe` path with arguments `["-m", "control_expert_mcp"]`.
 
 See [AGENTS.md](AGENTS.md) for repository conventions, the [development guide](docs/guide.md#development-and-validation) for architecture and integration checks, and [packaging and releases](docs/guide.md#packaging-and-releases) for distribution commands. Review integration scripts before running them: they can modify projects or terminate Control Expert.
-
-Model evaluation is optional and documented in the [benchmark guide](benchmarks/README.md). Benchmark results are exploratory and do not establish PLC runtime correctness.
 
 ## License and credits
 

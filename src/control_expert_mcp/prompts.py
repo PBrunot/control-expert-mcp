@@ -128,6 +128,8 @@ def register_prompts(mcp) -> None:
             "and prior flag/enable states; it does not emulate ALRM_DIA or a PLC. "
             "With demo_project and io_mapping_reference configured, two additional read-only "
             "M580 cases inspect weighing and I/O mapping across the full application. "
+            "The I/O mapping task specifies a fixed Markdown inventory table with one "
+            "instance per row, explicit statuses and repeated row-local mapping facts. "
             "Do not build or save these inspection cases. The private evaluator uses the "
             "approved sample mapping answer; it is never supplied to the model. "
             "After a timeout, stop CE work until the operator verifies the session idle and "

@@ -16,6 +16,32 @@ REFERENCE = Path(__file__).resolve().parents[1] / "samples/demo_ControlExpert_M5
 
 
 class DemoTests(unittest.IsolatedAsyncioTestCase):
+    def test_prescribed_inventory_format_grades_without_supporting_prose(self):
+        reference = REFERENCE.read_text(encoding='utf-8-sig')
+        inventory = reference.split('## Complete global signal inventory', 1)[1]
+        inventory = inventory.split('## Robot member inventory', 1)[0]
+        # Only the prescribed eight-column table supplies grading evidence.
+        answer = '## Application signal inventory\n\n' + '\n'.join(
+            line.replace('—', '-').replace('–', '-')
+                .replace('NO PHYSICAL MAPPING - MEMORY', 'INTERNAL MEMORY')
+            for line in inventory.splitlines() if line.startswith('|'))
+        grade = io_mapping_grade(answer, reference)
+        self.assertTrue(grade['answer_pass'], grade)
+        self.assertEqual(grade['coverage']['fraction'], 1)
+        for old, new, key in (
+            ('%Q0.3.3', '%Q0.3.4', 'physical:machine_running'),
+            ('%MW10`', '%MW11`', 'memory:current_position'),
+            ('| 0-31 | PHYSICAL DEVICE DDT', '| 0-30 | PHYSICAL DEVICE DDT',
+             'physical:ddi3202k_0_5'),
+            ('| `Start` | `BOOL` | - | - | - | UNMAPPED',
+             '| `Start` | `BOOL` | - | - | - | UNKNOWN', 'unmapped:start'),
+        ):
+            with self.subTest(key=key):
+                self.assertIn(old, answer)
+                wrong = io_mapping_grade(answer.replace(old, new), reference)
+                self.assertFalse(wrong['answer_pass'])
+                self.assertFalse(wrong['checks'][key])
+
     def test_unmapped_heading_scope_lists_and_repeated_columns(self):
         reference = REFERENCE.read_text(encoding='utf-8-sig')
         names = [row[0] for row in table_rows(reference)
