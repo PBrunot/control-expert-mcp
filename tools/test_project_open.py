@@ -77,7 +77,10 @@ class ProjectOpenTests(unittest.TestCase):
             executable = Path(temporary) / "custom-simulator.exe"
             executable.write_bytes(b"test, never executed")
             with patch.dict(os.environ, {"CE_MCP_SIMULATOR_EXE": str(executable)}):
-                self.assertEqual(bridge._simulator_executable(), str(executable.resolve()))
+                actual = Path(bridge._simulator_executable())
+                self.assertTrue(actual.is_absolute())
+                # Windows short and long paths can identify the same file.
+                self.assertTrue(actual.samefile(executable))
         with patch.dict(os.environ, {"CE_MCP_SIMULATOR_EXE": ""}):
             with self.assertRaisesRegex(CEError, "Open.*project first"):
                 bridge._simulator_executable()

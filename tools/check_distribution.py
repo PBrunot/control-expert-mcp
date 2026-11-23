@@ -62,7 +62,7 @@ def check_wheel(path: Path, expected_modules: set[str]) -> None:
 def check_sdist(path: Path, expected_modules: set[str]) -> None:
     source_modules = {"src/" + name for name in expected_modules}
     allowed = source_modules | {
-        "README.md", "pyproject.toml", "MANIFEST.in", "PKG-INFO", "setup.cfg", "LICENSE",
+        "README.md", "README.it.md", "docs/guide.md", "pyproject.toml", "MANIFEST.in", "PKG-INFO", "setup.cfg", "LICENSE",
         "benchmarks/example.json", "benchmarks/README.md", "benchmarks/CHECKPOINT.md",
         "benchmarks/deepseek.example.json",
         "benchmarks/opc.example.json", "tools/lang_refs/OPC_Bench.xml",

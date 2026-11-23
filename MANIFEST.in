@@ -1,4 +1,5 @@
 include README.md pyproject.toml MANIFEST.in
+include README.it.md docs/guide.md
 recursive-include samples *.json
 include tools/check_distribution.py
 include tools/check_ce_automation.py
