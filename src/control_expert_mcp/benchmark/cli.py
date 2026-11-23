@@ -99,6 +99,7 @@ def main(argv=None) -> int:
     sub.add_argument("--run-id", required=True)
     sub.add_argument("--archive", type=Path, default=Path("benchmarks/archive"))
     sub.add_argument("--allow-incomplete", action="store_true")
+    sub.add_argument("--rubric", default=None, help="Include only this saved regrade rubric")
     sub = subs.add_parser("visualize")
     sub.add_argument("--archive", type=Path, default=Path("benchmarks/archive"))
     sub.add_argument("--output", type=Path, default=Path("benchmarks/archive/overview.png"))
@@ -113,7 +114,8 @@ def main(argv=None) -> int:
             print(regrade_inspection(args.results, args.run_id, args.task))
             return 0
         if args.command == "archive":
-            print(archive_run(args.results, args.run_id, args.archive, allow_incomplete=args.allow_incomplete))
+            print(archive_run(args.results, args.run_id, args.archive,
+                              allow_incomplete=args.allow_incomplete, rubric=args.rubric))
             return 0
         if args.command == "visualize":
             from .plot import visualize_archive

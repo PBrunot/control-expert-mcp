@@ -10,6 +10,24 @@ from .core import digest, read_json, write_json
 from .report import aggregate
 
 
+def mapping_correctness(cases: list[dict]) -> dict:
+    """Report known I/O rubric checks without treating missing evidence as zero."""
+    matched, required, known, unknown = 0, 0, 0, 0
+    for case in cases:
+        if case['task'] != 'io_mapping':
+            continue
+        checks = case.get('validation', {}).get('checks', {})
+        if not checks or not all(isinstance(value, bool) for value in checks.values()):
+            unknown += 1
+            continue
+        matched += sum(checks.values())
+        required += len(checks)
+        known += 1
+    return {'matched': matched, 'required': required,
+            'fraction': matched / required if required else None,
+            'known_n': known, 'unknown_n': unknown}
+
+
 def chart_rows(archive: Path, scoring: str = "latest") -> tuple[list, dict]:
     """Keep campaigns separate; never pool incompatible experiments or models."""
     rows, inputs = [], {}
@@ -39,6 +57,7 @@ def chart_rows(archive: Path, scoring: str = "latest") -> tuple[list, dict]:
                 "model_identity": record["model"].get("identity", "pinned"), "source": source, "condition": condition,
                 "scoring": ", ".join(actual_rubrics) or record["rubric_version"],
                 "original": record["conditions"][condition]["overall"], "overall": aggregate(selected),
+                "io_correctness": mapping_correctness(selected),
                 "tasks": {task: aggregate([case for case in selected if case["task"] == task])
                           for task in sorted({case["task"] for case in selected})}})
     return rows, inputs
@@ -59,15 +78,15 @@ def visualize_archive(archive: Path, output: Path, scoring: str = "latest") -> P
     task_names = {task for row in rows for task in row["tasks"]}
     tasks = [task for task in preferred if task in task_names] + sorted(task_names - set(preferred))
     task_labels = ["OPC " + task[4:] if task.startswith("opc_") else {"io_mapping": "I/O mapping"}.get(task, task.title()) for task in tasks]
-    height = 5.2 + .85 * len(rows)
+    height = 5.2 + len(rows)
     with plt.rc_context({"font.family": "DejaVu Sans", "font.size": 10, "axes.titlesize": 12,
                          "figure.facecolor": "#f6f8fc", "axes.facecolor": "white"}):
         fig = plt.figure(figsize=(17, height), dpi=150)
-        grid = fig.add_gridspec(2, 3, height_ratios=[max(2, .68 * len(rows)), 1.65],
-                               left=.31, right=.97, top=.74, bottom=.19, hspace=.85, wspace=.3)
-        labels = [f"{row['provider']} / {row['model']}\n{row['source'][:12]} · {row['condition']}\n"
+        grid = fig.add_gridspec(2, 3, height_ratios=[max(2, .68 * len(rows)), max(1.65, .42 * len(rows))],
+                               left=.31, right=.97, top=.74, bottom=.22, hspace=.65, wspace=.3)
+        labels = [f"{row['provider']} / {row['model']}\n{row['source'][:8]} · {row['condition']} · "
                   + row['run_id'][:15] for row in rows]
-        specs = [("Accepted / attempts", "RdYlGn", "acceptance"),
+        specs = [("Accepted · I/O correctness %", "RdYlGn", "acceptance"),
                  ("Median workflow · seconds", "Blues", "time"),
                  ("Median provider tokens · thousands", "Purples", "tokens")]
         for index, (title, cmap, kind) in enumerate(specs):
@@ -82,6 +101,14 @@ def visualize_archive(archive: Path, output: Path, scoring: str = "latest") -> P
                     if kind == "acceptance":
                         values[y, x] = data["accepted"]["rate_all"]
                         texts[y][x] = f"{data['accepted']['pass']}/{data['cases']}"
+                        if task == 'io_mapping':
+                            correctness = row['io_correctness']
+                            fraction = correctness['fraction']
+                            values[y, x] = fraction if fraction is not None else np.nan
+                            percent = (f"{fraction:.0%}" if fraction in (0, 1) else f"{fraction:.1%}") if fraction is not None else 'n/a'
+                            if correctness['unknown_n']:
+                                percent += '*'
+                            texts[y][x] = percent + '\n' + texts[y][x]
                     else:
                         measure = data["all_attempts"]["workflow_seconds" if kind == "time" else "total_tokens"]
                         val = measure["median"]
@@ -110,12 +137,11 @@ def visualize_archive(archive: Path, output: Path, scoring: str = "latest") -> P
         table = []
         for row in rows:
             overall = row["overall"]
-            original = row["original"]["accepted"]["pass"]
             active = overall["accepted"]["pass"]
-            table.append([row["condition"] + " · " + row["run_id"][:15], f"{original} → {active} / {overall['cases']}",
+            table.append([row["condition"] + " · " + row["run_id"][:15], f"{active} / {overall['cases']}",
                           f"{overall['build']['pass']}/{overall['build']['n']}" if overall['build']['n'] else "n/a", str(overall["tool_errors"]),
                           f"{overall['all_attempts']['total_tokens']['known_n']}/{overall['cases']}"])
-        artist = table_axis.table(cellText=table, colLabels=["Condition / campaign", "Accepted: original → view", "Builds: pass / edits", "Tool errors", "Known token samples"],
+        artist = table_axis.table(cellText=table, colLabels=["Condition / campaign", "Accepted / attempts", "Builds: pass / edits", "Tool errors", "Known token samples"],
                                   loc="center", cellLoc="center", colWidths=[.3, .25, .2, .1, .15])
         artist.auto_set_font_size(False)
         artist.set_fontsize(9)
@@ -129,12 +155,13 @@ def visualize_archive(archive: Path, output: Path, scoring: str = "latest") -> P
         fig.text(.045, .945, "Control Expert · benchmark archive", fontsize=24, fontweight="bold", color="#172033")
         fig.text(.045, .885, f"{runs} campaign(s) · {models} model(s) · {revisions} measured source revision(s) · scoring view: {scoring}", fontsize=12, color="#4b5870")
         fig.text(.045, .825, "A: reference tools     B: installed manuals     OPC: live simulator I/O     |     Campaigns remain separate.", fontsize=10, color="#4b5870")
-        fig.text(.045, .085, "Counts show sample sizes. Time excludes setup/evaluation; tokens are provider totals across all requests. * = some usage unknown.", fontsize=9, color="#4b5870")
+        fig.text(.045, .105, "I/O correctness = matched / required rubric checks; cell color shows partial credit. Counts remain all-or-nothing acceptance.", fontsize=9, color="#4b5870")
+        fig.text(.045, .075, "Time excludes setup/evaluation; tokens cover all requests. * = some correctness or usage evidence unknown; n/a = no scored answer.", fontsize=9, color="#4b5870")
         fig.text(.045, .045, "Exploratory evidence. Mutable aliases limit reproducibility. Runtime is verified only for OPC simulator cases; offline cases use static checks.", fontsize=9, color="#4b5870")
         output.parent.mkdir(parents=True, exist_ok=True)
         fig.savefig(output, facecolor=fig.get_facecolor(), metadata={"Software": "ce-bench"})
         plt.close(fig)
-    write_json(output.with_suffix(".metadata.json"), {"plot_version": 1, "scoring_view": scoring,
+    write_json(output.with_suffix(".metadata.json"), {"plot_version": 2, "scoring_view": scoring,
         "inputs": inputs, "image_sha256": digest(output.read_bytes()), "generator_sha256": digest(Path(__file__).read_bytes()),
         "matplotlib": version("matplotlib"), "rows": rows})
     return output

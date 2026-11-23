@@ -26,7 +26,7 @@ def _modules(text: str) -> set[str]:
     return {re.sub(r'\s+', '', match) for match in matches}
 
 
-def _channels(row: list[str], channel: str, device: bool) -> bool:
+def _channels(row: list[str], channel: str, device: str | None) -> bool:
     channel = channel.replace('–', '-')
     pattern = re.escape(channel).replace(r'\-', r'(?:-|\.\.|to)')
     for cell in row:
@@ -39,7 +39,10 @@ def _channels(row: list[str], channel: str, device: bool) -> bool:
             return True
     if device and '-' in channel:
         start, end = map(int, channel.split('-'))
-        return bool(re.search(r'\b' + str(end-start+1) + r'\s+(?:di|do|ai)\b', ' '.join(row)))
+        direction = r'(?:di|digital\s+inputs?(?:\s+channels?)?)' if device == 'di' else (
+            r'(?:do|digital\s+outputs?(?:\s+channels?)?)' if device == 'do' else
+            r'(?:ai|analog\s+inputs?(?:\s+channels?)?)')
+        return bool(re.search(r'\b' + str(end-start+1) + r'\s+' + direction + r'\b', ' '.join(row)))
     return False
 
 
@@ -109,7 +112,10 @@ def grade_mapping(answer: str, reference: str) -> dict:
             # A channel address is exact, not a substring (e.g. .1 vs .10).
             address_ok = truth[2] in addresses if truth[2].startswith('%') else _mentions(joined, truth[2])
             module_ok = _modules(joined) == {module}
-            channel_ok = _channels(row, truth[4], truth[5] == 'physical device ddt')
+            device = None
+            if truth[5] == 'physical device ddt':
+                device = 'di' if 'ddi' in module else 'do' if 'ddo' in module else 'ai'
+            channel_ok = _channels(row, truth[4], device)
             # Slot evidence, when provided, must agree with the reference.
             slot = re.search(r'slot\s*(\d+)', truth[3])
             slots = re.findall(r'slot\s*(\d+)', joined)
@@ -118,7 +124,7 @@ def grade_mapping(answer: str, reference: str) -> dict:
             wrong_channel = bool(claims) and any(c != truth[4].replace('–', '-') for c in claims)
             if not channel_ok and not claims and truth[5] == 'physical device ddt' and slots and slot_ok:
                 linked = hardware.get((slot[1], module), [])
-                channel_ok = bool(linked) and all(_channels([value], truth[4], True) for value in linked)
+                channel_ok = bool(linked) and all(_channels([value], truth[4], device) for value in linked)
             wrong_address = bool(addresses - {truth[2]})
             if wrong_address or (_modules(joined) and not module_ok) or not slot_ok or wrong_channel:
                 incorrect.append(joined)
@@ -173,7 +179,7 @@ def grade_mapping(answer: str, reference: str) -> dict:
     record('no_false_physical_mappings', 'incorrect' if contradictions else 'matched',
            'Reference-unmapped signals must not acquire hardware assignments', sorted(set(contradictions)))
     matched = sum(checks.values())
-    return {'rubric': 'demo-io-mapping-3', 'checks': checks, 'facts': facts,
+    return {'rubric': 'demo-io-mapping-4', 'checks': checks, 'facts': facts,
             'coverage': {'matched': matched, 'required': len(checks), 'fraction': matched / len(checks)},
             'missing': [key for key, fact in facts.items() if fact['status'] == 'missing'],
             'incorrect': [key for key, fact in facts.items() if fact['status'] == 'incorrect'],

@@ -9,11 +9,25 @@ from control_expert_mcp.benchmark.core import digest, read_json, write_json
 from control_expert_mcp.benchmark.archive import archive_run
 from control_expert_mcp.benchmark.regrade import regrade_inspection, regraded_row
 from test_benchmark import GOLD
-from control_expert_mcp.benchmark.plot import chart_rows, visualize_archive
+from control_expert_mcp.benchmark.plot import chart_rows, visualize_archive, mapping_correctness
 from control_expert_mcp.benchmark.report import aggregate
 
 
 class ArchiveTests(unittest.TestCase):
+    def test_mapping_correctness_reports_partial_and_unknown_answers(self):
+        def case(matched, required=29):
+            return {'task': 'io_mapping', 'validation': {'checks': {
+                str(i): i < matched for i in range(required)}}}
+        for matched in (22, 23, 29):
+            score = mapping_correctness([case(matched)])
+            self.assertAlmostEqual(score['fraction'], matched / 29)
+            self.assertEqual((score['matched'], score['required']), (matched, 29))
+        score = mapping_correctness([case(23), case(22), {'task': 'io_mapping'},
+                                     {'task': 'inspect', 'validation': {'checks': {'x': True}}}])
+        self.assertEqual((score['matched'], score['required']), (45, 58))
+        self.assertEqual((score['known_n'], score['unknown_n']), (2, 1))
+        self.assertIsNone(mapping_correctness([{'task': 'io_mapping'}])['fraction'])
+
     def test_plot_data_keeps_models_and_versions_separate(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -72,6 +86,19 @@ class ArchiveTests(unittest.TestCase):
             for word in ("PRIVATE_", "SECRET_VALUE", "api_key_file", "final_response", "installation_path"):
                 self.assertNotIn(word, serialized)
             self.assertEqual(archive_run(root / "results", "run", root / "archive"), archive)
+            response = summary_path.parent / "final-response.txt"
+            response.write_text("saved answer", encoding="utf-8")
+            for rubric in ("feeder-2", "feeder-3"):
+                write_json(root / "results/run/regrades" / rubric / "inspect-0-A/attempt-1.json",
+                           {"rubric": rubric, "case_id": "inspect-0-A", "attempt_id": "attempt-1",
+                            "summary_sha256": digest(summary_path.read_bytes()),
+                            "response_sha256": digest(response.read_bytes()),
+                            "success": True, "validation": {"answer_pass": True}})
+            selected = archive_run(root / "results", "run", root / "selected", rubric="feeder-3")
+            self.assertEqual([g['rubric'] for g in read_json(selected / 'record.json')['inspection_regrades']],
+                             ['feeder-3'])
+            with self.assertRaisesRegex(ValueError, "No saved regrades"):
+                archive_run(root / "results", "run", root / "missing", rubric="absent")
             summary["success"] = False
             write_json(summary_path, summary)
             with self.assertRaises(ValueError):

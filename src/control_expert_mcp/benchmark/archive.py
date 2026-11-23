@@ -93,7 +93,8 @@ def verified_commit(server: dict, proof: dict) -> str:
     return resolved
 
 
-def archive_run(results: Path, run_id: str, destination: Path, *, allow_incomplete=False) -> Path:
+def archive_run(results: Path, run_id: str, destination: Path, *, allow_incomplete=False,
+                rubric: str | None = None) -> Path:
     """Archive numeric/boolean metadata only; never copy raw project/model payloads."""
     if Path(run_id).name != run_id or run_id in {".", ".."}:
         raise ValueError("Invalid run ID")
@@ -200,10 +201,14 @@ def archive_run(results: Path, run_id: str, destination: Path, *, allow_incomple
     for path in sorted((run / "regrades").glob("*/*/*.json")):
         from .regrade import regraded_row
         grade = read_json(path)
+        if rubric is not None and grade["rubric"] != rubric:
+            continue
         summary = run / grade["case_id"] / grade["attempt_id"] / "summary.json"
         regraded_row(summary, grade["rubric"])  # Validate source evidence hashes.
         regrades.append(grade)
     record["inspection_regrades"] = regrades
+    if rubric is not None and not regrades:
+        raise ValueError("No saved regrades match the selected rubric")
     record["regraded_conditions"] = {}
     for rubric in sorted({grade["rubric"] for grade in regrades}):
         revised = []
@@ -247,7 +252,7 @@ def archive_run(results: Path, run_id: str, destination: Path, *, allow_incomple
     for condition, server in servers.items():
         if server.get("verified_source_commit"):
             lines.append(f"- {condition}: `{server['verified_source_commit']}` (original dirty-state metadata retained).")
-    (staging / "report.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    (staging / "report.md").write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
     write_json(staging / "checksums.json", {name: digest((staging / name).read_bytes()) for name in ("record.json", "report.md")})
     if not staging.resolve().is_relative_to(destination.resolve()) or not target.resolve().is_relative_to(destination.resolve()):
         raise ValueError("Archive destination escaped intended directory")
@@ -270,7 +275,7 @@ def update_index(destination: Path) -> None:
     write_json(destination / "index.json", entries)
     index = ["# Archived benchmark runs", "", "Sanitized results intended for Git history. Raw evidence stays local.", "",
              "![Graphical benchmark overview](overview.png)", "",
-             "Regenerate from this archive with `ce-bench visualize --archive benchmarks/archive --output benchmarks/archive/overview.png`.", "",
+             f"Regenerate from this archive with `ce-bench visualize --archive {destination.as_posix()} --output {(destination / 'overview.png').as_posix()}`.", "",
              "| Run | Provider | Model | Measured source | Original accepted | Regraded accepted | Complete |", "|---|---|---|---|---|---|---|"]
     for value in entries:
         revisions = sorted({server.get("verified_source_commit") or server.get("source", {}).get("revision") or "unknown"
@@ -281,4 +286,4 @@ def update_index(destination: Path) -> None:
                             for rubric, arms in value.get("regraded_conditions", {}).items()) or "none"
         index.append(f"| [{value['run_id']}]({value['path']}/report.md) | {value['provider']} | {value['model']['id']} | "
                      f"{', '.join(rev[:12] for rev in revisions)} | {original}/{total} | {revised} | {value['complete']} |")
-    (destination / "README.md").write_text("\n".join(index) + "\n", encoding="utf-8")
+    (destination / "README.md").write_text("\n".join(index) + "\n", encoding="utf-8", newline="\n")

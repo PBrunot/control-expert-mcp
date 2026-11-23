@@ -27,7 +27,7 @@ def write_json(path: Path, value) -> None:
     """Atomically publish a summary; event streams are separately append-only."""
     path.parent.mkdir(parents=True, exist_ok=True)
     tmp = path.with_suffix(path.suffix + ".tmp")
-    with tmp.open("w", encoding="utf-8") as stream:
+    with tmp.open("w", encoding="utf-8", newline="\n") as stream:
         stream.write(json.dumps(value, indent=2, ensure_ascii=False))
         stream.flush()
         os.fsync(stream.fileno())

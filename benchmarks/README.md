@@ -30,9 +30,11 @@ reference answer is private to the evaluator and never included in model context
   Identify the relevant conditions and variables." Rubric `demo-weighing-1`
   requires `Weighing_Material_A` and `Weighing_Material_B` in the response. This
   scores identifier discovery only; explanation semantics remain unverified.
-- `io_mapping`: "Produce a table linking application signals to I/O addresses or
-  device-DDT fields, modules, and channels. Flag signals without a physical
-  mapping." Rubric `demo-io-mapping-3` uses the approved saved reference as ground truth.
+- `io_mapping`: Produce a table linking application signals to I/O addresses or
+  device-DDT fields, modules, and channels, covering the complete application-signal
+  inventory and flagging unmapped signals. Report module-owned device-DDT hardware
+  bindings and channel ranges separately from application use of their fields.
+  Rubric `demo-io-mapping-4` uses the approved saved reference as ground truth.
   It checks all 11 physical instances in Markdown table rows (signal, address or
   DDT, module type, channel), both internal-memory instances, 14 representative
   unmapped process signals, and unmapped Robot_one data. It rejects physical
@@ -40,15 +42,17 @@ reference answer is private to the evaluator and never included in model context
   and device-DDT leaf expansion are not automatically scored. Unsupported table
   representations remain unverified. This is a narrow deterministic rubric,
   not a semantic judge. Equivalent module spacing, channel labels/ranges or counts,
-  signal annotations and explicitly grouped unmapped rows are supported. Version 3
-  also recognizes direction labels such as `Output 3`, memory declarations in
+  signal annotations and explicitly grouped unmapped rows are supported. It
+  recognizes direction labels such as `Output 3`, memory declarations in
   prose, and device-DDT channel facts from a separate hardware table joined by
   explicit slot and module. It does not infer channels from the module name.
   Contradictory physical rows fail even when a correct row also exists.
   Results include per-check `matched`, `missing`, or `incorrect` status, coverage,
   and evidence hashes; missing facts cannot silently become passes. Coverage is
-  diagnostic, while acceptance still requires every check to pass. Versions 1
-  and 2 remain available for audit, and saved historical grades remain unchanged.
+  diagnostic, while acceptance still requires every check to pass. It also
+  recognizes `Signal(s)` and singular signal-column headings, and spelled-out
+  channel counts such as `32 digital input channels`. Count direction must agree
+  with the module. Regrades evaluate saved replies without adding facts.
 
 An explicit deterministic answer regrade preserves original summaries and
 responses, validates their hashes and the original reference hash, and makes
@@ -59,6 +63,14 @@ ce-bench regrade --results benchmarks/results --run-id RUN_ID --task io_mapping
 ```
 
 Archive both score views with `archive`, then regenerate with `visualize`.
+
+The [current scoring results](archive/README.md) and regenerated overview
+use `demo-io-mapping-4` for I/O mapping. The overview shows I/O correctness as
+the percentage of matched rubric checks, alongside the all-or-nothing pass count.
+Missing scoring evidence is shown as unknown rather than zero correctness.
+Select only this grader when creating an archive with
+`ce-bench archive --results benchmarks/results --run-id RUN_ID --archive DESTINATION --rubric demo-io-mapping-4`
+(add `--allow-incomplete` for an unfinished campaign).
 
 Each case must obtain source through MCP and leave its project file unchanged.
 One A/B repetition with both demo cases produces 14 independently scored cases.

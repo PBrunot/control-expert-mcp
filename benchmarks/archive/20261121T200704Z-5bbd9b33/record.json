@@ -4096,12 +4096,12 @@
       "fingerprint": "090c38dd92f607f0f0567edf29f36c0509b562cfc7b38dcc6ef4e76a9f7ca331",
       "prior_rubric": "demo-io-mapping-1",
       "prior_success": false,
-      "rubric": "demo-io-mapping-2",
+      "rubric": "demo-io-mapping-4",
       "success": true,
       "summary_sha256": "996d57154a23cfe679ca827825c2ac6ff6cf5a529064311906fdb9b7b07911eb",
       "response_sha256": "95d84b53b0a68b24141a53b7040266da15a71ab2469a8dfc064462f0f9329162",
       "validation": {
-        "rubric": "demo-io-mapping-2",
+        "rubric": "demo-io-mapping-4",
         "checks": {
           "physical:ami0410_0_7": true,
           "physical:analog_input_0": true,
@@ -4133,8 +4133,219 @@
           "robot_unmapped": true,
           "no_false_physical_mappings": true
         },
+        "facts": {
+          "physical:ami0410_0_7": {
+            "status": "matched",
+            "reason": "Signal, address/DDT, module and channel established together",
+            "evidence_sha256": [
+              "fdbc3c40c5d5a52059ca8f9bdd953f8fe31b60e6ede7ba13a41091a9dcb8fb12"
+            ]
+          },
+          "physical:analog_input_0": {
+            "status": "matched",
+            "reason": "Signal, address/DDT, module and channel established together",
+            "evidence_sha256": [
+              "9a3fb7d76b405d2b436bf20b07e4db0ba6b0ba891fd2dc040f81826a40d4b3fd"
+            ]
+          },
+          "physical:analog_input_1": {
+            "status": "matched",
+            "reason": "Signal, address/DDT, module and channel established together",
+            "evidence_sha256": [
+              "c63d4f42fc98c3bfc28f895237a7a0d2dbc33aeaf6d555dd10f9c4889d0dd5ea"
+            ]
+          },
+          "physical:analog_input_2": {
+            "status": "matched",
+            "reason": "Signal, address/DDT, module and channel established together",
+            "evidence_sha256": [
+              "2005334fdbb184233fc95997067afc3f9b668db6cada5b649b2c7c8187dc73a3"
+            ]
+          },
+          "physical:analog_input_3": {
+            "status": "matched",
+            "reason": "Signal, address/DDT, module and channel established together",
+            "evidence_sha256": [
+              "ff117e25334f832ec512d44c2814a29d7faaeec6a67774a5a32dcec81336b7ad"
+            ]
+          },
+          "physical:ddi3202k_0_5": {
+            "status": "matched",
+            "reason": "Signal, address/DDT, module and channel established together",
+            "evidence_sha256": [
+              "57a5fe08148d8eaa6a11d344a41b2319ed94744d5f06cd38168e34b93a069e38"
+            ]
+          },
+          "physical:ddo1602_0_6": {
+            "status": "matched",
+            "reason": "Signal, address/DDT, module and channel established together",
+            "evidence_sha256": [
+              "9d44f6d372f58da17077270ce1b02cdd4b1d21b4ed81ffd54b548f1f5572b206"
+            ]
+          },
+          "physical:l0": {
+            "status": "matched",
+            "reason": "Signal, address/DDT, module and channel established together",
+            "evidence_sha256": [
+              "ec1525c2285860be5fefd2e037ded34e7459f3f107031f7ea7c5c6d4934ac611"
+            ]
+          },
+          "physical:l1": {
+            "status": "matched",
+            "reason": "Signal, address/DDT, module and channel established together",
+            "evidence_sha256": [
+              "2508e6e0dcd15fa0540229e293157558b8f6942edaac131344f71e123832e2b3"
+            ]
+          },
+          "physical:l2": {
+            "status": "matched",
+            "reason": "Signal, address/DDT, module and channel established together",
+            "evidence_sha256": [
+              "c2abcbe2e8d64b753eb7161ad29a9b203f02ebae275d615a55778fa0cebc1120"
+            ]
+          },
+          "physical:machine_running": {
+            "status": "matched",
+            "reason": "Signal, address/DDT, module and channel established together",
+            "evidence_sha256": [
+              "7483e71964d089306e614c9bd7cb64c44a28c9f0862b3c2571dc6f1e75b42f65"
+            ]
+          },
+          "memory:current_position": {
+            "status": "matched",
+            "reason": "Require explicit internal-memory location and classification",
+            "evidence_sha256": [
+              "55d87cc086c5251ad8e853a1eb6da74c83aa04506389eb6af95bf35ae0518b0a"
+            ]
+          },
+          "memory:recipe": {
+            "status": "matched",
+            "reason": "Require explicit internal-memory location and classification",
+            "evidence_sha256": [
+              "da5d6e16ed9b1ee8d23f4a37c94186936bf614eed74285a68c5a9064f5421b17"
+            ]
+          },
+          "unmapped:start": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "a4d264f3b8de23c0dddd4277f9b0c97d97eef46a675a2ef888d46545260d7d82"
+            ]
+          },
+          "unmapped:stop": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "a4d264f3b8de23c0dddd4277f9b0c97d97eef46a675a2ef888d46545260d7d82"
+            ]
+          },
+          "unmapped:bp0": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "642d433baa6f0b546050763655e58b1169cacfbccd4ae201edc69d7baaca9627"
+            ]
+          },
+          "unmapped:bp1": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "642d433baa6f0b546050763655e58b1169cacfbccd4ae201edc69d7baaca9627"
+            ]
+          },
+          "unmapped:switch0": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "642d433baa6f0b546050763655e58b1169cacfbccd4ae201edc69d7baaca9627"
+            ]
+          },
+          "unmapped:measured_temp": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "096906a024a4d90e6f050716967368d43ea4e75f06c3339460a89fe912d92d91"
+            ]
+          },
+          "unmapped:valve_a_open": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "eb230ac65fa7d13ba603ff840be88c0317d69e56e33b20cd6e9019b77b648587"
+            ]
+          },
+          "unmapped:valve_a_closed": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "eb230ac65fa7d13ba603ff840be88c0317d69e56e33b20cd6e9019b77b648587"
+            ]
+          },
+          "unmapped:valve_b_open": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "eb230ac65fa7d13ba603ff840be88c0317d69e56e33b20cd6e9019b77b648587"
+            ]
+          },
+          "unmapped:valve_b_closed": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "eb230ac65fa7d13ba603ff840be88c0317d69e56e33b20cd6e9019b77b648587"
+            ]
+          },
+          "unmapped:conveying_screw": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "4691b863e8808e3a26a4fc436f246a2bd3029ce62086fab79e4d5f4a631bc112"
+            ]
+          },
+          "unmapped:forming": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "4691b863e8808e3a26a4fc436f246a2bd3029ce62086fab79e4d5f4a631bc112"
+            ]
+          },
+          "unmapped:belt_running": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "f95dfe795e3164211d5007a53cde3d01c638b214e12bd67947dabf1a3cde3ea5"
+            ]
+          },
+          "unmapped:material_picked_off": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "642d433baa6f0b546050763655e58b1169cacfbccd4ae201edc69d7baaca9627",
+              "6e04e36888a267881b535d88808d157db64294008f8fb17300a44816054151ce"
+            ]
+          },
+          "robot_unmapped": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "6e04e36888a267881b535d88808d157db64294008f8fb17300a44816054151ce"
+            ]
+          },
+          "no_false_physical_mappings": {
+            "status": "matched",
+            "reason": "Reference-unmapped signals must not acquire hardware assignments",
+            "evidence_sha256": []
+          }
+        },
+        "coverage": {
+          "matched": 29,
+          "required": 29,
+          "fraction": 1.0
+        },
+        "missing": [],
+        "incorrect": [],
         "answer_pass": true,
-        "limitation": "Reference-table subset; no semantic or exhaustive channel-leaf verification",
+        "limitation": "Deterministic reference subset; unrecognized representations remain missing. No semantic or exhaustive device-leaf verification.",
         "scope": "pass",
         "compile_pass": null,
         "runtime_behavior": "unverified",
@@ -4144,7 +4355,11 @@
       },
       "method": "Answer-only deterministic regrade; original saved-artifact scope/read evidence retained. No API or CE calls.",
       "reference_sha256": "ae70a0f647ac3d404ed66eb014a0f876806b067ef38f0b07953a5a8233218888",
-      "grader_sha256": "42abd585c5134dafbd308c1edc1654eb7192e8f561054c5e96640bf6cfcc52f0"
+      "grader_sha256": "10b81802f1a08f8f80eb13a9818761eb3093df22494a789e0d3769b4eb9d0708",
+      "grader_dependencies": {
+        "demo.py": "10b81802f1a08f8f80eb13a9818761eb3093df22494a789e0d3769b4eb9d0708",
+        "mapping_grade.py": "cea49430c8c2b65844a7dcd9fdeedd473f7f71c009943f34f1d0ff42861a1997"
+      }
     },
     {
       "case_id": "io_mapping-000-B",
@@ -4152,12 +4367,12 @@
       "fingerprint": "090c38dd92f607f0f0567edf29f36c0509b562cfc7b38dcc6ef4e76a9f7ca331",
       "prior_rubric": "demo-io-mapping-1",
       "prior_success": false,
-      "rubric": "demo-io-mapping-2",
+      "rubric": "demo-io-mapping-4",
       "success": true,
       "summary_sha256": "c9d85d6e697f3b4a08cee96fad1cd16fed439727d4f586a4e906382468af15e4",
       "response_sha256": "d37c9e6e4f95bf36e2af08534a71515495e29af5731cee36ac626cd9673637c6",
       "validation": {
-        "rubric": "demo-io-mapping-2",
+        "rubric": "demo-io-mapping-4",
         "checks": {
           "physical:ami0410_0_7": true,
           "physical:analog_input_0": true,
@@ -4189,8 +4404,218 @@
           "robot_unmapped": true,
           "no_false_physical_mappings": true
         },
+        "facts": {
+          "physical:ami0410_0_7": {
+            "status": "matched",
+            "reason": "Signal, address/DDT, module and channel established together",
+            "evidence_sha256": [
+              "8abd38c4d3bceacbd3ffe6e8032d99d5db09fd6df883d05f06f9920ed249b746"
+            ]
+          },
+          "physical:analog_input_0": {
+            "status": "matched",
+            "reason": "Signal, address/DDT, module and channel established together",
+            "evidence_sha256": [
+              "f869988fe345139eb102feaf54893965107adee8e14a7804054f120a9c1d008e"
+            ]
+          },
+          "physical:analog_input_1": {
+            "status": "matched",
+            "reason": "Signal, address/DDT, module and channel established together",
+            "evidence_sha256": [
+              "362b6a2d920425b3650629cc7a470468d1d72760ea50d04b0b691dd456e9421b"
+            ]
+          },
+          "physical:analog_input_2": {
+            "status": "matched",
+            "reason": "Signal, address/DDT, module and channel established together",
+            "evidence_sha256": [
+              "78f2d3b160fb1d60e2e05fcbb6c1576ee2d1084c9faebbdf11ca34036f5dc2ec"
+            ]
+          },
+          "physical:analog_input_3": {
+            "status": "matched",
+            "reason": "Signal, address/DDT, module and channel established together",
+            "evidence_sha256": [
+              "76d2e179170a65426a362dd2cff444122bf55676d4891d0da75145cfc7e3669a"
+            ]
+          },
+          "physical:ddi3202k_0_5": {
+            "status": "matched",
+            "reason": "Signal, address/DDT, module and channel established together",
+            "evidence_sha256": [
+              "1638186bc1fe01ab401d66abc8414e86f575374f674d902550eff7a675259cc5"
+            ]
+          },
+          "physical:ddo1602_0_6": {
+            "status": "matched",
+            "reason": "Signal, address/DDT, module and channel established together",
+            "evidence_sha256": [
+              "2c73b78c27a8b8f853e6819847c451a0469445202084adbb4d958cf2153028a3"
+            ]
+          },
+          "physical:l0": {
+            "status": "matched",
+            "reason": "Signal, address/DDT, module and channel established together",
+            "evidence_sha256": [
+              "7cd2b241ae8270265867d8cb1d03dc15db636047e2d315f6091c75e4f49b0d28"
+            ]
+          },
+          "physical:l1": {
+            "status": "matched",
+            "reason": "Signal, address/DDT, module and channel established together",
+            "evidence_sha256": [
+              "7e8706e9f4bc6cdcdb56ace6dbc218827beb018e5913302643645b3f188b9b51"
+            ]
+          },
+          "physical:l2": {
+            "status": "matched",
+            "reason": "Signal, address/DDT, module and channel established together",
+            "evidence_sha256": [
+              "23cdb8ed187b7595e27af42a5b12797a118f8d52701a2e0177e911ec0599e68a"
+            ]
+          },
+          "physical:machine_running": {
+            "status": "matched",
+            "reason": "Signal, address/DDT, module and channel established together",
+            "evidence_sha256": [
+              "146c6c2dd4897cd322ffda99110618578fce55da3e13910306bcb0519948e8da"
+            ]
+          },
+          "memory:current_position": {
+            "status": "matched",
+            "reason": "Require explicit internal-memory location and classification",
+            "evidence_sha256": [
+              "bf2d648c34e63684cb87a3e0884dc5749c88f0c2fb2bec3eea8f4548b3a9b981"
+            ]
+          },
+          "memory:recipe": {
+            "status": "matched",
+            "reason": "Require explicit internal-memory location and classification",
+            "evidence_sha256": [
+              "039ce28457288e43108dbb589d590d5c1682b87a13a962c5ae8ffaafa42f1a1b"
+            ]
+          },
+          "unmapped:start": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "9f9fc58301afef573580f282914dcaf90f414f75fdc423606fea20e715cbbab9"
+            ]
+          },
+          "unmapped:stop": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "9f9fc58301afef573580f282914dcaf90f414f75fdc423606fea20e715cbbab9"
+            ]
+          },
+          "unmapped:bp0": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "ba3ae6821208c0671f1c8585dfb1383c39a67554a3e43c35b63a50f19ba09166"
+            ]
+          },
+          "unmapped:bp1": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "ba3ae6821208c0671f1c8585dfb1383c39a67554a3e43c35b63a50f19ba09166"
+            ]
+          },
+          "unmapped:switch0": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "ba3ae6821208c0671f1c8585dfb1383c39a67554a3e43c35b63a50f19ba09166"
+            ]
+          },
+          "unmapped:measured_temp": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "d762a3e7562f1f10b3394df529c018ec811595284a8bfcc9ff1a70c99692938e"
+            ]
+          },
+          "unmapped:valve_a_open": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "87c3b00f969f02a0540c3afe69260ecad6fd8fc993bdd765221f45bce80fe474"
+            ]
+          },
+          "unmapped:valve_a_closed": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "87c3b00f969f02a0540c3afe69260ecad6fd8fc993bdd765221f45bce80fe474"
+            ]
+          },
+          "unmapped:valve_b_open": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "87c3b00f969f02a0540c3afe69260ecad6fd8fc993bdd765221f45bce80fe474"
+            ]
+          },
+          "unmapped:valve_b_closed": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "87c3b00f969f02a0540c3afe69260ecad6fd8fc993bdd765221f45bce80fe474"
+            ]
+          },
+          "unmapped:conveying_screw": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "7f9bf919166d4bd1b73c84f9fec53053170b211664568a27d8d664b8f1c611b1"
+            ]
+          },
+          "unmapped:forming": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "7f9bf919166d4bd1b73c84f9fec53053170b211664568a27d8d664b8f1c611b1"
+            ]
+          },
+          "unmapped:belt_running": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "7f9bf919166d4bd1b73c84f9fec53053170b211664568a27d8d664b8f1c611b1"
+            ]
+          },
+          "unmapped:material_picked_off": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "9cc74f947ba248f4561d353bafde814e2cf15f341e9e9ffb518d20dd4480b733"
+            ]
+          },
+          "robot_unmapped": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "9cc74f947ba248f4561d353bafde814e2cf15f341e9e9ffb518d20dd4480b733"
+            ]
+          },
+          "no_false_physical_mappings": {
+            "status": "matched",
+            "reason": "Reference-unmapped signals must not acquire hardware assignments",
+            "evidence_sha256": []
+          }
+        },
+        "coverage": {
+          "matched": 29,
+          "required": 29,
+          "fraction": 1.0
+        },
+        "missing": [],
+        "incorrect": [],
         "answer_pass": true,
-        "limitation": "Reference-table subset; no semantic or exhaustive channel-leaf verification",
+        "limitation": "Deterministic reference subset; unrecognized representations remain missing. No semantic or exhaustive device-leaf verification.",
         "scope": "pass",
         "compile_pass": null,
         "runtime_behavior": "unverified",
@@ -4200,11 +4625,15 @@
       },
       "method": "Answer-only deterministic regrade; original saved-artifact scope/read evidence retained. No API or CE calls.",
       "reference_sha256": "ae70a0f647ac3d404ed66eb014a0f876806b067ef38f0b07953a5a8233218888",
-      "grader_sha256": "42abd585c5134dafbd308c1edc1654eb7192e8f561054c5e96640bf6cfcc52f0"
+      "grader_sha256": "10b81802f1a08f8f80eb13a9818761eb3093df22494a789e0d3769b4eb9d0708",
+      "grader_dependencies": {
+        "demo.py": "10b81802f1a08f8f80eb13a9818761eb3093df22494a789e0d3769b4eb9d0708",
+        "mapping_grade.py": "cea49430c8c2b65844a7dcd9fdeedd473f7f71c009943f34f1d0ff42861a1997"
+      }
     }
   ],
   "regraded_conditions": {
-    "demo-io-mapping-2": {
+    "demo-io-mapping-4": {
       "A": {
         "cases": 7,
         "completion": {

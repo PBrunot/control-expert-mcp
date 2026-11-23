@@ -1,16 +1,16 @@
 {
-  "plot_version": 1,
+  "plot_version": 2,
   "scoring_view": "latest",
   "inputs": {
     "20261121T100834Z-be7edc84/record.json": "601fce9a0e855bd383b31d3173535ce45ede72b2facc0822143e858ce9a99fa3",
     "20261121T112555Z-608e42da/record.json": "80afc03e9a842a737bcc09c8799560ebe3e185576590355a2873d22909c623b1",
     "20261121T114513Z-a78f24bc/record.json": "cc153915a0cb7633dcf37da90a705dbc9748cbb068a6687777721b56767e2012",
-    "20261121T200704Z-5bbd9b33/record.json": "572debd8f7bc0fbe0afb69f2f737cf26924fb049001095ca94167283430f2001",
-    "20261121T204037Z-e4c05842-partial-200738467d/record.json": "71901384f660351d72b110fc66df8efdfe4e54662f23eae706d6b35de9597325",
-    "20261121T211320Z-ec8c65a1/record.json": "0c5b677eac290d10b0753e8ad690efe79fdab03860269f89cc3e0ae182602c9d"
+    "20261121T200704Z-5bbd9b33/record.json": "68ed1d734528f901ca99ab65a16e03aca2a10cfd7ff57562b99a253b8e8e328a",
+    "20261121T204037Z-e4c05842-partial-be63ed1b57/record.json": "5ff1a758f166a70e4c68ee86eb562494bbbcbb31554c97cb14ed02cf188d0626",
+    "20261121T211320Z-ec8c65a1/record.json": "bb9b43ae5c3b680551cae5e38f56da06dc86c4fa6f3a91bc7590cd67aa012cd0"
   },
-  "image_sha256": "aba266ddd1f8ae24a48e67940116f45b9da61ae23a524e56591e0c987842602d",
-  "generator_sha256": "ecd1df131cf48707edd127c4426484123faf91f748a971a5f098c8a320373cda",
+  "image_sha256": "c244708f6570e1824f8389c2945021e698bebb95d144fe7e80aadac349f7ecf4",
+  "generator_sha256": "6b0e5d9579082ace54c78846151c2518a7edae35d4c335cbc9cfcfe22e800675",
   "matplotlib": "3.11.2",
   "rows": [
     {
@@ -227,6 +227,13 @@
         "statuses": {
           "completed": 4
         }
+      },
+      "io_correctness": {
+        "matched": 0,
+        "required": 0,
+        "fraction": null,
+        "known_n": 0,
+        "unknown_n": 0
       },
       "tasks": {
         "inspect": {
@@ -861,6 +868,13 @@
         "statuses": {
           "completed": 4
         }
+      },
+      "io_correctness": {
+        "matched": 0,
+        "required": 0,
+        "fraction": null,
+        "known_n": 0,
+        "unknown_n": 0
       },
       "tasks": {
         "inspect": {
@@ -1497,6 +1511,13 @@
           "completed": 4,
           "workflow_failure": 1
         }
+      },
+      "io_correctness": {
+        "matched": 0,
+        "required": 0,
+        "fraction": null,
+        "known_n": 0,
+        "unknown_n": 0
       },
       "tasks": {
         "alarms": {
@@ -2235,6 +2256,13 @@
         "statuses": {
           "completed": 5
         }
+      },
+      "io_correctness": {
+        "matched": 0,
+        "required": 0,
+        "fraction": null,
+        "known_n": 0,
+        "unknown_n": 0
       },
       "tasks": {
         "alarms": {
@@ -2975,6 +3003,13 @@
           "completed": 5
         }
       },
+      "io_correctness": {
+        "matched": 0,
+        "required": 0,
+        "fraction": null,
+        "known_n": 0,
+        "unknown_n": 0
+      },
       "tasks": {
         "alarms": {
           "cases": 1,
@@ -3714,6 +3749,13 @@
           "completed": 5
         }
       },
+      "io_correctness": {
+        "matched": 0,
+        "required": 0,
+        "fraction": null,
+        "known_n": 0,
+        "unknown_n": 0
+      },
       "tasks": {
         "alarms": {
           "cases": 1,
@@ -4244,7 +4286,7 @@
       "model_identity": "alias",
       "source": "0b53d53d8b5e4713ddb97e473a14cf5208499203",
       "condition": "A",
-      "scoring": "demo-io-mapping-2, demo-weighing-1, feeder-2, feeder-alarms-1, feeder-temperature-2",
+      "scoring": "demo-io-mapping-4, demo-weighing-1, feeder-2, feeder-alarms-1, feeder-temperature-2",
       "original": {
         "cases": 7,
         "completion": {
@@ -4452,6 +4494,13 @@
         "statuses": {
           "completed": 7
         }
+      },
+      "io_correctness": {
+        "matched": 29,
+        "required": 29,
+        "fraction": 1.0,
+        "known_n": 1,
+        "unknown_n": 0
       },
       "tasks": {
         "alarms": {
@@ -5191,7 +5240,7 @@
       "model_identity": "alias",
       "source": "0b53d53d8b5e4713ddb97e473a14cf5208499203",
       "condition": "B",
-      "scoring": "demo-io-mapping-2, demo-weighing-1, feeder-2, feeder-alarms-1, feeder-temperature-2",
+      "scoring": "demo-io-mapping-4, demo-weighing-1, feeder-2, feeder-alarms-1, feeder-temperature-2",
       "original": {
         "cases": 7,
         "completion": {
@@ -5399,6 +5448,13 @@
         "statuses": {
           "completed": 7
         }
+      },
+      "io_correctness": {
+        "matched": 29,
+        "required": 29,
+        "fraction": 1.0,
+        "known_n": 1,
+        "unknown_n": 0
       },
       "tasks": {
         "alarms": {
@@ -6138,7 +6194,7 @@
       "model_identity": "pinned",
       "source": "c17ace01f2bd8fb5724812c436e631aa680d5141",
       "condition": "A",
-      "scoring": "demo-io-mapping-3, feeder-alarms-1, feeder-temperature-2",
+      "scoring": "demo-io-mapping-4, feeder-alarms-1, feeder-temperature-2",
       "original": {
         "cases": 4,
         "completion": {
@@ -6253,10 +6309,10 @@
           "rate_all": 0.75
         },
         "accepted": {
-          "pass": 2,
+          "pass": 3,
           "n": 4,
           "verified_n": 4,
-          "rate_all": 0.5
+          "rate_all": 0.75
         },
         "build": {
           "pass": 3,
@@ -6308,32 +6364,32 @@
         },
         "accepted_attempts": {
           "workflow_seconds": {
-            "n": 2,
-            "known_n": 2,
+            "n": 3,
+            "known_n": 3,
             "unknown_n": 0,
-            "median": 21.189329049999287,
-            "p95": 21.74815529999978
+            "median": 21.74815529999978,
+            "p95": 104.71821269999782
           },
           "input_tokens": {
-            "n": 2,
-            "known_n": 2,
+            "n": 3,
+            "known_n": 3,
             "unknown_n": 0,
-            "median": 24275.0,
-            "p95": 25815
+            "median": 25815,
+            "p95": 890897
           },
           "output_tokens": {
-            "n": 2,
-            "known_n": 2,
+            "n": 3,
+            "known_n": 3,
             "unknown_n": 0,
-            "median": 814.0,
-            "p95": 850
+            "median": 850,
+            "p95": 4771
           },
           "total_tokens": {
-            "n": 2,
-            "known_n": 2,
+            "n": 3,
+            "known_n": 3,
             "unknown_n": 0,
-            "median": 25089.0,
-            "p95": 26665
+            "median": 26665,
+            "p95": 895668
           }
         },
         "known_partial_tokens": {
@@ -6348,6 +6404,13 @@
           "completed": 3,
           "workflow_failure": 1
         }
+      },
+      "io_correctness": {
+        "matched": 29,
+        "required": 29,
+        "fraction": 1.0,
+        "known_n": 1,
+        "unknown_n": 0
       },
       "tasks": {
         "alarms": {
@@ -6463,10 +6526,10 @@
             "rate_all": 1.0
           },
           "accepted": {
-            "pass": 0,
+            "pass": 1,
             "n": 1,
             "verified_n": 1,
-            "rate_all": 0.0
+            "rate_all": 1.0
           },
           "build": {
             "pass": 0,
@@ -6518,32 +6581,32 @@
           },
           "accepted_attempts": {
             "workflow_seconds": {
-              "n": 0,
-              "known_n": 0,
+              "n": 1,
+              "known_n": 1,
               "unknown_n": 0,
-              "median": null,
-              "p95": null
+              "median": 104.71821269999782,
+              "p95": 104.71821269999782
             },
             "input_tokens": {
-              "n": 0,
-              "known_n": 0,
+              "n": 1,
+              "known_n": 1,
               "unknown_n": 0,
-              "median": null,
-              "p95": null
+              "median": 890897,
+              "p95": 890897
             },
             "output_tokens": {
-              "n": 0,
-              "known_n": 0,
+              "n": 1,
+              "known_n": 1,
               "unknown_n": 0,
-              "median": null,
-              "p95": null
+              "median": 4771,
+              "p95": 4771
             },
             "total_tokens": {
-              "n": 0,
-              "known_n": 0,
+              "n": 1,
+              "known_n": 1,
               "unknown_n": 0,
-              "median": null,
-              "p95": null
+              "median": 895668,
+              "p95": 895668
             }
           },
           "known_partial_tokens": {
@@ -6775,7 +6838,7 @@
       "model_identity": "pinned",
       "source": "c17ace01f2bd8fb5724812c436e631aa680d5141",
       "condition": "B",
-      "scoring": "demo-io-mapping-3, feeder-temperature-2",
+      "scoring": "demo-io-mapping-4, feeder-temperature-2",
       "original": {
         "cases": 3,
         "completion": {
@@ -6983,6 +7046,13 @@
         "statuses": {
           "completed": 3
         }
+      },
+      "io_correctness": {
+        "matched": 29,
+        "required": 29,
+        "fraction": 1.0,
+        "known_n": 1,
+        "unknown_n": 0
       },
       "tasks": {
         "io_mapping": {
@@ -7306,7 +7376,7 @@
       "model_identity": "alias",
       "source": "c17ace01f2bd8fb5724812c436e631aa680d5141",
       "condition": "A",
-      "scoring": "demo-io-mapping-3, demo-weighing-1, feeder-2, feeder-alarms-1, feeder-temperature-2",
+      "scoring": "demo-io-mapping-4, demo-weighing-1, feeder-2, feeder-alarms-1, feeder-temperature-2",
       "original": {
         "cases": 7,
         "completion": {
@@ -7514,6 +7584,13 @@
         "statuses": {
           "completed": 7
         }
+      },
+      "io_correctness": {
+        "matched": 23,
+        "required": 29,
+        "fraction": 0.7931034482758621,
+        "known_n": 1,
+        "unknown_n": 0
       },
       "tasks": {
         "alarms": {
@@ -8253,7 +8330,7 @@
       "model_identity": "alias",
       "source": "c17ace01f2bd8fb5724812c436e631aa680d5141",
       "condition": "B",
-      "scoring": "demo-io-mapping-3, demo-weighing-1, feeder-2, feeder-alarms-1, feeder-temperature-2",
+      "scoring": "demo-io-mapping-4, demo-weighing-1, feeder-2, feeder-alarms-1, feeder-temperature-2",
       "original": {
         "cases": 7,
         "completion": {
@@ -8461,6 +8538,13 @@
         "statuses": {
           "completed": 7
         }
+      },
+      "io_correctness": {
+        "matched": 22,
+        "required": 29,
+        "fraction": 0.7586206896551724,
+        "known_n": 1,
+        "unknown_n": 0
       },
       "tasks": {
         "alarms": {

@@ -4085,124 +4085,12 @@
       "fingerprint": "a5c51d5335a82ed0bdebcb6458f58ac6364a4fc135cd2fe6b2b208f5d8fcca75",
       "prior_rubric": "demo-io-mapping-2",
       "prior_success": false,
-      "rubric": "demo-io-mapping-2",
+      "rubric": "demo-io-mapping-4",
       "success": false,
       "summary_sha256": "0e314bf5d8c7be7b53c9224b775247afeef7a9532777c5fe15dad470dc16dba4",
       "response_sha256": "bb0c494718a1774ad5c5027041a75307af08f70c4b87598c960be40fe60f5657",
       "validation": {
-        "rubric": "demo-io-mapping-2",
-        "checks": {
-          "physical:ami0410_0_7": false,
-          "physical:analog_input_0": true,
-          "physical:analog_input_1": true,
-          "physical:analog_input_2": true,
-          "physical:analog_input_3": true,
-          "physical:ddi3202k_0_5": false,
-          "physical:ddo1602_0_6": false,
-          "physical:l0": true,
-          "physical:l1": true,
-          "physical:l2": true,
-          "physical:machine_running": true,
-          "memory:current_position": false,
-          "memory:recipe": false,
-          "unmapped:start": true,
-          "unmapped:stop": true,
-          "unmapped:bp0": true,
-          "unmapped:bp1": true,
-          "unmapped:switch0": true,
-          "unmapped:measured_temp": true,
-          "unmapped:valve_a_open": true,
-          "unmapped:valve_a_closed": true,
-          "unmapped:valve_b_open": true,
-          "unmapped:valve_b_closed": true,
-          "unmapped:conveying_screw": true,
-          "unmapped:forming": false,
-          "unmapped:belt_running": false,
-          "unmapped:material_picked_off": false,
-          "robot_unmapped": true,
-          "no_false_physical_mappings": true
-        },
-        "answer_pass": false,
-        "limitation": "Reference-table subset; no semantic or exhaustive channel-leaf verification",
-        "scope": "pass",
-        "compile_pass": null,
-        "runtime_behavior": "unverified",
-        "static_behavior": null,
-        "obtained_source_through_mcp": true,
-        "success": false
-      },
-      "method": "Answer-only deterministic regrade; original saved-artifact scope/read evidence retained. No API or CE calls.",
-      "reference_sha256": "ae70a0f647ac3d404ed66eb014a0f876806b067ef38f0b07953a5a8233218888",
-      "grader_sha256": "42abd585c5134dafbd308c1edc1654eb7192e8f561054c5e96640bf6cfcc52f0"
-    },
-    {
-      "case_id": "io_mapping-000-B",
-      "attempt_id": "attempt-4cf1090eef044830bb90839a1c760304",
-      "fingerprint": "a5c51d5335a82ed0bdebcb6458f58ac6364a4fc135cd2fe6b2b208f5d8fcca75",
-      "prior_rubric": "demo-io-mapping-2",
-      "prior_success": false,
-      "rubric": "demo-io-mapping-2",
-      "success": false,
-      "summary_sha256": "e5f47534851c918d225aeb7f8004d6c64c6b0df0100fd4fffbadfe74001eabe9",
-      "response_sha256": "e3290d8c4afd6f8ffa08e0a6758da1393a423df4dac505aaf930f14d837c5ac6",
-      "validation": {
-        "rubric": "demo-io-mapping-2",
-        "checks": {
-          "physical:ami0410_0_7": false,
-          "physical:analog_input_0": true,
-          "physical:analog_input_1": false,
-          "physical:analog_input_2": false,
-          "physical:analog_input_3": false,
-          "physical:ddi3202k_0_5": false,
-          "physical:ddo1602_0_6": false,
-          "physical:l0": false,
-          "physical:l1": false,
-          "physical:l2": false,
-          "physical:machine_running": false,
-          "memory:current_position": false,
-          "memory:recipe": false,
-          "unmapped:start": true,
-          "unmapped:stop": true,
-          "unmapped:bp0": true,
-          "unmapped:bp1": true,
-          "unmapped:switch0": true,
-          "unmapped:measured_temp": true,
-          "unmapped:valve_a_open": true,
-          "unmapped:valve_a_closed": true,
-          "unmapped:valve_b_open": true,
-          "unmapped:valve_b_closed": true,
-          "unmapped:conveying_screw": true,
-          "unmapped:forming": false,
-          "unmapped:belt_running": false,
-          "unmapped:material_picked_off": false,
-          "robot_unmapped": false,
-          "no_false_physical_mappings": true
-        },
-        "answer_pass": false,
-        "limitation": "Reference-table subset; no semantic or exhaustive channel-leaf verification",
-        "scope": "pass",
-        "compile_pass": null,
-        "runtime_behavior": "unverified",
-        "static_behavior": null,
-        "obtained_source_through_mcp": true,
-        "success": false
-      },
-      "method": "Answer-only deterministic regrade; original saved-artifact scope/read evidence retained. No API or CE calls.",
-      "reference_sha256": "ae70a0f647ac3d404ed66eb014a0f876806b067ef38f0b07953a5a8233218888",
-      "grader_sha256": "42abd585c5134dafbd308c1edc1654eb7192e8f561054c5e96640bf6cfcc52f0"
-    },
-    {
-      "case_id": "io_mapping-000-A",
-      "attempt_id": "attempt-8b60d619e6c746ae96872ecde2c0a205",
-      "fingerprint": "a5c51d5335a82ed0bdebcb6458f58ac6364a4fc135cd2fe6b2b208f5d8fcca75",
-      "prior_rubric": "demo-io-mapping-2",
-      "prior_success": false,
-      "rubric": "demo-io-mapping-3",
-      "success": false,
-      "summary_sha256": "0e314bf5d8c7be7b53c9224b775247afeef7a9532777c5fe15dad470dc16dba4",
-      "response_sha256": "bb0c494718a1774ad5c5027041a75307af08f70c4b87598c960be40fe60f5657",
-      "validation": {
-        "rubric": "demo-io-mapping-3",
+        "rubric": "demo-io-mapping-4",
         "checks": {
           "physical:ami0410_0_7": false,
           "physical:analog_input_0": true,
@@ -4456,10 +4344,10 @@
       },
       "method": "Answer-only deterministic regrade; original saved-artifact scope/read evidence retained. No API or CE calls.",
       "reference_sha256": "ae70a0f647ac3d404ed66eb014a0f876806b067ef38f0b07953a5a8233218888",
-      "grader_sha256": "0a5c308eefca4b53922cc1d3b7bf9399a222553f7b18753b46b79b00e06ecb27",
+      "grader_sha256": "10b81802f1a08f8f80eb13a9818761eb3093df22494a789e0d3769b4eb9d0708",
       "grader_dependencies": {
-        "demo.py": "0a5c308eefca4b53922cc1d3b7bf9399a222553f7b18753b46b79b00e06ecb27",
-        "mapping_grade.py": "30d35c27caec6193fb6b23b956ca764bebb03124b3cacb3a06a6f92c811f8207"
+        "demo.py": "10b81802f1a08f8f80eb13a9818761eb3093df22494a789e0d3769b4eb9d0708",
+        "mapping_grade.py": "cea49430c8c2b65844a7dcd9fdeedd473f7f71c009943f34f1d0ff42861a1997"
       }
     },
     {
@@ -4468,12 +4356,12 @@
       "fingerprint": "a5c51d5335a82ed0bdebcb6458f58ac6364a4fc135cd2fe6b2b208f5d8fcca75",
       "prior_rubric": "demo-io-mapping-2",
       "prior_success": false,
-      "rubric": "demo-io-mapping-3",
+      "rubric": "demo-io-mapping-4",
       "success": false,
       "summary_sha256": "e5f47534851c918d225aeb7f8004d6c64c6b0df0100fd4fffbadfe74001eabe9",
       "response_sha256": "e3290d8c4afd6f8ffa08e0a6758da1393a423df4dac505aaf930f14d837c5ac6",
       "validation": {
-        "rubric": "demo-io-mapping-3",
+        "rubric": "demo-io-mapping-4",
         "checks": {
           "physical:ami0410_0_7": false,
           "physical:analog_input_0": true,
@@ -4509,9 +4397,7 @@
           "physical:ami0410_0_7": {
             "status": "missing",
             "reason": "Need signal, exact address/DDT, module and channel in one row",
-            "evidence_sha256": [
-              "b40dfe58bdfea04968f061a7900fcbbcb3a2e4a8e4c49cd5f4c4009066f4dc9e"
-            ]
+            "evidence_sha256": []
           },
           "physical:analog_input_0": {
             "status": "matched",
@@ -4544,16 +4430,12 @@
           "physical:ddi3202k_0_5": {
             "status": "missing",
             "reason": "Need signal, exact address/DDT, module and channel in one row",
-            "evidence_sha256": [
-              "df99c4df712aa98715f8881bdbda84b20ad16ed1ad3c9f44e7cdb6e02e1b468f"
-            ]
+            "evidence_sha256": []
           },
           "physical:ddo1602_0_6": {
             "status": "missing",
             "reason": "Need signal, exact address/DDT, module and channel in one row",
-            "evidence_sha256": [
-              "de4476d32f2ac8e5a97b3ce40656e0d499776f48086b099b342e28570eb191fa"
-            ]
+            "evidence_sha256": []
           },
           "physical:l0": {
             "status": "matched",
@@ -4726,225 +4608,15 @@
       },
       "method": "Answer-only deterministic regrade; original saved-artifact scope/read evidence retained. No API or CE calls.",
       "reference_sha256": "ae70a0f647ac3d404ed66eb014a0f876806b067ef38f0b07953a5a8233218888",
-      "grader_sha256": "0a5c308eefca4b53922cc1d3b7bf9399a222553f7b18753b46b79b00e06ecb27",
+      "grader_sha256": "10b81802f1a08f8f80eb13a9818761eb3093df22494a789e0d3769b4eb9d0708",
       "grader_dependencies": {
-        "demo.py": "0a5c308eefca4b53922cc1d3b7bf9399a222553f7b18753b46b79b00e06ecb27",
-        "mapping_grade.py": "30d35c27caec6193fb6b23b956ca764bebb03124b3cacb3a06a6f92c811f8207"
+        "demo.py": "10b81802f1a08f8f80eb13a9818761eb3093df22494a789e0d3769b4eb9d0708",
+        "mapping_grade.py": "cea49430c8c2b65844a7dcd9fdeedd473f7f71c009943f34f1d0ff42861a1997"
       }
     }
   ],
   "regraded_conditions": {
-    "demo-io-mapping-2": {
-      "A": {
-        "cases": 7,
-        "completion": {
-          "pass": 7,
-          "n": 7,
-          "verified_n": 7,
-          "rate_all": 1.0
-        },
-        "accepted": {
-          "pass": 6,
-          "n": 7,
-          "verified_n": 7,
-          "rate_all": 0.8571428571428571
-        },
-        "build": {
-          "pass": 4,
-          "n": 4,
-          "verified_n": 4,
-          "rate_all": 1.0
-        },
-        "static_behavior": {
-          "pass": 4,
-          "n": 4,
-          "verified_n": 4,
-          "rate_all": 1.0
-        },
-        "runtime_behavior": {
-          "pass": 0,
-          "n": 4,
-          "verified_n": 0,
-          "rate_all": 0.0
-        },
-        "all_attempts": {
-          "workflow_seconds": {
-            "n": 7,
-            "known_n": 7,
-            "unknown_n": 0,
-            "median": 15.31014850000065,
-            "p95": 44.97436540000126
-          },
-          "input_tokens": {
-            "n": 7,
-            "known_n": 7,
-            "unknown_n": 0,
-            "median": 35410,
-            "p95": 467462
-          },
-          "output_tokens": {
-            "n": 7,
-            "known_n": 7,
-            "unknown_n": 0,
-            "median": 734,
-            "p95": 3680
-          },
-          "total_tokens": {
-            "n": 7,
-            "known_n": 7,
-            "unknown_n": 0,
-            "median": 36344,
-            "p95": 471142
-          }
-        },
-        "accepted_attempts": {
-          "workflow_seconds": {
-            "n": 6,
-            "known_n": 6,
-            "unknown_n": 0,
-            "median": 15.046490849999827,
-            "p95": 33.81924980000258
-          },
-          "input_tokens": {
-            "n": 6,
-            "known_n": 6,
-            "unknown_n": 0,
-            "median": 34702.5,
-            "p95": 83383
-          },
-          "output_tokens": {
-            "n": 6,
-            "known_n": 6,
-            "unknown_n": 0,
-            "median": 721.5,
-            "p95": 2895
-          },
-          "total_tokens": {
-            "n": 6,
-            "known_n": 6,
-            "unknown_n": 0,
-            "median": 35521.5,
-            "p95": 86278
-          }
-        },
-        "known_partial_tokens": {
-          "input_tokens": 707365,
-          "output_tokens": 10251,
-          "total_tokens": 717616
-        },
-        "tool_errors": 2,
-        "api_retries": 0,
-        "repair_cycles": 1,
-        "statuses": {
-          "completed": 7
-        }
-      },
-      "B": {
-        "cases": 7,
-        "completion": {
-          "pass": 7,
-          "n": 7,
-          "verified_n": 7,
-          "rate_all": 1.0
-        },
-        "accepted": {
-          "pass": 6,
-          "n": 7,
-          "verified_n": 7,
-          "rate_all": 0.8571428571428571
-        },
-        "build": {
-          "pass": 4,
-          "n": 4,
-          "verified_n": 4,
-          "rate_all": 1.0
-        },
-        "static_behavior": {
-          "pass": 4,
-          "n": 4,
-          "verified_n": 4,
-          "rate_all": 1.0
-        },
-        "runtime_behavior": {
-          "pass": 0,
-          "n": 4,
-          "verified_n": 0,
-          "rate_all": 0.0
-        },
-        "all_attempts": {
-          "workflow_seconds": {
-            "n": 7,
-            "known_n": 7,
-            "unknown_n": 0,
-            "median": 16.763072399997327,
-            "p95": 57.88744980000047
-          },
-          "input_tokens": {
-            "n": 7,
-            "known_n": 7,
-            "unknown_n": 0,
-            "median": 46182,
-            "p95": 336342
-          },
-          "output_tokens": {
-            "n": 7,
-            "known_n": 7,
-            "unknown_n": 0,
-            "median": 1148,
-            "p95": 4473
-          },
-          "total_tokens": {
-            "n": 7,
-            "known_n": 7,
-            "unknown_n": 0,
-            "median": 47338,
-            "p95": 340815
-          }
-        },
-        "accepted_attempts": {
-          "workflow_seconds": {
-            "n": 6,
-            "known_n": 6,
-            "unknown_n": 0,
-            "median": 15.770438699997612,
-            "p95": 41.42795169999954
-          },
-          "input_tokens": {
-            "n": 6,
-            "known_n": 6,
-            "unknown_n": 0,
-            "median": 41643.5,
-            "p95": 124047
-          },
-          "output_tokens": {
-            "n": 6,
-            "known_n": 6,
-            "unknown_n": 0,
-            "median": 897.0,
-            "p95": 2920
-          },
-          "total_tokens": {
-            "n": 6,
-            "known_n": 6,
-            "unknown_n": 0,
-            "median": 42544.5,
-            "p95": 126967
-          }
-        },
-        "known_partial_tokens": {
-          "input_tokens": 717106,
-          "output_tokens": 11521,
-          "total_tokens": 728627
-        },
-        "tool_errors": 1,
-        "api_retries": 0,
-        "repair_cycles": 0,
-        "statuses": {
-          "completed": 7
-        }
-      }
-    },
-    "demo-io-mapping-3": {
+    "demo-io-mapping-4": {
       "A": {
         "cases": 7,
         "completion": {

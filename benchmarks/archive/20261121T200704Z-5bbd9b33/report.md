@@ -30,8 +30,8 @@ Harness base revision: `0b53d53d8b5e4713ddb97e473a14cf5208499203`; dirty: `True`
 
 Original results above remain unchanged. Explicit inspection regrades:
 
-- `demo-io-mapping-2`, A: 7/7 accepted.
-- `demo-io-mapping-2`, B: 7/7 accepted.
+- `demo-io-mapping-4`, A: 7/7 accepted.
+- `demo-io-mapping-4`, B: 7/7 accepted.
 
 Measured Python source verified against Git (CRLF/LF normalized):
 

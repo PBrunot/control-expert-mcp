@@ -5,7 +5,7 @@ import tempfile
 from types import SimpleNamespace
 from unittest.mock import AsyncMock
 
-from control_expert_mcp.benchmark.demo import io_mapping_grade, weighing_grade, DEMO_PROMPTS, io_mapping_grade_v1, table_rows
+from control_expert_mcp.benchmark.demo import io_mapping_grade, weighing_grade, DEMO_PROMPTS, table_rows
 from control_expert_mcp.benchmark.report import aggregate
 from control_expert_mcp.benchmark.core import digest, read_json, write_json
 from control_expert_mcp.benchmark.regrade import regrade_inspection, regraded_row
@@ -16,7 +16,54 @@ REFERENCE = Path(__file__).resolve().parents[1] / "samples/demo_ControlExpert_M5
 
 
 class DemoTests(unittest.IsolatedAsyncioTestCase):
-    def test_mapping_v3_prose_memory_and_direction_channel_labels(self):
+    def test_mapping_signal_column_and_spelled_out_channel_counts(self):
+        reference = REFERENCE.read_text(encoding="utf-8-sig")
+        kept = []
+        names = []
+        for line in reference.splitlines():
+            rows = table_rows(line)
+            if rows and len(rows[0]) >= 7 and rows[0][5].startswith('unmapped'):
+                names.append(rows[0][0])
+                continue
+            if rows and len(rows[0]) >= 7 and rows[0][5] == 'physical device ddt':
+                cells = line.split('|')
+                cells[5] = {'ddi3202k_0_5': '32 digital input channels',
+                            'ddo1602_0_6': '16 digital output channels',
+                            'ami0410_0_7': '4 analog input channels'}[rows[0][0]]
+                line = '|'.join(cells)
+            kept.append(line)
+        # Remove separate hardware/leaf tables so they cannot rescue bad counts.
+        start = kept.index('## Signals with physical mappings')
+        end = kept.index('## Device-DDT channel fields')
+        physical = '\n'.join(kept[start:end])
+        memory = '\nCurrent_position (%MW10) and recipe (%MW100) are internal memory.\n'
+        for header in ('Signal(s) without physical mapping', 'Signals without physical mapping',
+                       'Application signal', 'Unmapped signals'):
+            with self.subTest(header=header):
+                answer = (physical + memory + '\n## Unmapped signals\n\n| Signal group | ' + header
+                          + ' |\n|---|---|\n| Process | ' + ', '.join(names) + ' |\n')
+                grade = io_mapping_grade(answer, reference)
+                self.assertEqual(grade['rubric'], 'demo-io-mapping-4')
+                self.assertTrue(grade['answer_pass'], grade['missing'])
+                for old, new, key in (
+                    ('32 digital input channels', '31 digital input channels', 'physical:ddi3202k_0_5'),
+                    ('32 digital input channels', '32 digital output channels', 'physical:ddi3202k_0_5'),
+                    ('16 digital output channels', '16 digital input channels', 'physical:ddo1602_0_6'),
+                    ('4 analog input channels', '4 digital input channels', 'physical:ami0410_0_7'),
+                    ('belt_running', 'belt_motor', 'unmapped:belt_running'),
+                    ('robot_one', 'unrelated_robot', 'robot_unmapped'),
+                ):
+                    wrong = io_mapping_grade(answer.replace(old, new), reference)
+                    self.assertFalse(wrong['answer_pass'])
+                    self.assertIn(key, wrong['missing'])
+                hardware = ('\n| Slot | Module | Channels configured | Application signal aliases found |\n'
+                            '|---|---|---|---|\n'
+                            '| 5 | BMXDDI3202K | 32 DI | Module DDT DDI3202K_0_5 |\n'
+                            '| 6 | BMXDDO1602 | 16 DO | Module DDT DDO1602_0_6 |\n'
+                            '| 7 | BMXAMI0410 | 4 AI | Module DDT AMI0410_0_7 |\n')
+                self.assertTrue(io_mapping_grade(answer + hardware, reference)['answer_pass'])
+
+    def test_mapping_prose_memory_and_direction_channel_labels(self):
         reference = REFERENCE.read_text(encoding="utf-8-sig")
         lines = []
         for line in reference.splitlines():
@@ -34,7 +81,7 @@ class DemoTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(grade['coverage']['matched'], grade['coverage']['required'])
         self.assertFalse(io_mapping_grade(answer.replace('%MW10)', '%MW11)'), reference)['answer_pass'])
 
-    def test_mapping_v3_conflicts_cannot_be_rescued_by_correct_rows(self):
+    def test_mapping_conflicts_cannot_be_rescued_by_correct_rows(self):
         reference = REFERENCE.read_text(encoding="utf-8-sig")
         for bad in ('%Q0.3.30 | BMXDDO1602 | 3', '%Q0.3.3 | BMXDDO1602 | 15',
                     '%Q0.3.3 | slot 6 BMXDDO1602 | 3', '%Q0.3.3 | BMXDDI3202K | 3',
@@ -46,7 +93,7 @@ class DemoTests(unittest.IsolatedAsyncioTestCase):
                 self.assertTrue('physical:machine_running' in grade['incorrect']
                                 or 'physical:machine_running' in grade['missing'])
 
-    def test_mapping_v3_explicit_hardware_join_and_missing_diagnostics(self):
+    def test_mapping_explicit_hardware_join_and_missing_diagnostics(self):
         reference = REFERENCE.read_text(encoding="utf-8-sig")
         lines = []
         for line in reference.splitlines():
@@ -64,7 +111,7 @@ class DemoTests(unittest.IsolatedAsyncioTestCase):
         self.assertIn('physical:ddi3202k_0_5', grade['missing'])
         self.assertEqual(grade['facts']['physical:ddi3202k_0_5']['status'], 'missing')
 
-    def test_mapping_v3_omissions_remain_failures(self):
+    def test_mapping_omissions_remain_failures(self):
         reference = REFERENCE.read_text(encoding="utf-8-sig")
         answer = reference.replace('Belt_running', 'Unrelated_signal')
         grade = io_mapping_grade(answer, reference)
@@ -140,7 +187,6 @@ class DemoTests(unittest.IsolatedAsyncioTestCase):
             lines.append(line)
         equivalent = "\n".join(lines)
         self.assertTrue(io_mapping_grade(equivalent, reference)["answer_pass"])
-        self.assertFalse(io_mapping_grade_v1(equivalent, reference)["answer_pass"])
         # Group every software signal in one explicitly flagged table row.
         kept = [line for line in equivalent.splitlines()
                 if "UNMAPPED" not in line or not line.startswith("|")]
@@ -180,7 +226,7 @@ class DemoTests(unittest.IsolatedAsyncioTestCase):
                        "snapshot": {"config": {"io_mapping_reference": str(ref)},
                                     "demo_inputs": {"io_mapping_reference": digest(ref.read_bytes())}}})
             regrade_inspection(root, "run", "io_mapping")
-            row = regraded_row(attempt / "summary.json", "demo-io-mapping-3")
+            row = regraded_row(attempt / "summary.json", "demo-io-mapping-4")
             self.assertTrue(row["success"])
             self.assertEqual(read_json(attempt / "summary.json"), summary)
             ref.write_text(reference + "changed", encoding="utf-8")
@@ -188,7 +234,7 @@ class DemoTests(unittest.IsolatedAsyncioTestCase):
                 regrade_inspection(root, "run", "io_mapping")
             (attempt / "final-response.txt").write_text("changed", encoding="utf-8")
             with self.assertRaises(ValueError):
-                regraded_row(attempt / "summary.json", "demo-io-mapping-3")
+                regraded_row(attempt / "summary.json", "demo-io-mapping-4")
 
     def test_read_only_cases_are_excluded_from_build_denominators(self):
         rows = [{"task": task, "status": "completed", "success": True,
