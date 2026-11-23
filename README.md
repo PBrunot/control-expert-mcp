@@ -270,7 +270,7 @@ it. The `export_project_backup` prompt describes this offline workflow.
 | DTM configuration | `get_dtm_control_parameters`, `set_dtm_control_parameters`, `get_dtm_dataset`, `set_dtm_dataset`, `get_master_dtm_dataset`, `set_master_dtm_dataset` |
 | Ethernet and networks | `configure_cpu_ethernet`, `list_networks`, `add_network`, `set_network_ip` |
 | Animation tables and UI | `list_animation_tables`, `create_animation_table`, `delete_animation_table`, `show_ui`, `open_animation_table` |
-| Simulator process | `start_simulator`, `stop_simulator` |
+| Simulator process and PLC execution state | `get_simulator_status`, `start_simulator`, `stop_simulator` |
 | Local manuals | `get_documentation_status`, `search_manuals`, `get_manual_topic` |
 | Live session setup (always available) | `get_live_access_setup`, `configure_live_access` |
 | PLC connection **(opt-in)** | `plc_setup_connection`, `plc_connect`, `plc_disconnect`, `plc_state`, `plc_transfer`, `plc_command` |
@@ -300,7 +300,13 @@ The server includes reusable MCP prompts in [prompts.py](src/control_expert_mcp/
 
 Set `CE_MCP_ENABLE_ONLINE=1` in the server environment and restart it to expose online tools. This only makes the tools available; every server process starts with live access blocked.
 
-On connection, the LLM is instructed to call `get_live_access_setup` and collect the user's choices: offline or live access, OPC (preferred) or Modbus, and the OFS device alias for OPC. Before closed-loop writes or PLC control, the user must explicitly approve that mode and confirm OFS is available and running for OPC. `configure_live_access` records these answers; the server enforces them before connecting, reading, writing, transferring, or issuing PLC commands. There is no automatic protocol fallback. Configuration lasts for the server process; restarting requires setup again. Changing setup disconnects existing connections. Cleanup and status calls remain available. MCP instructions guide the conversation; client support determines how the questions are displayed.
+Simulator startup uses the open Control Expert/Unity Pro application's
+`InstallationPath`, so the executable follows that installation rather than a
+hard-coded release or product folder name. For custom layouts or startup without
+an open project, set `CE_MCP_SIMULATOR_EXE` to the matching simulator executable.
+The server does not automatically fall back to another installed release.
+
+Before live work, the LLM is instructed to call `get_live_access_setup`, reuse recorded user choices, and collect any missing choices: offline or live access, OPC (preferred) or Modbus, and the OFS device alias for OPC. Before closed-loop writes or PLC control, the user must explicitly approve that mode and confirm OFS is available and running for OPC. `configure_live_access` records these answers; the server enforces them before connecting, reading, writing, transferring, or issuing PLC commands. There is no automatic protocol fallback. Configuration lasts for the server process; restarting requires setup again. Changing setup disconnects existing connections. Cleanup and status calls remain available. MCP instructions guide the conversation; client support determines how the questions are displayed.
 
 For example, **after** the user approves OPC connections, confirms the alias and running OFS, and approves closed-loop tests:
 
@@ -311,6 +317,19 @@ configure_live_access(allow_live_connection=true, protocol="opc",
 
 Use `allow_closed_loop=false` for read-only sessions. To revoke live access, call `configure_live_access(allow_live_connection=false)`. Tool arguments attest to answers obtained by the client; the server cannot independently authenticate a conversational user confirmation.
 
+For an explicitly approved simulator download without live tag access, use
+`configure_live_access(allow_live_connection=true, protocol="engineering", allow_closed_loop=true)`.
+This enables engineering connections and deployment without requiring OFS; OPC
+and Modbus tag access remain blocked. Configure those separately if requested.
+
+`get_simulator_status` is available offline and does not start or connect anything.
+It distinguishes `simulator_running` (the process exists) from `plc_state`
+(`run`, `stop`, `no_conf`, `halt`, `default`, or `unknown`). PLC state is observed
+only through an existing engineering connection with the simulator selected.
+Otherwise it reports `unknown` and a reason, never an assumed STOP or RUN.
+`pc_equals_plc=true` identifies a matching deployed application; process presence
+alone proves neither deployment nor execution.
+
 Use the `commission_simulator` prompt for the complete commissioning procedure.
 
 The commissioning sequence is:
@@ -318,11 +337,24 @@ The commissioning sequence is:
 1. Build the project and confirm `build_state="built_ok"`.
 2. Launch the simulator with `start_simulator` or the installed `PLC_Simulator\sim.exe`.
 3. Configure `plc_setup_connection(target="simulator", address="127.0.0.1")` and call `plc_connect(target="simulator")`.
-4. Ensure the controller is stopped before `plc_transfer(direction="pc_to_plc")`.
+4. Inspect state: an empty `no_conf` simulator has nothing to stop. Otherwise call `plc_command(command="stop")` and require STOP before `plc_transfer(direction="pc_to_plc")`.
 5. Call `plc_command(command="run")` and inspect `plc_state`.
 
 > [!IMPORTANT]
-> A fresh simulator with no station loaded (`no_conf`) can reject API downloads with **“Family check failed.”** Seed it once through the Control Expert GUI: PLC → Simulation Mode → Connect → Transfer, using a project of the matching controller family. The station persists while `sim.exe` runs. Subsequent API downloads require the controller to be stopped.
+> If an API download reports **“Family check failed,”** seed the matching controller family once through the Control Expert GUI: PLC → Simulation Mode → Connect → Transfer. Use this workaround only when that error occurs; an empty simulator can accept an initial API download directly.
+
+Validated on 2026-11-23 with Control Expert 16.4 and the M580 demo, CPU
+`BME P58 3040` version `03.20`: the stdio MCP sequence opened and fully rebuilt
+the demo, launched a closed simulator, connected in `no_conf`, and downloaded
+directly to STOP with `pc_equals_plc=true`. Build reported zero errors and one
+gateway network warning. This verifies deployment, not functional process logic.
+
+Repeat the local integration check from the repository root:
+`python tools/check_simulator.py --approve-download --cold-start --verify-run`.
+It replaces the simulator application, verifies closed/empty/STOP/RUN state
+reporting, returns the PLC to STOP, and records version, diagnostics and results
+in `tmp/simulator-check.json`. It never saves the source project. Omit
+`--verify-run` for download-only validation or `--cold-start` to reuse the process.
 
 ### Symbolic live values through OFS OPC DA
 

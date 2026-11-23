@@ -16,8 +16,8 @@ class LiveAccessPolicy:
     def validate(self, allow_live_connection: bool, protocol: str = "opc",
                  ofs_alias: str = "", opc_server_confirmed_running: bool = False,
                  allow_closed_loop: bool = False) -> dict:
-        if protocol not in ("opc", "modbus"):
-            raise ValueError("protocol must be 'opc' (preferred) or 'modbus'; no automatic fallback")
+        if protocol not in ("opc", "modbus", "engineering"):
+            raise ValueError("protocol must be 'opc' (preferred), 'modbus' or 'engineering'; no automatic fallback")
         if allow_live_connection and not self.enabled:
             raise ValueError("Live tools are disabled. Set CE_MCP_ENABLE_ONLINE=1 and restart, then repeat setup.")
         ofs_alias = ofs_alias.strip()

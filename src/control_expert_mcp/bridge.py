@@ -2868,10 +2868,60 @@ class ControlExpertBridge:
 
     # ----------------------------------------------------------- simulator
 
-    SIM_EXE = (
-        r"C:\Program Files (x86)\Schneider Electric\Control Expert 14.0"
-        r"\PLC_Simulator\sim.exe"
-    )
+    def get_simulator_status(self) -> dict:
+        return self._run(self._do_get_simulator_status)
+
+    def _do_get_simulator_status(self) -> dict:
+        """Observe the local process and an existing simulator connection only."""
+        running = self._sim_running()
+        result: dict[str, Any] = {
+            "simulator_running": running, "connected": False,
+            "plc_state": "unknown", "pc_equals_plc": None,
+            "state_source": "unavailable",
+        }
+        if not running:
+            result["reason"] = "simulator_not_running"
+            return result
+        if self._app is None:
+            result["reason"] = "no_application_open"
+            return result
+        try:
+            if int(self._app.SelectTarget) != C.TARGET_SIMULATOR:
+                result["reason"] = "engineering_target_is_not_simulator"
+                return result
+            state = self._do_plc_state()
+        except Exception as exc:
+            result["reason"] = "simulator_state_unavailable"
+            result["error"] = _format_com_error(exc)
+            return result
+        if state.get("connected") is not True:
+            result["reason"] = "simulator_not_connected"
+            return result
+        result.update(state)
+        result["state_source"] = "engineering_connection"
+        return result
+
+    def _simulator_executable(self) -> str:
+        """Resolve the matching CE/Unity simulator without guessing a version."""
+        override = os.environ.get("CE_MCP_SIMULATOR_EXE", "").strip()
+        if override:
+            exe = os.path.abspath(os.path.expandvars(override))
+        else:
+            try:
+                installation = str(self._ensure_app().InstallationPath).strip()
+            except Exception as exc:
+                raise CEError(
+                    "Cannot determine the matching PLC Simulator installation. "
+                    "Open a Control Expert/Unity Pro project first, or set "
+                    "CE_MCP_SIMULATOR_EXE to its simulator executable."
+                ) from exc
+            if not installation:
+                raise CEError("Empty installation path; set CE_MCP_SIMULATOR_EXE explicitly.")
+            exe = os.path.join(installation, "PLC_Simulator", "sim.exe")
+        if not os.path.isfile(exe):
+            raise CEError(f"Simulator not found at {exe}. Set CE_MCP_SIMULATOR_EXE "
+                          "for a nonstandard installation; no other release is selected automatically.")
+        return exe
 
     def start_simulator(self, enforce_security: bool) -> dict:
         return self._run(self._do_start_simulator, enforce_security)
@@ -2902,14 +2952,13 @@ class ControlExpertBridge:
         if already:
             result["simulator"] = "already running"
             return result
-        exe = self.SIM_EXE
-        if not os.path.isfile(exe):
-            raise CEError(f"Simulator not found at {exe}")
+        exe = self._simulator_executable()
         subprocess.Popen([exe])
         for _ in range(30):
             time.sleep(1)
             if self._sim_running():
                 result["simulator"] = "started"
+                result["executable"] = exe
                 return result
         raise CEError("sim.exe did not come up within 30 s")
 

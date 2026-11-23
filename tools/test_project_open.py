@@ -3,6 +3,7 @@
 import os
 from pathlib import Path
 import tempfile
+import sys
 import unittest
 from unittest.mock import Mock, patch
 
@@ -12,6 +13,75 @@ from control_expert_mcp.bridge import (
 
 
 class ProjectOpenTests(unittest.TestCase):
+    def test_simulator_status_distinguishes_process_from_plc_execution(self):
+        bridge = object.__new__(ControlExpertBridge)
+        bridge._app = Mock(SelectTarget=1)
+        bridge._sim_running = Mock(return_value=False)
+        bridge._do_plc_state = Mock()
+        status = bridge._do_get_simulator_status()
+        self.assertFalse(status['simulator_running'])
+        self.assertEqual(status['plc_state'], 'unknown')
+        bridge._do_plc_state.assert_not_called()
+        bridge._sim_running.return_value = True
+        for state in ('no_conf', 'stop', 'run', 'halt', 'default', 'unknown'):
+            bridge._do_plc_state.return_value = {
+                'connected': True, 'plc_state': state, 'pc_equals_plc': state != 'no_conf'}
+            with self.subTest(state=state):
+                status = bridge._do_get_simulator_status()
+                self.assertTrue(status['simulator_running'])
+                self.assertEqual(status['plc_state'], state)
+                self.assertEqual(status['state_source'], 'engineering_connection')
+
+    def test_simulator_status_never_attributes_a_real_plc_or_stale_state(self):
+        bridge = object.__new__(ControlExpertBridge)
+        bridge._sim_running = Mock(return_value=True)
+        bridge._do_plc_state = Mock(return_value={'connected': False, 'plc_state': 'run'})
+        for app, reason in ((None, 'no_application_open'),
+                            (Mock(SelectTarget=0), 'engineering_target_is_not_simulator'),
+                            (Mock(SelectTarget=1), 'simulator_not_connected')):
+            bridge._app = app
+            with self.subTest(reason=reason):
+                status = bridge._do_get_simulator_status()
+                self.assertEqual(status['plc_state'], 'unknown')
+                self.assertIsNone(status['pc_equals_plc'])
+                self.assertEqual(status['reason'], reason)
+
+    def test_simulator_uses_active_installation_instead_of_legacy_path(self):
+        bridge = object.__new__(ControlExpertBridge)
+        bridge._app = Mock(InstallationPath="active-ce-16.4")
+        bridge._sim_running = Mock(side_effect=[False, True])
+        expected = os.path.join("active-ce-16.4", "PLC_Simulator", "sim.exe")
+        with patch.dict(os.environ, {"CE_MCP_SIMULATOR_EXE": ""}), \
+             patch.dict(sys.modules, {"winreg": Mock()}), \
+             patch("os.path.isfile", side_effect=lambda p: p == expected), \
+             patch("subprocess.Popen") as launch, patch("time.sleep"):
+            self.assertEqual(bridge._do_start_simulator(True)["simulator"], "started")
+        launch.assert_called_once_with([expected])
+
+    def test_missing_active_simulator_does_not_launch_another_version(self):
+        bridge = object.__new__(ControlExpertBridge)
+        bridge._app = Mock(InstallationPath="missing-active-ce")
+        bridge._sim_running = Mock(return_value=False)
+        with patch.dict(os.environ, {"CE_MCP_SIMULATOR_EXE": ""}), \
+             patch.dict(sys.modules, {"winreg": Mock()}), \
+             patch("os.path.isfile", return_value=False), \
+             patch("subprocess.Popen") as launch:
+            with self.assertRaisesRegex(CEError, "missing-active-ce"):
+                bridge._do_start_simulator(True)
+        launch.assert_not_called()
+
+    def test_simulator_override_and_missing_application_need_no_version_guess(self):
+        bridge = object.__new__(ControlExpertBridge)
+        bridge._app = None
+        with tempfile.TemporaryDirectory() as temporary:
+            executable = Path(temporary) / "custom-simulator.exe"
+            executable.write_bytes(b"test, never executed")
+            with patch.dict(os.environ, {"CE_MCP_SIMULATOR_EXE": str(executable)}):
+                self.assertEqual(bridge._simulator_executable(), str(executable.resolve()))
+        with patch.dict(os.environ, {"CE_MCP_SIMULATOR_EXE": ""}):
+            with self.assertRaisesRegex(CEError, "Open.*project first"):
+                bridge._simulator_executable()
+
     def test_archive_requires_native_saveas_and_preserves_source(self):
         bridge = object.__new__(ControlExpertBridge)
         bridge._do_close = Mock()

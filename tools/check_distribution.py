@@ -19,6 +19,7 @@ HELPERS = {
     "test_benchmark.py", "benchmark_fake_server.py",
     "test_benchmark_archive.py", "test_benchmark_alarms.py",
     "test_opc.py", "check_opc.py",
+    "check_simulator.py",
     "test_opc_benchmark.py",
 }
 

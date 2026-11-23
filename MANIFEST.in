@@ -13,6 +13,7 @@ include tools/test_export_ce_help.py
 include tools/test_mcp_runtime.py
 include tools/test_opc.py
 include tools/check_opc.py
+include tools/check_simulator.py
 include tools/test_opc_benchmark.py
 include tools/lang_refs/OPC_Bench.xml
 include benchmarks/opc.example.json

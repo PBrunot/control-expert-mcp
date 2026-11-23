@@ -60,6 +60,7 @@ class MCPRuntimeTests(unittest.IsolatedAsyncioTestCase):
                 self.assertEqual(initialized.server_info.version, version("control-expert-mcp"))
                 tools = {tool.name for tool in (await session.list_tools()).tools}
                 self.assertIn("get_language_reference", tools)
+                self.assertIn("get_simulator_status", tools)
                 self.assertNotIn("plc_connect", tools)
                 result = await session.call_tool("get_status", {})
                 self.assertFalse(result.is_error)
@@ -91,6 +92,7 @@ class MCPRuntimeTests(unittest.IsolatedAsyncioTestCase):
                 self.assertIn("opc_connect", tools)
                 self.assertIn("configure_live_access", tools)
                 self.assertIn("get_live_access_setup", tools)
+                self.assertIn("get_simulator_status", tools)
                 status = await session.call_tool("get_live_access_setup", {})
                 self.assertFalse(json.loads(status.content[0].text)["allow_live_connection"])
                 blocked = await session.call_tool("opc_connect", {})
@@ -100,6 +102,14 @@ class MCPRuntimeTests(unittest.IsolatedAsyncioTestCase):
                     "allow_live_connection": True, "ofs_alias": "Demo", "allow_closed_loop": True})
                 self.assertTrue(rejected.is_error)
                 self.assertIn("confirm OFS", rejected.content[0].text)
+                engineering = await session.call_tool("configure_live_access", {
+                    "allow_live_connection": True, "protocol": "engineering", "allow_closed_loop": True})
+                self.assertFalse(engineering.is_error)
+                self.assertEqual(json.loads(engineering.content[0].text)["protocol"], "engineering")
+                for name, args in (("opc_connect", {}), ("modbus_connect", {"host": "127.0.0.1"})):
+                    blocked = await session.call_tool(name, args)
+                    self.assertTrue(blocked.is_error)
+                    self.assertIn("engineering", blocked.content[0].text)
                 accepted = await session.call_tool("configure_live_access", {
                     "allow_live_connection": True, "ofs_alias": "Demo"})
                 self.assertFalse(accepted.is_error)

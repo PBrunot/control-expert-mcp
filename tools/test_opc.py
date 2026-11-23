@@ -12,6 +12,26 @@ from control_expert_mcp.opc_worker import AutomationSession
 
 
 class LivePolicyTests(unittest.TestCase):
+    def test_engineering_deployment_needs_consent_but_not_ofs(self):
+        policy = LiveAccessPolicy(True)
+        policy.config = policy.validate(True, 'engineering', allow_closed_loop=True)
+        policy.configured = True
+        for name in ('plc_setup_connection', 'plc_connect', 'plc_state', 'plc_transfer', 'plc_command'):
+            with self.subTest(name=name), policy.guard(name):
+                pass
+        for name in ('opc_connect', 'opc_read_tags', 'opc_write_tags',
+                     'modbus_connect', 'read_tags', 'write_tags'):
+            with self.subTest(name=name), self.assertRaises(ValueError):
+                with policy.guard(name):
+                    self.fail('engineering approval must not grant tag access')
+        policy.config = policy.validate(True, 'engineering')
+        for name in ('plc_transfer', 'plc_command'):
+            with self.subTest(name=name), self.assertRaises(ValueError):
+                with policy.guard(name):
+                    self.fail('control still requires explicit approval')
+        with self.assertRaisesRegex(ValueError, 'CE_MCP_ENABLE_ONLINE'):
+            LiveAccessPolicy(False).validate(True, 'engineering', allow_closed_loop=True)
+
     def test_opt_in_is_not_consent_and_opc_confirmation_is_required(self):
         policy = LiveAccessPolicy(True)
         with self.assertRaisesRegex(ValueError, 'configure_live_access'):

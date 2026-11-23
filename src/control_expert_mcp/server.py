@@ -66,14 +66,16 @@ mcp = ControlExpertMCPServer(
     "Control Expert",
     version=version("control-expert-mcp"),
     instructions=(
-        "ON CONNECTION: call get_live_access_setup before any live work. Ask the user "
+        "ON CONNECTION: call get_live_access_setup before live work. Reuse recorded choices; ask "
         "whether to allow a live connection, which protocol to use (prefer OPC), and "
         "the OFS device alias. Before enabling closed-loop writes/PLC control, obtain "
         "explicit user approval and, for OPC, user confirmation that OFS is available "
         "and running. Call configure_live_access with those answers. Environment "
         "opt-in only exposes tools; it is not session consent. Stay offline until "
         "setup is completed; never silently fall back to Modbus.\n\n"
-        "Expected test setup: OFS connected to PLC Simulator, default alias Dev_Alias_2 "
+        "For engineering deployment only, protocol='engineering' needs no OFS setup "
+        "and grants no tag access; record explicit live/download approval. "
+        "Expected symbolic test setup: OFS connected to PLC Simulator, default alias Dev_Alias_2 "
         "(confirm with the user). Build and download with Data dictionary enabled and "
         "Only HMI variables cleared, so non-HMI variables support symbolic reads/writes.\n\n"
         "Automates a local EcoStruxure Control Expert (Unity Pro) installation. "
@@ -89,9 +91,11 @@ mcp = ControlExpertMCPServer(
         "import_xml(kind='section'). SFC is the right choice for stepwise "
         "sequences (steps + transitions + ST actions).\n\n"
         "Live testing: online tools (plc_*, opc_*, modbus_*) need CE_MCP_ENABLE_ONLINE=1. "
-        "To run a project on the simulator, see the commission_simulator prompt (a "
-        "fresh sim needs a one-time manual transfer from the CE GUI to seed the CPU "
-        "family — 'Family check failed' otherwise). Reading/writing LIVE values is "
+        "To run a project on the simulator, see commission_simulator. An empty no_conf "
+        "simulator can accept an initial API download; only use a GUI seed transfer "
+        "if transfer reports Family check failed. get_simulator_status distinguishes "
+        "process presence from PLC RUN; unavailable execution state is unknown. "
+        "Reading/writing LIVE values is "
         "available symbolically through OFS OPC DA (opc_connect/opc_browse/opc_read_tags/"
         "opc_write_tags), including exposed unlocated variables and DFB members. "
         "See test_logic_opc for data dictionary and 32-bit wrapper setup. "
@@ -111,8 +115,10 @@ live_policy = LiveAccessPolicy(ONLINE_ENABLED)
 
 @mcp.tool()
 def get_live_access_setup() -> dict:
-    """First-call setup/status, available even offline. Ask the user whether
-    live connections are allowed, OPC (preferred) or Modbus, and the OFS device
+    """Read session consent and setup status before live work; available offline.
+    Reuse recorded user choices rather than asking again. For missing choices ask
+    whether live connections are allowed, OPC (preferred), Modbus, or engineering
+    deployment only, and (for OPC) the OFS device
     alias. Closed-loop writes/control need explicit approval; OPC also needs
     user confirmation that OFS is available and running. Never infer answers
     from discovery or environment variables. Choices last for this server process."""
@@ -126,7 +132,10 @@ def configure_live_access(allow_live_connection: bool, protocol: str = "opc",
     """Record the user's explicit setup answers, never an LLM-inferred approval.
     Defaults to offline/read-only and prefers OPC. OPC live access needs the
     user-confirmed alias. Closed-loop OPC requires user confirmation that OFS
-    is available/running as well as allow_closed_loop=true. Changing setup
+    is available/running as well as allow_closed_loop=true. Setup
+    with protocol='engineering' allows only plc_* tools without OPC/Modbus tag
+    access; it needs no OFS alias or OFS confirmation. Explicit download/control
+    approval still requires allow_closed_loop=true. Changing setup
     disconnects existing live sessions. No settings persist across restarts.
     CE_MCP_ENABLE_ONLINE=1 is a separate administrator prerequisite."""
     with live_policy.lock:
@@ -991,13 +1000,38 @@ def configure_cpu_ethernet(
 
 
 @mcp.tool()
+def get_simulator_status() -> dict:
+    """Observe local simulator process presence and its PLC execution state.
+    Available offline; never starts, connects, downloads or sends commands.
+    simulator_running is process presence, not PLC RUN. plc_state is run,
+    stop, no_conf (empty), halt, default or unknown. Execution state and
+    pc_equals_plc are read only from an existing engineering connection whose
+    selected target is simulator. Otherwise plc_state='unknown' with a reason;
+    do not infer STOP from a missing connection or process. For state discovery,
+    use approved plc_setup_connection/plc_connect, then call this tool again.
+    A successful download normally leaves the PLC in STOP; RUN requires an
+    approved plc_command('run') and an observed run state."""
+    return ce.get_simulator_status()
+
+
+@mcp.tool()
 def start_simulator(enforce_security: bool = False) -> dict:
     """Start the Control Expert PLC simulator (sim.exe) so plc_connect can
-    reach it. With enforce_security=False (default) the simulator's 'use
+    reach it. Uses the open application's InstallationPath, independent of
+    CE/Unity version or product folder name; CE_MCP_SIMULATOR_EXE overrides the
+    executable for custom layouts or startup without an open project. No other
+    installed release is guessed. With enforce_security=False (default) the simulator's 'use
     default application (enforce security)' option is disabled in the registry
     first — otherwise sim.exe blocks on a warning dialog unless a
     password-protected default application is configured. Only use on a local
-    test machine."""
+    test machine. Launching does not load or run the open project. For approved
+    commissioning: build_project until built_ok with no error, start_simulator,
+    plc_setup_connection(target='simulator', address='127.0.0.1', driver='TCPIP'),
+    plc_connect(target='simulator'), plc_command('stop') unless state is no_conf,
+    plc_transfer('pc_to_plc'),
+    plc_command('run'), then plc_state. Require RUN and pc_equals_plc=true.
+    If transfer reports 'Family check failed', seed the CPU family through the
+    CE GUI. An empty simulator does not always require this workaround."""
     return ce.start_simulator(enforce_security)
 
 
@@ -1065,14 +1099,24 @@ if ONLINE_ENABLED:
 
     @mcp.tool()
     def plc_setup_connection(target: str = "simulator", address: str = "", driver: str = "") -> dict:
-        """Configure the connection target. target: 'simulator' or 'plc'.
+        """Configure the engineering connection; this does not connect or transfer.
+        Requires completed live-access setup and an open project. Use only the
+        user-approved target: 'simulator' or 'plc'.
         address e.g. '127.0.0.1' or '192.168.10.1'; driver e.g. 'TCPIP'.
-        EXPERIMENTAL — affects equipment when target='plc'."""
+        For the local simulator use target='simulator', address='127.0.0.1',
+        driver='TCPIP'. Call plc_connect with the same target afterwards.
+        EXPERIMENTAL — real PLC access can affect equipment."""
         return ce.plc_setup_connection(target, address or None, driver or None)
 
     @mcp.tool()
     def plc_connect(target: str = "simulator", mode: str = "primary") -> dict:
-        """Connect to the PLC or simulator. The project must be built first."""
+        """Connect the open engineering project to the approved PLC or simulator.
+        Complete live-access setup, build the project and configure the intended
+        target with plc_setup_connection first. For a simulator, start_simulator
+        first. target must match that setup; leave mode='primary' unless another
+        mode is specifically required. Inspect returned connection/application
+        state with plc_state; connecting does not download or start the program.
+        This connection is separate from opc_connect and modbus_connect."""
         return ce.plc_connect(target, mode)
 
     @mcp.tool()
@@ -1082,20 +1126,40 @@ if ONLINE_ENABLED:
 
     @mcp.tool()
     def plc_state() -> dict:
-        """Report connection state and PLC run/stop state."""
+        """Observe the engineering connection and PLC state after plc_connect.
+        Returns available connected, connection_state, plc_state and
+        pc_equals_plc fields. Missing fields mean unknown, not success.
+        After download/run require connected=true, plc_state='run' and
+        pc_equals_plc=true before attributing tests to the current project.
+        These establish deployment state, not functional input/output behavior;
+        use approved live reads for that. OPC alone needs no engineering session."""
         return ce.plc_state()
 
     @mcp.tool()
     def plc_transfer(direction: str = "pc_to_plc") -> dict:
-        """Transfer the application. direction: 'pc_to_plc' (download to
-        controller — DANGEROUS on live equipment, PLC must be stopped) or
-        'plc_to_pc' (upload from controller)."""
+        """Transfer between the engineering application and the connected target.
+        Requires approved closed-loop access. Confirm the intended target and
+        connection before either direction. 'pc_to_plc' downloads: first require
+        build_state='built_ok' with no error and stop the target using plc_command.
+        'plc_to_pc' uploads and can replace engineering content; preserve work first.
+        DANGEROUS on real equipment. A fresh/different-family simulator may reject
+        download with 'Family check failed': if that error occurs, seed the same
+        CPU family once through the CE GUI, not repeated API transfers.
+        An empty simulator in no_conf can accept its initial download directly;
+        it has no running application to stop. Check returned plc_state and
+        pc_equals_plc; transfer does not prove RUN or functional correctness.
+        After a timeout the effect is unknown; do not replay automatically."""
         return ce.plc_transfer(direction)
 
     @mcp.tool()
     def plc_command(command: str) -> dict:
-        """Send a run/stop/init command to the connected PLC. DANGEROUS:
-        starting or stopping a live controller affects the physical process."""
+        """Send 'run', 'stop' or 'init' to the connected PLC/simulator.
+        Requires approved closed-loop access and the intended target connection.
+        DANGEROUS: these change process execution; init reinitializes the application.
+        Returns observed state after bounded polling; inspect plc_state rather
+        than treating the echoed command as success. Check pc_equals_plc before
+        testing the current project. A timed-out command has an unknown outcome;
+        inspect state before further control, never replay automatically."""
         return ce.plc_command(command)
 
     # ------------------------------------- symbolic live values over OPC DA
