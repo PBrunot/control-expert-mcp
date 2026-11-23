@@ -17,6 +17,8 @@ include tools/check_simulator.py
 include tools/test_opc_benchmark.py
 include tools/lang_refs/OPC_Bench.xml
 include benchmarks/opc.example.json
+include benchmarks/simulator.example.json
+include tools/test_simulator_benchmark.py
 include tools/test_benchmark.py
 include tools/test_benchmark_archive.py
 include tools/test_benchmark_alarms.py

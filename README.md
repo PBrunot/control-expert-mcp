@@ -281,7 +281,23 @@ DTM scan-request configuration uses the master/CPU dataset's `ManagedModbusReque
 
 ## Guided workflows
 
-The server includes reusable MCP prompts in [prompts.py](src/control_expert_mcp/prompts.py). Select them through your client's prompt picker.
+The server includes optional workflow recipes in [prompts.py](src/control_expert_mcp/prompts.py).
+Select them through your client's prompt picker; clients do not necessarily load
+them automatically. Tool descriptions carry prerequisites, replacement behavior,
+result checks and recovery guidance independently of these recipes. Project
+declarations and initial values are distinct from live PLC values; saving,
+building, downloading and verifying behavior are separate operations.
+
+For simulator verification, define input sequences and expected outputs with
+tolerances and observation deadlines. Check good-quality live input/output values,
+report each case as pass, fail or unverified, and verify test-input restoration.
+A build or write acknowledgement alone does not prove runtime correctness.
+The offline benchmark consumes server instructions and tool descriptions, not
+these recipes; simulator behavior is measured separately by the opt-in OPC suite.
+
+The opt-in `ce-bench simulator` suite tests the full M580 demo workflow: create
+`MAST/LLM`, implement `TEST_LLM` +1/second, build, download and RUN, then grade
+independent OPC DA observations. See [simulator benchmark setup and scoring](benchmarks/README.md#m580-simulator-counter-benchmark).
 
 | Prompt | Workflow |
 | --- | --- |

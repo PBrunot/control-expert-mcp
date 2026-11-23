@@ -21,6 +21,7 @@ HELPERS = {
     "test_opc.py", "check_opc.py",
     "check_simulator.py",
     "test_opc_benchmark.py",
+    "test_simulator_benchmark.py",
 }
 
 
@@ -65,6 +66,7 @@ def check_sdist(path: Path, expected_modules: set[str]) -> None:
         "benchmarks/example.json", "benchmarks/README.md", "benchmarks/CHECKPOINT.md",
         "benchmarks/deepseek.example.json",
         "benchmarks/opc.example.json", "tools/lang_refs/OPC_Bench.xml",
+        "benchmarks/simulator.example.json",
         "tools/lang_refs/ST_2_Feeder.xml",
         *("tools/" + name for name in HELPERS),
         *(p.relative_to(ROOT).as_posix() for p in (ROOT / "samples").glob("*.json")),

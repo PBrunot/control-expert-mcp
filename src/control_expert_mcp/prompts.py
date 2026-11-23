@@ -68,6 +68,25 @@ def register_prompts(mcp) -> None:
         )
 
     @mcp.prompt()
+    def benchmark_simulator_counter() -> str:
+        """Evaluate M580 demo editing, deployment and one-second OPC DA counter behavior."""
+        return (
+            "Use ce-bench simulator with benchmarks/simulator.example.json. Prepare an "
+            "offline disposable demo baseline, then explicitly validate the real simulator "
+            "path before a paid run. Confirm the OFS alias points to PLC Simulator, OFS is "
+            "running, and the operator approves live/closed-loop access and replacing the "
+            "simulator application. Seed the CPU family manually if needed. The model opens "
+            "a fresh demo copy, creates MAST/LLM and TEST_LLM with +1/second logic, builds "
+            "and fixes errors, saves, downloads and runs, then reads TEST_LLM over OPC DA. "
+            "The independent read-only judge grades existence and repeated unit increments "
+            "at one-second cadence with fixed published sampling tolerances. Model prose "
+            "or a successful build alone cannot pass. Model OPC writes are blocked. Leave "
+            "RUN for evaluation; the harness stops/disconnects afterwards and does not "
+            "restore the previous simulator application. CE timeouts require verified-idle "
+            "recovery; never replay writes. See benchmarks/README.md for commands and limits."
+        )
+
+    @mcp.prompt()
     def setup_live_access() -> str:
         """Collect user choices at connection time; start offline and prefer OPC."""
         return (
@@ -203,10 +222,16 @@ def register_prompts(mcp) -> None:
             "scalars and exposed DFB/array members do not need %MW mirrors. Missing symbols "
             "require checking dictionary inclusion, OFS alias and application consistency.\n"
             "6. Inspect the program before choosing an input; record its original value. "
+            "Define named cases from requirements with input sequences, expected outputs, "
+            "tolerances and observation deadlines; cover relevant boundaries and resets. "
             "Use opc_write_tags with typed JSON values, then opc_read_tags on inputs and "
             "outputs to verify behavior. A successful write is an acknowledgement, not a "
-            "force: cyclic logic may overwrite it. Restore test inputs in a finally step "
-            "and verify restoration. Do not replay a timed-out write automatically.\n"
+            "force: cyclic logic may overwrite it. Check every per-item error and quality; "
+            "repeat observations within the deadline for transitions or stability. Report "
+            "expected/observed values and pass, fail or unverified per case. Any source edit "
+            "requires rebuilding, redeploying and retesting. Restore test inputs in a finally "
+            "step and verify restoration unless an explicit harness owns cleanup. "
+            "Do not replay a timed-out write automatically.\n"
             "7. opc_disconnect releases only this client's OPC session. Modbus read_tags/"
             "write_tags remain separate and only support located addresses."
         )
@@ -253,7 +278,9 @@ def register_prompts(mcp) -> None:
             "  b. import_xml the section (or write_st_logic for ST).\n"
             "  c. build_project; read the 'output' field — it lists per-section errors "
             "(pin geometry, type rules — things the schema can't catch); fix and repeat "
-            "until 'Process succeeded'.\n"
+            "until build_state='built_ok' with no error. Check diagnostics availability "
+            "and capture freshness; empty diagnostics alone do not prove success. "
+            "Building does not save, deploy or verify runtime behavior.\n"
             "Declare referenced variables first (create_variable) or include a <dataBlock>.\n"
         )
         if lang == "ST":

@@ -20,7 +20,8 @@ def summarize_validation(value: dict) -> dict:
     result = {key: value[key] for key in (
         "rubric", "answer_pass", "scope", "static_behavior", "runtime_behavior", "compile_pass",
         "declarations_pass", "model_built", "model_saved", "success", "obtained_source_through_mcp",
-        "checks", "limitation", "evaluator_seconds", "partition_cases", "int_domain", "runtime_checks") if key in value}
+        "checks", "limitation", "evaluator_seconds", "partition_cases", "int_domain", "runtime_checks",
+        "observation_policy", "increments", "intervals_seconds", "mean_period_seconds") if key in value}
     build = value.get("build", {})
     if build:
         capture = build.get("diagnostics_capture", {})
@@ -101,6 +102,9 @@ def archive_run(results: Path, run_id: str, destination: Path, *, allow_incomple
     snapshot = plan["snapshot"]
     config = snapshot["config"]
     live = snapshot.get("suite") == "opc-live"
+    simulator = snapshot.get("suite") == "simulator-counter"
+    if simulator and (plan.get("mode") != "run" or not read_json(run / "outcome.json").get("cleanup_verified")):
+        raise ValueError("Only LLM simulator runs with verified cleanup can be archived")
     if live and plan.get("mode") != "run":
         raise ValueError("Scripted OPC validation is not an LLM benchmark run")
     if live and not read_json(run / "outcome.json").get("restoration_verified"):
@@ -127,7 +131,7 @@ def archive_run(results: Path, run_id: str, destination: Path, *, allow_incomple
             safe["interaction_metrics"] = interaction_metrics(attempt)
             safe["validation"] = summarize_validation(row.get("validation", {}))
             safe["artifact_sha256"] = {name: digest((attempt / name).read_bytes())
-                for name in ("project.stu", "saved-section.xml", "saved-variables.xml") if (attempt / name).exists()}
+                for name in ("project.stu", "saved-section.xml", "saved-variables.xml", "counter-samples.json") if (attempt / name).exists()}
             rows.append(safe)
         if not any(row["case_id"] == case["case_id"] and row.get("durable_completed") for row in rows):
             missing.append(case["case_id"])
@@ -179,7 +183,8 @@ def archive_run(results: Path, run_id: str, destination: Path, *, allow_incomple
         "suite": snapshot.get("suite", "offline-feeder-demo" if snapshot.get("demo_inputs") else "offline-feeder"),
         "limitations": ["Small repetition counts are exploratory, not statistically strong comparisons.",
             ("Live scalar OPC input/output checks on PLC Simulator; no physical hardware validation."
-             if live else "Static recognized-subset acceptance; PLC runtime behavior remains unverified."),
+             if live else "Sampled one-second OPC DA counter behavior on PLC Simulator; no scan-level or physical-hardware proof."
+             if simulator else "Static recognized-subset acceptance; PLC runtime behavior remains unverified."),
             "API client/model experiment, distinct from ChatGPT UI.",
             "Dirty source fingerprints identify uncommitted code; do not label them a clean revision."]}
     if live:
@@ -187,6 +192,10 @@ def archive_run(results: Path, run_id: str, destination: Path, *, allow_incomple
         record["runtime_environment"] = {"ofs": {k: outcome.get("ofs", {}).get(k) for k in
             ("version", "worker_bits", "server_state")}, "restoration_verified": True,
             "alias_sha256": digest(plan["alias"])}
+    if simulator:
+        record["runtime_environment"] = {"protocol": "opc-da", "cleanup_verified": True,
+                                         "alias_sha256": digest(plan["alias"])}
+        record["observation_policy"] = snapshot["observation_policy"]
     regrades = []
     for path in sorted((run / "regrades").glob("*/*/*.json")):
         from .regrade import regraded_row

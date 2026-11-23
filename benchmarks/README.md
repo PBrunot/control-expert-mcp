@@ -64,6 +64,75 @@ Each case must obtain source through MCP and leave its project file unchanged.
 One A/B repetition with both demo cases produces 14 independently scored cases.
 Keep older five-task campaigns separate when comparing acceptance rates.
 
+## M580 simulator counter benchmark
+
+`ce-bench simulator` is a separate opt-in **OPC DA** suite. Its task is to open
+a disposable copy of `samples/demo_ControlExpert_M580.STU`, create ST section
+`MAST/LLM`, declare numeric `TEST_LLM`, implement +1 every second, build/fix/save,
+download to the local simulator, RUN, and check the variable through OFS.
+The model chooses its ST implementation; helper declarations use `LLM_*`.
+
+**Success is determined only by independently observed counter behavior:**
+`TEST_LLM` exists with good-quality numeric values and repeatedly increases by
+exactly 1 at one-second intervals. The judge samples for 8 seconds, nominally
+every 100 ms, requires at least 6 increments, permits 0.35 s variation per
+observed transition interval and 0.15 s variation in the mean period. Any
+negative/non-unit increment, frozen counter or wrong rate fails. Missing/bad
+quality, insufficient observation time or sample gaps exceeding 0.35 s leave
+behavior **unverified**. These fixed tolerances are fingerprinted; sampling is
+not proof of exact scan-level timing. Initial counter value is unrestricted.
+Model prose, model readback, build results and artifacts are diagnostic evidence,
+not additional acceptance criteria. A current-case download and matching RUN
+state are required to attribute OPC observations to this case; an old counter
+already running in the simulator cannot pass an idle model.
+
+Use a dedicated CE/simulator session. This suite **replaces the simulator's
+application** and stops it after each case; it does not restore the previous
+application. Preserve it first. Confirm the OFS alias resolves to
+`MBT:127.0.0.1/U` (PLC Simulator), not a physical PLC. OFS must be running and
+`CE_MCP_OPC_PYTHON` must match the OPC Automation wrapper bitness. Seed the same
+CPU family once with a manual CE GUI transfer if the simulator is fresh or
+reports `Family check failed`. No automatic process killing or GUI workaround
+is attempted. The native demo is a local prerequisite, not shipped in PyPI.
+
+```powershell
+Copy-Item benchmarks\simulator.example.json benchmarks\.local\simulator.json
+# Edit model/provider, paths (relative to the copied config), CE version and OPC Python.
+# Prepare uses offline MCP on a unique copy; it never touches the source demo or downloads.
+ce-bench simulator prepare --config benchmarks\.local\simulator.json
+
+# Scripted end-to-end feasibility test: actual CE/simulator/OFS, zero API requests.
+ce-bench simulator validate --config benchmarks\.local\simulator.json --alias Dev_Alias_2 --allow-live --confirm-ofs-running --allow-closed-loop --allow-simulator-replacement
+
+# No COM/OPC connections and no API requests; validates configuration only.
+ce-bench simulator run --config benchmarks\.local\simulator.json --alias Dev_Alias_2 --allow-live --confirm-ofs-running --allow-closed-loop --allow-simulator-replacement --dry-run
+
+# Paid LLM run, with a fresh copy and conversation per repetition.
+ce-bench simulator run --config benchmarks\.local\simulator.json --alias Dev_Alias_2 --allow-live --confirm-ofs-running --allow-closed-loop --allow-simulator-replacement --repeats 1
+```
+
+Only `run` calls a provider. `validate` uses a reference TON implementation and
+must not be reported or archived as LLM performance. Consent flags attest to the
+local simulator replacement, live access and running OFS; the harness records
+these in session setup, so the model does not need to request them again.
+Prepared copies have data dictionary enabled and Only HMI variables cleared.
+The source/baseline hashes, server instructions/schemas, model, timing rubric
+and environment are recorded; changed baselines require preparation again.
+The judge is read-only and the model cannot write OPC values, connect to a
+physical PLC, edit other sections or save over the source demo. Existing demo
+sections are preserved by task/policy; arbitrary ST semantics are not statically
+proved safe by this suite. Keep all work on the isolated simulator.
+
+Local evidence includes `project.stu`, `saved-section.xml`, `counter-samples.json`,
+request/tool events, `validation.json`, `summary.json` and campaign `outcome.json`.
+Provider completion and behavioral acceptance are reported separately. Cleanup
+failure stops the campaign without erasing behavioral results. After a timed-out
+CE call no further project/control operations are issued; verify the session
+idle and use the existing `ce-bench recover --verified-idle` flow before retrying.
+There is no automatic resume or write replay. Compare/archive paid campaigns
+with the existing commands; only runs with verified cleanup can be archived.
+Keep this suite separate from offline Feeder and the scalar OPC benchmark.
+
 ## Live OPC read/write benchmark
 
 `ce-bench opc` is a separate, opt-in suite. The original Feeder suite below

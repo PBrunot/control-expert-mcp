@@ -64,9 +64,13 @@ def main(argv=None) -> int:
     if arguments and arguments[0] == "opc":
         from .opc import main as opc_main
         return opc_main(arguments[1:])
+    if arguments and arguments[0] == "simulator":
+        from .simulator import main as simulator_main
+        return simulator_main(arguments[1:])
     parser = argparse.ArgumentParser(description=__doc__)
     subs = parser.add_subparsers(dest="command", required=True)
     subs.add_parser("opc", help="Opt-in live OFS/PLC Simulator LLM benchmark")
+    subs.add_parser("simulator", help="Opt-in M580 edit/build/deploy/one-second counter benchmark")
     for name in ("doctor", "prepare", "validate", "run", "resume", "recover"):
         sub = subs.add_parser(name)
         sub.add_argument("--config", required=True)
