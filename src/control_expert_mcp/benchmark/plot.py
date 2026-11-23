@@ -29,8 +29,8 @@ def mapping_correctness(cases: list[dict]) -> dict:
 
 
 def chart_rows(archive: Path, scoring: str = "latest") -> tuple[list, dict]:
-    """Keep campaigns separate; never pool incompatible experiments or models."""
-    rows, inputs = [], {}
+    """Keep campaigns separate unless an explicit suite display group is configured."""
+    rows, inputs, evidence, records = [], {}, {}, {}
     for path in sorted(archive.glob("*/record.json")):
         if path.parent.name.startswith("."):
             continue
@@ -39,11 +39,29 @@ def chart_rows(archive: Path, scoring: str = "latest") -> tuple[list, dict]:
         if digest(path.read_bytes()) != checksums["record.json"]:
             raise ValueError("Archive record checksum mismatch")
         inputs[path.relative_to(archive).as_posix()] = digest(path.read_bytes())
+        records.setdefault(record['run_id'], []).append(record)
+    for versions in records.values():
+        # Scoring snapshots retain originals but must not duplicate plotted cases.
+        def rank(value):
+            rubrics = {g['rubric'] for g in value.get('inspection_regrades', [])}
+            return (len(value['cases']), sorted((re.sub(r'\d+', '', r),
+                    tuple(int(n) for n in re.findall(r'\d+', r))) for r in rubrics))
+        record = max(versions, key=rank)
+        originals = {}
+        for version in versions:
+            if version.get('fingerprint') != record.get('fingerprint'):
+                raise ValueError('Scoring snapshots have different campaign fingerprints')
+            for case in version['cases']:
+                identity = (case['case_id'], case.get('attempt_id'))
+                if identity in originals and originals[identity] != case:
+                    raise ValueError('Scoring snapshots changed original case evidence')
+                originals[identity] = case
         grades = record.get("inspection_regrades", []) if scoring == "latest" else []
         def key(grade):
             return [int(n) for n in re.findall(r"\d+", grade["rubric"])]
         grades = sorted(grades, key=key)
         cases = copy.deepcopy(record["cases"])
+        original_cases = copy.deepcopy(cases)
         for grade in grades:
             for case in cases:
                 if (case["case_id"], case["attempt_id"]) == (grade["case_id"], grade["attempt_id"]):
@@ -60,6 +78,35 @@ def chart_rows(archive: Path, scoring: str = "latest") -> tuple[list, dict]:
                 "io_correctness": mapping_correctness(selected),
                 "tasks": {task: aggregate([case for case in selected if case["task"] == task])
                           for task in sorted({case["task"] for case in selected})}})
+            evidence[(record["run_id"], condition)] = (selected,
+                [case for case in original_cases if case["condition"] == condition])
+    group_path = archive / "overview.groups.json"
+    if group_path.exists():
+        inputs[group_path.name] = digest(group_path.read_bytes())
+        for group in read_json(group_path)["groups"]:
+            members = [row for row in rows if row["run_id"] in group["run_ids"]]
+            if {row["run_id"] for row in members} != set(group["run_ids"]):
+                raise ValueError("Suite display group references missing runs")
+            if len({(row["provider"], row["model"], row["source"]) for row in members}) != 1:
+                raise ValueError("Suite display group must use one provider, model and source revision")
+            selected, originals = [], []
+            for row in members:
+                current, original = evidence[(row["run_id"], row["condition"])]
+                selected.extend(current)
+                originals.extend(original)
+            identities = [(case["condition"], case["task"], case["repeat"]) for case in selected]
+            expected = [tuple(case) for case in group["expected_cases"]]
+            if len(identities) != len(set(identities)) or sorted(identities) != sorted(expected):
+                raise ValueError("Suite display group has missing or duplicate cases")
+            summary = {**members[0], "run_id": group["id"], "condition": group["label"],
+                "display_label": group["label"],
+                "members": [{"run_id": row["run_id"], "condition": row["condition"]} for row in members],
+                "scoring": ", ".join(sorted({row["scoring"] for row in members})),
+                "original": aggregate(originals), "overall": aggregate(selected),
+                "io_correctness": mapping_correctness(selected),
+                "tasks": {task: aggregate([case for case in selected if case["task"] == task])
+                          for task in sorted({case["task"] for case in selected})}}
+            rows = [row for row in rows if row not in members] + [summary]
     return rows, inputs
 
 
@@ -77,7 +124,7 @@ def visualize_archive(archive: Path, output: Path, scoring: str = "latest") -> P
     preferred = ["inspect", "threshold", "temperature", "repair", "alarms", "weighing", "io_mapping"]
     task_names = {task for row in rows for task in row["tasks"]}
     tasks = [task for task in preferred if task in task_names] + sorted(task_names - set(preferred))
-    task_labels = ["OPC " + task[4:] if task.startswith("opc_") else {"io_mapping": "I/O mapping"}.get(task, task.title()) for task in tasks]
+    task_labels = ["OPC " + task[4:] if task.startswith("opc_") else {"io_mapping": "I/O mapping", "simulator_counter": "M580 1s counter"}.get(task, task.title()) for task in tasks]
     height = 5.2 + len(rows)
     with plt.rc_context({"font.family": "DejaVu Sans", "font.size": 10, "axes.titlesize": 12,
                          "figure.facecolor": "#f6f8fc", "axes.facecolor": "white"}):
@@ -85,7 +132,8 @@ def visualize_archive(archive: Path, output: Path, scoring: str = "latest") -> P
         grid = fig.add_gridspec(2, 3, height_ratios=[max(2, .68 * len(rows)), max(1.65, .42 * len(rows))],
                                left=.31, right=.97, top=.74, bottom=.22, hspace=.65, wspace=.3)
         labels = [f"{row['provider']} / {row['model']}\n{row['source'][:8]} · {row['condition']} · "
-                  + row['run_id'][:15] for row in rows]
+                  + row['run_id'][:15] if not row.get('display_label') else
+                  f"{row['provider']} / {row['model']}\n{row['display_label']}" for row in rows]
         specs = [("Accepted · I/O correctness %", "RdYlGn", "acceptance"),
                  ("Median workflow · seconds", "Blues", "time"),
                  ("Median provider tokens · thousands", "Purples", "tokens")]
@@ -138,7 +186,7 @@ def visualize_archive(archive: Path, output: Path, scoring: str = "latest") -> P
         for row in rows:
             overall = row["overall"]
             active = overall["accepted"]["pass"]
-            table.append([row["condition"] + " · " + row["run_id"][:15], f"{active} / {overall['cases']}",
+            table.append([row.get("display_label") or row["condition"] + " · " + row["run_id"][:15], f"{active} / {overall['cases']}",
                           f"{overall['build']['pass']}/{overall['build']['n']}" if overall['build']['n'] else "n/a", str(overall["tool_errors"]),
                           f"{overall['all_attempts']['total_tokens']['known_n']}/{overall['cases']}"])
         artist = table_axis.table(cellText=table, colLabels=["Condition / campaign", "Accepted / attempts", "Builds: pass / edits", "Tool errors", "Known token samples"],
@@ -151,10 +199,10 @@ def visualize_archive(archive: Path, output: Path, scoring: str = "latest") -> P
             cell.set_facecolor("#e7edf6" if r == 0 else "white")
         models = len({(r["provider"], r["model"]) for r in rows})
         revisions = len({r["source"] for r in rows})
-        runs = len(inputs)
+        runs = len({member['run_id'] for row in rows for member in row.get('members', [row])})
         fig.text(.045, .945, "Control Expert · benchmark archive", fontsize=24, fontweight="bold", color="#172033")
         fig.text(.045, .885, f"{runs} campaign(s) · {models} model(s) · {revisions} measured source revision(s) · scoring view: {scoring}", fontsize=12, color="#4b5870")
-        fig.text(.045, .825, "A: reference tools     B: installed manuals     OPC: live simulator I/O     |     Campaigns remain separate.", fontsize=10, color="#4b5870")
+        fig.text(.045, .825, "A: reference tools     B: installed manuals     Simulator: M580 1s counter     |     Latest suite row combines A+B+simulator.", fontsize=10, color="#4b5870")
         fig.text(.045, .105, "I/O correctness = matched / required rubric checks; cell color shows partial credit. Counts remain all-or-nothing acceptance.", fontsize=9, color="#4b5870")
         fig.text(.045, .075, "Time excludes setup/evaluation; tokens cover all requests. * = some correctness or usage evidence unknown; n/a = no scored answer.", fontsize=9, color="#4b5870")
         fig.text(.045, .045, "Exploratory evidence. Mutable aliases limit reproducibility. Runtime is verified only for OPC simulator cases; offline cases use static checks.", fontsize=9, color="#4b5870")

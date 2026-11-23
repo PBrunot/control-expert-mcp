@@ -29,6 +29,8 @@ Use `unittest` with `tools/test_*.py`; no coverage threshold is configured. CI t
 
 When archiving benchmarks, regenerate graphics and metadata with `ce-bench visualize`, verify integrity, and commit data, graphics, and metadata together.
 
+A request to run the **full DeepSeek suite** includes both the seven-task offline A/B campaign (14 cases per repetition) and the M580 simulator `TEST_LLM` +1 every second campaign. Run them sequentially and report both results; the offline campaign alone is not the full suite. Use the existing local DeepSeek configurations and simulator/OFS prerequisites documented in `benchmarks/README.md`. Keep their evidence and acceptance results separate. Respect the simulator consent and target checks; do not substitute a physical PLC. Make documentation/source edits only after campaigns finish because source fingerprints are immutable during a campaign.
+
 ## Commit & Pull Request Guidelines
 
 Use concise subjects with optional component prefixes. PRs should explain behavior, link issues, and report validation/limitations. Update README and prompts for capability changes. Releases require matching `pyproject.toml` versions and `vX.Y.Z` tags; publishing a GitHub release triggers validated PyPI publication.

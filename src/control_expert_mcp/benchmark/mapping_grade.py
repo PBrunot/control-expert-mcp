@@ -4,11 +4,11 @@ from __future__ import annotations
 import re
 
 from .core import digest
-from .demo import _mapping_rows, table_rows
+from .demo import _mapping_rows, _mapping_text, table_rows
 
 
 def _normal(text: str) -> str:
-    return text.lower().replace('`', '').replace('**', '').replace('–', '-').replace('—', '-')
+    return _mapping_text(text)
 
 
 def _mentions(text: str, name: str) -> bool:
@@ -29,6 +29,16 @@ def _modules(text: str) -> set[str]:
 def _channels(row: list[str], channel: str, device: str | None) -> bool:
     channel = channel.replace('–', '-')
     pattern = re.escape(channel).replace(r'\-', r'(?:-|\.\.|to)')
+    if device and '-' in channel:
+        start, end = map(int, channel.split('-'))
+        directions = {'di': r'(?:di|(?:digital|discrete)\s+inputs?(?:\s+channels?)?)',
+                      'do': r'(?:do|(?:digital|discrete)\s+outputs?(?:\s+channels?)?)',
+                      'ai': r'(?:ai|analog\s+inputs?(?:\s+channels?)?)'}
+        capacity_text = re.sub(r'\bbmx\s*(?:ddi|ddo|ami)\s*\d+[a-z0-9]*\b', '[module]', ' '.join(row))
+        counts = re.findall(r'\b(\d+)\s+(di|do|ai|(?:digital|discrete|analog)\s+(?:inputs?|outputs?)(?:\s+channels?)?)\b', capacity_text)
+        if any(int(count) != end - start + 1 or not re.fullmatch(directions[device], direction)
+               for count, direction in counts):
+            return False
     for cell in row:
         compact = re.sub(r'\s+', '', cell)
         if re.fullmatch(r'(?:(?:ch(?:annel)?s?|output|input|analoginput):?)?' + pattern, compact):
@@ -37,11 +47,13 @@ def _channels(row: list[str], channel: str, device: str | None) -> bool:
             return True
         if '-' not in channel and re.fullmatch(r'byte\s*0,?\s*bit\s*' + channel, cell):
             return True
+        if '-' not in channel and re.fullmatch(r'(?:out\s+)?group\s+0-7,?\s*bit\s*' + channel, cell):
+            return True
+        if '-' in channel and re.search(r'\bch(?:annel)?s?\s*:?\s*' + pattern + r'(?![\d.])', cell):
+            return True
     if device and '-' in channel:
         start, end = map(int, channel.split('-'))
-        direction = r'(?:di|digital\s+inputs?(?:\s+channels?)?)' if device == 'di' else (
-            r'(?:do|digital\s+outputs?(?:\s+channels?)?)' if device == 'do' else
-            r'(?:ai|analog\s+inputs?(?:\s+channels?)?)')
+        direction = directions[device]
         return bool(re.search(r'\b' + str(end-start+1) + r'\s+' + direction + r'\b', ' '.join(row)))
     return False
 
@@ -53,6 +65,11 @@ def _channel_claims(row: list[str]) -> list[str]:
                              r'(\d+(?:\s*(?:-|\.\.|to)\s*\d+)?)', cell)
         if match:
             claims.append(re.sub(r'\s+', '', match[1]).replace('to', '-').replace('..', '-'))
+        for match in re.finditer(r'\bch(?:annel)?s?\s*:?\s*(\d+\s*(?:-|\.\.|to)\s*\d+)(?![\d.])', cell):
+            claims.append(re.sub(r'\s+', '', match[1]).replace('to', '-').replace('..', '-'))
+        match = re.fullmatch(r'(?:out\s+)?group\s+0-7,?\s*bit\s*(\d+)', cell)
+        if match:
+            claims.append(match[1])
     return claims
 
 
@@ -179,7 +196,7 @@ def grade_mapping(answer: str, reference: str) -> dict:
     record('no_false_physical_mappings', 'incorrect' if contradictions else 'matched',
            'Reference-unmapped signals must not acquire hardware assignments', sorted(set(contradictions)))
     matched = sum(checks.values())
-    return {'rubric': 'demo-io-mapping-4', 'checks': checks, 'facts': facts,
+    return {'rubric': 'demo-io-mapping-6', 'checks': checks, 'facts': facts,
             'coverage': {'matched': matched, 'required': len(checks), 'fraction': matched / len(checks)},
             'missing': [key for key, fact in facts.items() if fact['status'] == 'missing'],
             'incorrect': [key for key, fact in facts.items() if fact['status'] == 'incorrect'],

@@ -72,3 +72,4 @@ _attic/
 .env
 .secrets
 /benchmarks/archive/.staging-*/
+/benchmarks/archive-io-v4

@@ -16,6 +16,62 @@ REFERENCE = Path(__file__).resolve().parents[1] / "samples/demo_ControlExpert_M5
 
 
 class DemoTests(unittest.IsolatedAsyncioTestCase):
+    def test_unmapped_heading_scope_lists_and_repeated_columns(self):
+        reference = REFERENCE.read_text(encoding='utf-8-sig')
+        names = [row[0] for row in table_rows(reference)
+                 if len(row) >= 7 and row[5].startswith('unmapped')]
+        physical = '\n'.join(line for line in reference.splitlines()
+                             if not (line.startswith('|') and 'UNMAPPED' in line))
+        lists = ('\n## Unmapped signals\n\n### Process\n\n'
+                 + ', '.join('`' + name + '`' for name in names))
+        self.assertTrue(io_mapping_grade(physical + lists, reference)['answer_pass'])
+        self.assertFalse(io_mapping_grade(physical + lists.replace('`belt_running`', '`Other`'),
+                                         reference)['answer_pass'])
+        # The classification ends at a sibling heading; identifiers alone do not pass.
+        outside = physical + lists.replace('### Process', '## Other inventory')
+        self.assertFalse(io_mapping_grade(outside, reference)['answer_pass'])
+        nested_physical = physical + lists.replace('### Process', '### Signals with physical mappings')
+        self.assertFalse(io_mapping_grade(nested_physical, reference)['answer_pass'])
+        bad = physical + lists + '\n`Start` = %I0.2.0\n'
+        self.assertIn('unmapped:start', io_mapping_grade(bad, reference)['incorrect'])
+        table = '\n## Unmapped signals\n\n### Process\n\n| Signal | Type | Used in | Signal | Type | Used in |\n|---|---|---|---|---|---|\n'
+        for index in range(0, len(names), 2):
+            pair = names[index:index + 2]
+            table += '| ' + ' | '.join(name + ' | BOOL | MAST' for name in pair) + ' |\n'
+        self.assertTrue(io_mapping_grade(physical + table, reference)['answer_pass'])
+        self.assertFalse(io_mapping_grade(physical + table.replace('belt_running', 'Other'),
+                                         reference)['answer_pass'])
+
+    def test_same_module_and_channel_notation_remain_conservative(self):
+        reference = REFERENCE.read_text(encoding='utf-8-sig')
+        lines = []
+        for line in reference.splitlines():
+            rows = table_rows(line)
+            if rows and rows[0][0] == 'analog_input_1':
+                cells = line.split('|'); cells[4] = ' same '; line = '|'.join(cells)
+            if rows and rows[0][0] == 'l0':
+                cells = line.split('|'); cells[5] = ' out group 0‑7, **bit 0** '; line = '|'.join(cells)
+            if rows and rows[0][0] == 'ddi3202k_0_5':
+                cells = line.split('|'); cells[5] = ' 32 discrete inputs, ch 0…31 '; line = '|'.join(cells)
+            lines.append(line)
+        answer = '\n'.join(lines)
+        self.assertTrue(io_mapping_grade(answer, reference)['answer_pass'])
+        self.assertTrue(io_mapping_grade(answer.replace('BMXAMI0410', 'BMX AMI 0410 analog input'),
+                                         reference)['answer_pass'])
+        self.assertTrue(io_mapping_grade(answer.replace('BMXAMI0410', 'BMX AMI 0410 analog input')
+                                         .replace('Rack 0, slot 7:', 'slot 7'), reference)['answer_pass'])
+        for old, new, key in (
+            ('**bit 0**', '**bit 1**', 'physical:l0'),
+            ('32 discrete inputs, ch 0…31', '32 discrete inputs, ch 0…30', 'physical:ddi3202k_0_5'),
+            ('32 discrete inputs', '31 discrete inputs', 'physical:ddi3202k_0_5'),
+            ('32 discrete inputs', '32 discrete outputs', 'physical:ddi3202k_0_5'),
+        ):
+            grade = io_mapping_grade(answer.replace(old, new), reference)
+            self.assertFalse(grade['checks'][key], (old, new))
+        # A same-module reference cannot borrow across a table boundary.
+        answer = answer.replace('| `Analog_input_1`', '\n| Signal | Type | Address | Module | Channel | Status | Meaning | Use |\n|---|---|---|---|---|---|---|---|\n| `Analog_input_1`')
+        self.assertFalse(io_mapping_grade(answer, reference)['checks']['physical:analog_input_1'])
+
     def test_mapping_signal_column_and_spelled_out_channel_counts(self):
         reference = REFERENCE.read_text(encoding="utf-8-sig")
         kept = []
@@ -43,7 +99,7 @@ class DemoTests(unittest.IsolatedAsyncioTestCase):
                 answer = (physical + memory + '\n## Unmapped signals\n\n| Signal group | ' + header
                           + ' |\n|---|---|\n| Process | ' + ', '.join(names) + ' |\n')
                 grade = io_mapping_grade(answer, reference)
-                self.assertEqual(grade['rubric'], 'demo-io-mapping-4')
+                self.assertEqual(grade['rubric'], 'demo-io-mapping-6')
                 self.assertTrue(grade['answer_pass'], grade['missing'])
                 for old, new, key in (
                     ('32 digital input channels', '31 digital input channels', 'physical:ddi3202k_0_5'),
@@ -226,7 +282,7 @@ class DemoTests(unittest.IsolatedAsyncioTestCase):
                        "snapshot": {"config": {"io_mapping_reference": str(ref)},
                                     "demo_inputs": {"io_mapping_reference": digest(ref.read_bytes())}}})
             regrade_inspection(root, "run", "io_mapping")
-            row = regraded_row(attempt / "summary.json", "demo-io-mapping-4")
+            row = regraded_row(attempt / "summary.json", "demo-io-mapping-6")
             self.assertTrue(row["success"])
             self.assertEqual(read_json(attempt / "summary.json"), summary)
             ref.write_text(reference + "changed", encoding="utf-8")
@@ -234,7 +290,7 @@ class DemoTests(unittest.IsolatedAsyncioTestCase):
                 regrade_inspection(root, "run", "io_mapping")
             (attempt / "final-response.txt").write_text("changed", encoding="utf-8")
             with self.assertRaises(ValueError):
-                regraded_row(attempt / "summary.json", "demo-io-mapping-4")
+                regraded_row(attempt / "summary.json", "demo-io-mapping-6")
 
     def test_read_only_cases_are_excluded_from_build_denominators(self):
         rows = [{"task": task, "status": "completed", "success": True,

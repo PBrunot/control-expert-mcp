@@ -9089,5 +9089,2251 @@
         }
       }
     }
+  },
+  {
+    "path": "20261123T203810Z-2c2576bd-partial-636ad52638",
+    "run_id": "20261123T203810Z-2c2576bd",
+    "provider": "deepseek",
+    "model": {
+      "id": "deepseek-flash",
+      "identity": "alias",
+      "reasoning_effort": "high",
+      "max_output_tokens": 12000
+    },
+    "harness": {
+      "revision": "a28ec8a8e9609d62bbd44d1944155deb0df20558",
+      "dirty": true,
+      "dirty_fingerprint": "ad3f6faab71b2ab299b1bd4c170942b71b3a210ea53bb2e8639bf1553e4c359d"
+    },
+    "servers": {
+      "A": {
+        "source": {
+          "revision": "a28ec8a8e9609d62bbd44d1944155deb0df20558",
+          "dirty": true,
+          "dirty_fingerprint": "ad3f6faab71b2ab299b1bd4c170942b71b3a210ea53bb2e8639bf1553e4c359d"
+        },
+        "runtime_package_sha256": "f7b67e42fb1f22905ddf544c0819ca2d0bdedda9d11acf521bddcf19e10a91f8",
+        "dependencies": {
+          "control-expert-mcp": "0.9.0",
+          "mcp": "2.3.0"
+        },
+        "documentation_available": false,
+        "corpus_sha256": "a1ec0bc44081b4ae58812c29cee112de3c0ca46d45854e6909a5b7cef7c1f1af",
+        "corpus_files": 47545,
+        "environment_sha256": "c82a06e204614d2a7f12e9c5be90f332bf1eb53dedaee5bb60eac3ddc5c41b2d"
+      },
+      "B": {
+        "source": {
+          "revision": "a28ec8a8e9609d62bbd44d1944155deb0df20558",
+          "dirty": true,
+          "dirty_fingerprint": "ad3f6faab71b2ab299b1bd4c170942b71b3a210ea53bb2e8639bf1553e4c359d"
+        },
+        "runtime_package_sha256": "f7b67e42fb1f22905ddf544c0819ca2d0bdedda9d11acf521bddcf19e10a91f8",
+        "dependencies": {
+          "control-expert-mcp": "0.9.0",
+          "mcp": "2.3.0"
+        },
+        "documentation_available": true,
+        "corpus_sha256": "a1ec0bc44081b4ae58812c29cee112de3c0ca46d45854e6909a5b7cef7c1f1af",
+        "corpus_files": 47545,
+        "environment_sha256": "c82a06e204614d2a7f12e9c5be90f332bf1eb53dedaee5bb60eac3ddc5c41b2d"
+      }
+    },
+    "complete": false,
+    "conditions": {
+      "A": {
+        "overall": {
+          "cases": 4,
+          "completion": {
+            "pass": 4,
+            "n": 4,
+            "verified_n": 4,
+            "rate_all": 1.0
+          },
+          "accepted": {
+            "pass": 3,
+            "n": 4,
+            "verified_n": 4,
+            "rate_all": 0.75
+          },
+          "build": {
+            "pass": 3,
+            "n": 3,
+            "verified_n": 3,
+            "rate_all": 1.0
+          },
+          "static_behavior": {
+            "pass": 3,
+            "n": 3,
+            "verified_n": 3,
+            "rate_all": 1.0
+          },
+          "runtime_behavior": {
+            "pass": 0,
+            "n": 3,
+            "verified_n": 0,
+            "rate_all": 0.0
+          },
+          "all_attempts": {
+            "workflow_seconds": {
+              "n": 4,
+              "known_n": 4,
+              "unknown_n": 0,
+              "median": 23.612292499979958,
+              "p95": 100.22077559999889
+            },
+            "input_tokens": {
+              "n": 4,
+              "known_n": 4,
+              "unknown_n": 0,
+              "median": 63704.0,
+              "p95": 1925734
+            },
+            "output_tokens": {
+              "n": 4,
+              "known_n": 4,
+              "unknown_n": 0,
+              "median": 2784.0,
+              "p95": 18627
+            },
+            "total_tokens": {
+              "n": 4,
+              "known_n": 4,
+              "unknown_n": 0,
+              "median": 66488.0,
+              "p95": 1944361
+            }
+          },
+          "accepted_attempts": {
+            "workflow_seconds": {
+              "n": 3,
+              "known_n": 3,
+              "unknown_n": 0,
+              "median": 19.36190199997509,
+              "p95": 27.862682999984827
+            },
+            "input_tokens": {
+              "n": 3,
+              "known_n": 3,
+              "unknown_n": 0,
+              "median": 61503,
+              "p95": 65905
+            },
+            "output_tokens": {
+              "n": 3,
+              "known_n": 3,
+              "unknown_n": 0,
+              "median": 2093,
+              "p95": 3475
+            },
+            "total_tokens": {
+              "n": 3,
+              "known_n": 3,
+              "unknown_n": 0,
+              "median": 63596,
+              "p95": 69380
+            }
+          },
+          "known_partial_tokens": {
+            "input_tokens": 2111072,
+            "output_tokens": 25719,
+            "total_tokens": 2136791
+          },
+          "tool_errors": 5,
+          "api_retries": 0,
+          "repair_cycles": 0,
+          "statuses": {
+            "completed": 4
+          }
+        },
+        "tasks": {
+          "alarms": {
+            "cases": 1,
+            "completion": {
+              "pass": 1,
+              "n": 1,
+              "verified_n": 1,
+              "rate_all": 1.0
+            },
+            "accepted": {
+              "pass": 1,
+              "n": 1,
+              "verified_n": 1,
+              "rate_all": 1.0
+            },
+            "build": {
+              "pass": 1,
+              "n": 1,
+              "verified_n": 1,
+              "rate_all": 1.0
+            },
+            "static_behavior": {
+              "pass": 1,
+              "n": 1,
+              "verified_n": 1,
+              "rate_all": 1.0
+            },
+            "runtime_behavior": {
+              "pass": 0,
+              "n": 1,
+              "verified_n": 0,
+              "rate_all": 0.0
+            },
+            "all_attempts": {
+              "workflow_seconds": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 27.862682999984827,
+                "p95": 27.862682999984827
+              },
+              "input_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 65905,
+                "p95": 65905
+              },
+              "output_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 3475,
+                "p95": 3475
+              },
+              "total_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 69380,
+                "p95": 69380
+              }
+            },
+            "accepted_attempts": {
+              "workflow_seconds": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 27.862682999984827,
+                "p95": 27.862682999984827
+              },
+              "input_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 65905,
+                "p95": 65905
+              },
+              "output_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 3475,
+                "p95": 3475
+              },
+              "total_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 69380,
+                "p95": 69380
+              }
+            },
+            "known_partial_tokens": {
+              "input_tokens": 65905,
+              "output_tokens": 3475,
+              "total_tokens": 69380
+            },
+            "tool_errors": 0,
+            "api_retries": 0,
+            "repair_cycles": 0,
+            "statuses": {
+              "completed": 1
+            }
+          },
+          "io_mapping": {
+            "cases": 1,
+            "completion": {
+              "pass": 1,
+              "n": 1,
+              "verified_n": 1,
+              "rate_all": 1.0
+            },
+            "accepted": {
+              "pass": 0,
+              "n": 1,
+              "verified_n": 1,
+              "rate_all": 0.0
+            },
+            "build": {
+              "pass": 0,
+              "n": 0,
+              "verified_n": 0,
+              "rate_all": null
+            },
+            "static_behavior": {
+              "pass": 0,
+              "n": 0,
+              "verified_n": 0,
+              "rate_all": null
+            },
+            "runtime_behavior": {
+              "pass": 0,
+              "n": 0,
+              "verified_n": 0,
+              "rate_all": null
+            },
+            "all_attempts": {
+              "workflow_seconds": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 100.22077559999889,
+                "p95": 100.22077559999889
+              },
+              "input_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 1925734,
+                "p95": 1925734
+              },
+              "output_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 18627,
+                "p95": 18627
+              },
+              "total_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 1944361,
+                "p95": 1944361
+              }
+            },
+            "accepted_attempts": {
+              "workflow_seconds": {
+                "n": 0,
+                "known_n": 0,
+                "unknown_n": 0,
+                "median": null,
+                "p95": null
+              },
+              "input_tokens": {
+                "n": 0,
+                "known_n": 0,
+                "unknown_n": 0,
+                "median": null,
+                "p95": null
+              },
+              "output_tokens": {
+                "n": 0,
+                "known_n": 0,
+                "unknown_n": 0,
+                "median": null,
+                "p95": null
+              },
+              "total_tokens": {
+                "n": 0,
+                "known_n": 0,
+                "unknown_n": 0,
+                "median": null,
+                "p95": null
+              }
+            },
+            "known_partial_tokens": {
+              "input_tokens": 1925734,
+              "output_tokens": 18627,
+              "total_tokens": 1944361
+            },
+            "tool_errors": 5,
+            "api_retries": 0,
+            "repair_cycles": 0,
+            "statuses": {
+              "completed": 1
+            }
+          },
+          "temperature": {
+            "cases": 1,
+            "completion": {
+              "pass": 1,
+              "n": 1,
+              "verified_n": 1,
+              "rate_all": 1.0
+            },
+            "accepted": {
+              "pass": 1,
+              "n": 1,
+              "verified_n": 1,
+              "rate_all": 1.0
+            },
+            "build": {
+              "pass": 1,
+              "n": 1,
+              "verified_n": 1,
+              "rate_all": 1.0
+            },
+            "static_behavior": {
+              "pass": 1,
+              "n": 1,
+              "verified_n": 1,
+              "rate_all": 1.0
+            },
+            "runtime_behavior": {
+              "pass": 0,
+              "n": 1,
+              "verified_n": 0,
+              "rate_all": 0.0
+            },
+            "all_attempts": {
+              "workflow_seconds": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 17.642244999995455,
+                "p95": 17.642244999995455
+              },
+              "input_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 57930,
+                "p95": 57930
+              },
+              "output_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 1524,
+                "p95": 1524
+              },
+              "total_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 59454,
+                "p95": 59454
+              }
+            },
+            "accepted_attempts": {
+              "workflow_seconds": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 17.642244999995455,
+                "p95": 17.642244999995455
+              },
+              "input_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 57930,
+                "p95": 57930
+              },
+              "output_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 1524,
+                "p95": 1524
+              },
+              "total_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 59454,
+                "p95": 59454
+              }
+            },
+            "known_partial_tokens": {
+              "input_tokens": 57930,
+              "output_tokens": 1524,
+              "total_tokens": 59454
+            },
+            "tool_errors": 0,
+            "api_retries": 0,
+            "repair_cycles": 0,
+            "statuses": {
+              "completed": 1
+            }
+          },
+          "threshold": {
+            "cases": 1,
+            "completion": {
+              "pass": 1,
+              "n": 1,
+              "verified_n": 1,
+              "rate_all": 1.0
+            },
+            "accepted": {
+              "pass": 1,
+              "n": 1,
+              "verified_n": 1,
+              "rate_all": 1.0
+            },
+            "build": {
+              "pass": 1,
+              "n": 1,
+              "verified_n": 1,
+              "rate_all": 1.0
+            },
+            "static_behavior": {
+              "pass": 1,
+              "n": 1,
+              "verified_n": 1,
+              "rate_all": 1.0
+            },
+            "runtime_behavior": {
+              "pass": 0,
+              "n": 1,
+              "verified_n": 0,
+              "rate_all": 0.0
+            },
+            "all_attempts": {
+              "workflow_seconds": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 19.36190199997509,
+                "p95": 19.36190199997509
+              },
+              "input_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 61503,
+                "p95": 61503
+              },
+              "output_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 2093,
+                "p95": 2093
+              },
+              "total_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 63596,
+                "p95": 63596
+              }
+            },
+            "accepted_attempts": {
+              "workflow_seconds": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 19.36190199997509,
+                "p95": 19.36190199997509
+              },
+              "input_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 61503,
+                "p95": 61503
+              },
+              "output_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 2093,
+                "p95": 2093
+              },
+              "total_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 63596,
+                "p95": 63596
+              }
+            },
+            "known_partial_tokens": {
+              "input_tokens": 61503,
+              "output_tokens": 2093,
+              "total_tokens": 63596
+            },
+            "tool_errors": 0,
+            "api_retries": 0,
+            "repair_cycles": 0,
+            "statuses": {
+              "completed": 1
+            }
+          }
+        }
+      },
+      "B": {
+        "overall": {
+          "cases": 5,
+          "completion": {
+            "pass": 5,
+            "n": 5,
+            "verified_n": 5,
+            "rate_all": 1.0
+          },
+          "accepted": {
+            "pass": 4,
+            "n": 5,
+            "verified_n": 5,
+            "rate_all": 0.8
+          },
+          "build": {
+            "pass": 4,
+            "n": 4,
+            "verified_n": 4,
+            "rate_all": 1.0
+          },
+          "static_behavior": {
+            "pass": 4,
+            "n": 4,
+            "verified_n": 4,
+            "rate_all": 1.0
+          },
+          "runtime_behavior": {
+            "pass": 0,
+            "n": 4,
+            "verified_n": 0,
+            "rate_all": 0.0
+          },
+          "all_attempts": {
+            "workflow_seconds": {
+              "n": 5,
+              "known_n": 5,
+              "unknown_n": 0,
+              "median": 23.11025399999926,
+              "p95": 98.91025549999904
+            },
+            "input_tokens": {
+              "n": 5,
+              "known_n": 5,
+              "unknown_n": 0,
+              "median": 64803,
+              "p95": 2559306
+            },
+            "output_tokens": {
+              "n": 5,
+              "known_n": 5,
+              "unknown_n": 0,
+              "median": 2509,
+              "p95": 16983
+            },
+            "total_tokens": {
+              "n": 5,
+              "known_n": 5,
+              "unknown_n": 0,
+              "median": 68068,
+              "p95": 2576289
+            }
+          },
+          "accepted_attempts": {
+            "workflow_seconds": {
+              "n": 4,
+              "known_n": 4,
+              "unknown_n": 0,
+              "median": 21.76861665000615,
+              "p95": 26.05883220001124
+            },
+            "input_tokens": {
+              "n": 4,
+              "known_n": 4,
+              "unknown_n": 0,
+              "median": 64356.0,
+              "p95": 81848
+            },
+            "output_tokens": {
+              "n": 4,
+              "known_n": 4,
+              "unknown_n": 0,
+              "median": 2169.5,
+              "p95": 3265
+            },
+            "total_tokens": {
+              "n": 4,
+              "known_n": 4,
+              "unknown_n": 0,
+              "median": 66903.5,
+              "p95": 84357
+            }
+          },
+          "known_partial_tokens": {
+            "input_tokens": 2833141,
+            "output_tokens": 26188,
+            "total_tokens": 2859329
+          },
+          "tool_errors": 4,
+          "api_retries": 0,
+          "repair_cycles": 1,
+          "statuses": {
+            "completed": 5
+          }
+        },
+        "tasks": {
+          "alarms": {
+            "cases": 1,
+            "completion": {
+              "pass": 1,
+              "n": 1,
+              "verified_n": 1,
+              "rate_all": 1.0
+            },
+            "accepted": {
+              "pass": 1,
+              "n": 1,
+              "verified_n": 1,
+              "rate_all": 1.0
+            },
+            "build": {
+              "pass": 1,
+              "n": 1,
+              "verified_n": 1,
+              "rate_all": 1.0
+            },
+            "static_behavior": {
+              "pass": 1,
+              "n": 1,
+              "verified_n": 1,
+              "rate_all": 1.0
+            },
+            "runtime_behavior": {
+              "pass": 0,
+              "n": 1,
+              "verified_n": 0,
+              "rate_all": 0.0
+            },
+            "all_attempts": {
+              "workflow_seconds": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 26.05883220001124,
+                "p95": 26.05883220001124
+              },
+              "input_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 64803,
+                "p95": 64803
+              },
+              "output_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 3265,
+                "p95": 3265
+              },
+              "total_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 68068,
+                "p95": 68068
+              }
+            },
+            "accepted_attempts": {
+              "workflow_seconds": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 26.05883220001124,
+                "p95": 26.05883220001124
+              },
+              "input_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 64803,
+                "p95": 64803
+              },
+              "output_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 3265,
+                "p95": 3265
+              },
+              "total_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 68068,
+                "p95": 68068
+              }
+            },
+            "known_partial_tokens": {
+              "input_tokens": 64803,
+              "output_tokens": 3265,
+              "total_tokens": 68068
+            },
+            "tool_errors": 0,
+            "api_retries": 0,
+            "repair_cycles": 0,
+            "statuses": {
+              "completed": 1
+            }
+          },
+          "io_mapping": {
+            "cases": 1,
+            "completion": {
+              "pass": 1,
+              "n": 1,
+              "verified_n": 1,
+              "rate_all": 1.0
+            },
+            "accepted": {
+              "pass": 0,
+              "n": 1,
+              "verified_n": 1,
+              "rate_all": 0.0
+            },
+            "build": {
+              "pass": 0,
+              "n": 0,
+              "verified_n": 0,
+              "rate_all": null
+            },
+            "static_behavior": {
+              "pass": 0,
+              "n": 0,
+              "verified_n": 0,
+              "rate_all": null
+            },
+            "runtime_behavior": {
+              "pass": 0,
+              "n": 0,
+              "verified_n": 0,
+              "rate_all": null
+            },
+            "all_attempts": {
+              "workflow_seconds": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 98.91025549999904,
+                "p95": 98.91025549999904
+              },
+              "input_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 2559306,
+                "p95": 2559306
+              },
+              "output_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 16983,
+                "p95": 16983
+              },
+              "total_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 2576289,
+                "p95": 2576289
+              }
+            },
+            "accepted_attempts": {
+              "workflow_seconds": {
+                "n": 0,
+                "known_n": 0,
+                "unknown_n": 0,
+                "median": null,
+                "p95": null
+              },
+              "input_tokens": {
+                "n": 0,
+                "known_n": 0,
+                "unknown_n": 0,
+                "median": null,
+                "p95": null
+              },
+              "output_tokens": {
+                "n": 0,
+                "known_n": 0,
+                "unknown_n": 0,
+                "median": null,
+                "p95": null
+              },
+              "total_tokens": {
+                "n": 0,
+                "known_n": 0,
+                "unknown_n": 0,
+                "median": null,
+                "p95": null
+              }
+            },
+            "known_partial_tokens": {
+              "input_tokens": 2559306,
+              "output_tokens": 16983,
+              "total_tokens": 2576289
+            },
+            "tool_errors": 4,
+            "api_retries": 0,
+            "repair_cycles": 0,
+            "statuses": {
+              "completed": 1
+            }
+          },
+          "repair": {
+            "cases": 1,
+            "completion": {
+              "pass": 1,
+              "n": 1,
+              "verified_n": 1,
+              "rate_all": 1.0
+            },
+            "accepted": {
+              "pass": 1,
+              "n": 1,
+              "verified_n": 1,
+              "rate_all": 1.0
+            },
+            "build": {
+              "pass": 1,
+              "n": 1,
+              "verified_n": 1,
+              "rate_all": 1.0
+            },
+            "static_behavior": {
+              "pass": 1,
+              "n": 1,
+              "verified_n": 1,
+              "rate_all": 1.0
+            },
+            "runtime_behavior": {
+              "pass": 0,
+              "n": 1,
+              "verified_n": 0,
+              "rate_all": 0.0
+            },
+            "all_attempts": {
+              "workflow_seconds": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 23.11025399999926,
+                "p95": 23.11025399999926
+              },
+              "input_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 81848,
+                "p95": 81848
+              },
+              "output_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 2509,
+                "p95": 2509
+              },
+              "total_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 84357,
+                "p95": 84357
+              }
+            },
+            "accepted_attempts": {
+              "workflow_seconds": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 23.11025399999926,
+                "p95": 23.11025399999926
+              },
+              "input_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 81848,
+                "p95": 81848
+              },
+              "output_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 2509,
+                "p95": 2509
+              },
+              "total_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 84357,
+                "p95": 84357
+              }
+            },
+            "known_partial_tokens": {
+              "input_tokens": 81848,
+              "output_tokens": 2509,
+              "total_tokens": 84357
+            },
+            "tool_errors": 0,
+            "api_retries": 0,
+            "repair_cycles": 1,
+            "statuses": {
+              "completed": 1
+            }
+          },
+          "temperature": {
+            "cases": 1,
+            "completion": {
+              "pass": 1,
+              "n": 1,
+              "verified_n": 1,
+              "rate_all": 1.0
+            },
+            "accepted": {
+              "pass": 1,
+              "n": 1,
+              "verified_n": 1,
+              "rate_all": 1.0
+            },
+            "build": {
+              "pass": 1,
+              "n": 1,
+              "verified_n": 1,
+              "rate_all": 1.0
+            },
+            "static_behavior": {
+              "pass": 1,
+              "n": 1,
+              "verified_n": 1,
+              "rate_all": 1.0
+            },
+            "runtime_behavior": {
+              "pass": 0,
+              "n": 1,
+              "verified_n": 0,
+              "rate_all": 0.0
+            },
+            "all_attempts": {
+              "workflow_seconds": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 20.426979300013045,
+                "p95": 20.426979300013045
+              },
+              "input_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 63909,
+                "p95": 63909
+              },
+              "output_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 1830,
+                "p95": 1830
+              },
+              "total_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 65739,
+                "p95": 65739
+              }
+            },
+            "accepted_attempts": {
+              "workflow_seconds": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 20.426979300013045,
+                "p95": 20.426979300013045
+              },
+              "input_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 63909,
+                "p95": 63909
+              },
+              "output_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 1830,
+                "p95": 1830
+              },
+              "total_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 65739,
+                "p95": 65739
+              }
+            },
+            "known_partial_tokens": {
+              "input_tokens": 63909,
+              "output_tokens": 1830,
+              "total_tokens": 65739
+            },
+            "tool_errors": 0,
+            "api_retries": 0,
+            "repair_cycles": 0,
+            "statuses": {
+              "completed": 1
+            }
+          },
+          "threshold": {
+            "cases": 1,
+            "completion": {
+              "pass": 1,
+              "n": 1,
+              "verified_n": 1,
+              "rate_all": 1.0
+            },
+            "accepted": {
+              "pass": 1,
+              "n": 1,
+              "verified_n": 1,
+              "rate_all": 1.0
+            },
+            "build": {
+              "pass": 1,
+              "n": 1,
+              "verified_n": 1,
+              "rate_all": 1.0
+            },
+            "static_behavior": {
+              "pass": 1,
+              "n": 1,
+              "verified_n": 1,
+              "rate_all": 1.0
+            },
+            "runtime_behavior": {
+              "pass": 0,
+              "n": 1,
+              "verified_n": 0,
+              "rate_all": 0.0
+            },
+            "all_attempts": {
+              "workflow_seconds": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 18.303670099994633,
+                "p95": 18.303670099994633
+              },
+              "input_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 63275,
+                "p95": 63275
+              },
+              "output_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 1601,
+                "p95": 1601
+              },
+              "total_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 64876,
+                "p95": 64876
+              }
+            },
+            "accepted_attempts": {
+              "workflow_seconds": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 18.303670099994633,
+                "p95": 18.303670099994633
+              },
+              "input_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 63275,
+                "p95": 63275
+              },
+              "output_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 1601,
+                "p95": 1601
+              },
+              "total_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 64876,
+                "p95": 64876
+              }
+            },
+            "known_partial_tokens": {
+              "input_tokens": 63275,
+              "output_tokens": 1601,
+              "total_tokens": 64876
+            },
+            "tool_errors": 0,
+            "api_retries": 0,
+            "repair_cycles": 0,
+            "statuses": {
+              "completed": 1
+            }
+          }
+        }
+      }
+    },
+    "regraded_conditions": {}
+  },
+  {
+    "path": "20261123T205344Z-37142f78",
+    "run_id": "20261123T205344Z-37142f78",
+    "provider": "deepseek",
+    "model": {
+      "id": "deepseek-flash",
+      "identity": "alias",
+      "reasoning_effort": "high",
+      "max_output_tokens": 12000
+    },
+    "harness": {
+      "revision": "a28ec8a8e9609d62bbd44d1944155deb0df20558",
+      "dirty": true,
+      "dirty_fingerprint": "ad3f6faab71b2ab299b1bd4c170942b71b3a210ea53bb2e8639bf1553e4c359d"
+    },
+    "servers": {
+      "A": {
+        "source": {
+          "revision": "a28ec8a8e9609d62bbd44d1944155deb0df20558",
+          "dirty": true,
+          "dirty_fingerprint": "ad3f6faab71b2ab299b1bd4c170942b71b3a210ea53bb2e8639bf1553e4c359d"
+        },
+        "runtime_package_sha256": "f7b67e42fb1f22905ddf544c0819ca2d0bdedda9d11acf521bddcf19e10a91f8",
+        "dependencies": {
+          "control-expert-mcp": "0.9.0",
+          "mcp": "2.3.0"
+        },
+        "documentation_available": false,
+        "corpus_sha256": "a1ec0bc44081b4ae58812c29cee112de3c0ca46d45854e6909a5b7cef7c1f1af",
+        "corpus_files": 47545,
+        "environment_sha256": "581c8c9871ba0d70b3d3e12ad9a5b0dd10207ae45605b99e4fac0085800f053d"
+      },
+      "B": {
+        "source": {
+          "revision": "a28ec8a8e9609d62bbd44d1944155deb0df20558",
+          "dirty": true,
+          "dirty_fingerprint": "ad3f6faab71b2ab299b1bd4c170942b71b3a210ea53bb2e8639bf1553e4c359d"
+        },
+        "runtime_package_sha256": "f7b67e42fb1f22905ddf544c0819ca2d0bdedda9d11acf521bddcf19e10a91f8",
+        "dependencies": {
+          "control-expert-mcp": "0.9.0",
+          "mcp": "2.3.0"
+        },
+        "documentation_available": true,
+        "corpus_sha256": "a1ec0bc44081b4ae58812c29cee112de3c0ca46d45854e6909a5b7cef7c1f1af",
+        "corpus_files": 47545,
+        "environment_sha256": "581c8c9871ba0d70b3d3e12ad9a5b0dd10207ae45605b99e4fac0085800f053d"
+      }
+    },
+    "complete": true,
+    "conditions": {
+      "A": {
+        "overall": {
+          "cases": 3,
+          "completion": {
+            "pass": 3,
+            "n": 3,
+            "verified_n": 3,
+            "rate_all": 1.0
+          },
+          "accepted": {
+            "pass": 3,
+            "n": 3,
+            "verified_n": 3,
+            "rate_all": 1.0
+          },
+          "build": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "static_behavior": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "runtime_behavior": {
+            "pass": 0,
+            "n": 1,
+            "verified_n": 0,
+            "rate_all": 0.0
+          },
+          "all_attempts": {
+            "workflow_seconds": {
+              "n": 3,
+              "known_n": 3,
+              "unknown_n": 0,
+              "median": 20.62003150000237,
+              "p95": 88.18700810000882
+            },
+            "input_tokens": {
+              "n": 3,
+              "known_n": 3,
+              "unknown_n": 0,
+              "median": 68621,
+              "p95": 143802
+            },
+            "output_tokens": {
+              "n": 3,
+              "known_n": 3,
+              "unknown_n": 0,
+              "median": 1825,
+              "p95": 15648
+            },
+            "total_tokens": {
+              "n": 3,
+              "known_n": 3,
+              "unknown_n": 0,
+              "median": 70446,
+              "p95": 159450
+            }
+          },
+          "accepted_attempts": {
+            "workflow_seconds": {
+              "n": 3,
+              "known_n": 3,
+              "unknown_n": 0,
+              "median": 20.62003150000237,
+              "p95": 88.18700810000882
+            },
+            "input_tokens": {
+              "n": 3,
+              "known_n": 3,
+              "unknown_n": 0,
+              "median": 68621,
+              "p95": 143802
+            },
+            "output_tokens": {
+              "n": 3,
+              "known_n": 3,
+              "unknown_n": 0,
+              "median": 1825,
+              "p95": 15648
+            },
+            "total_tokens": {
+              "n": 3,
+              "known_n": 3,
+              "unknown_n": 0,
+              "median": 70446,
+              "p95": 159450
+            }
+          },
+          "known_partial_tokens": {
+            "input_tokens": 230268,
+            "output_tokens": 18635,
+            "total_tokens": 248903
+          },
+          "tool_errors": 0,
+          "api_retries": 0,
+          "repair_cycles": 1,
+          "statuses": {
+            "completed": 3
+          }
+        },
+        "tasks": {
+          "inspect": {
+            "cases": 1,
+            "completion": {
+              "pass": 1,
+              "n": 1,
+              "verified_n": 1,
+              "rate_all": 1.0
+            },
+            "accepted": {
+              "pass": 1,
+              "n": 1,
+              "verified_n": 1,
+              "rate_all": 1.0
+            },
+            "build": {
+              "pass": 0,
+              "n": 0,
+              "verified_n": 0,
+              "rate_all": null
+            },
+            "static_behavior": {
+              "pass": 0,
+              "n": 0,
+              "verified_n": 0,
+              "rate_all": null
+            },
+            "runtime_behavior": {
+              "pass": 0,
+              "n": 0,
+              "verified_n": 0,
+              "rate_all": null
+            },
+            "all_attempts": {
+              "workflow_seconds": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 9.645760500017786,
+                "p95": 9.645760500017786
+              },
+              "input_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 17845,
+                "p95": 17845
+              },
+              "output_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 1162,
+                "p95": 1162
+              },
+              "total_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 19007,
+                "p95": 19007
+              }
+            },
+            "accepted_attempts": {
+              "workflow_seconds": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 9.645760500017786,
+                "p95": 9.645760500017786
+              },
+              "input_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 17845,
+                "p95": 17845
+              },
+              "output_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 1162,
+                "p95": 1162
+              },
+              "total_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 19007,
+                "p95": 19007
+              }
+            },
+            "known_partial_tokens": {
+              "input_tokens": 17845,
+              "output_tokens": 1162,
+              "total_tokens": 19007
+            },
+            "tool_errors": 0,
+            "api_retries": 0,
+            "repair_cycles": 0,
+            "statuses": {
+              "completed": 1
+            }
+          },
+          "repair": {
+            "cases": 1,
+            "completion": {
+              "pass": 1,
+              "n": 1,
+              "verified_n": 1,
+              "rate_all": 1.0
+            },
+            "accepted": {
+              "pass": 1,
+              "n": 1,
+              "verified_n": 1,
+              "rate_all": 1.0
+            },
+            "build": {
+              "pass": 1,
+              "n": 1,
+              "verified_n": 1,
+              "rate_all": 1.0
+            },
+            "static_behavior": {
+              "pass": 1,
+              "n": 1,
+              "verified_n": 1,
+              "rate_all": 1.0
+            },
+            "runtime_behavior": {
+              "pass": 0,
+              "n": 1,
+              "verified_n": 0,
+              "rate_all": 0.0
+            },
+            "all_attempts": {
+              "workflow_seconds": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 20.62003150000237,
+                "p95": 20.62003150000237
+              },
+              "input_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 68621,
+                "p95": 68621
+              },
+              "output_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 1825,
+                "p95": 1825
+              },
+              "total_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 70446,
+                "p95": 70446
+              }
+            },
+            "accepted_attempts": {
+              "workflow_seconds": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 20.62003150000237,
+                "p95": 20.62003150000237
+              },
+              "input_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 68621,
+                "p95": 68621
+              },
+              "output_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 1825,
+                "p95": 1825
+              },
+              "total_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 70446,
+                "p95": 70446
+              }
+            },
+            "known_partial_tokens": {
+              "input_tokens": 68621,
+              "output_tokens": 1825,
+              "total_tokens": 70446
+            },
+            "tool_errors": 0,
+            "api_retries": 0,
+            "repair_cycles": 1,
+            "statuses": {
+              "completed": 1
+            }
+          },
+          "weighing": {
+            "cases": 1,
+            "completion": {
+              "pass": 1,
+              "n": 1,
+              "verified_n": 1,
+              "rate_all": 1.0
+            },
+            "accepted": {
+              "pass": 1,
+              "n": 1,
+              "verified_n": 1,
+              "rate_all": 1.0
+            },
+            "build": {
+              "pass": 0,
+              "n": 0,
+              "verified_n": 0,
+              "rate_all": null
+            },
+            "static_behavior": {
+              "pass": 0,
+              "n": 0,
+              "verified_n": 0,
+              "rate_all": null
+            },
+            "runtime_behavior": {
+              "pass": 0,
+              "n": 0,
+              "verified_n": 0,
+              "rate_all": null
+            },
+            "all_attempts": {
+              "workflow_seconds": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 88.18700810000882,
+                "p95": 88.18700810000882
+              },
+              "input_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 143802,
+                "p95": 143802
+              },
+              "output_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 15648,
+                "p95": 15648
+              },
+              "total_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 159450,
+                "p95": 159450
+              }
+            },
+            "accepted_attempts": {
+              "workflow_seconds": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 88.18700810000882,
+                "p95": 88.18700810000882
+              },
+              "input_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 143802,
+                "p95": 143802
+              },
+              "output_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 15648,
+                "p95": 15648
+              },
+              "total_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 159450,
+                "p95": 159450
+              }
+            },
+            "known_partial_tokens": {
+              "input_tokens": 143802,
+              "output_tokens": 15648,
+              "total_tokens": 159450
+            },
+            "tool_errors": 0,
+            "api_retries": 0,
+            "repair_cycles": 0,
+            "statuses": {
+              "completed": 1
+            }
+          }
+        }
+      },
+      "B": {
+        "overall": {
+          "cases": 2,
+          "completion": {
+            "pass": 2,
+            "n": 2,
+            "verified_n": 2,
+            "rate_all": 1.0
+          },
+          "accepted": {
+            "pass": 2,
+            "n": 2,
+            "verified_n": 2,
+            "rate_all": 1.0
+          },
+          "build": {
+            "pass": 0,
+            "n": 0,
+            "verified_n": 0,
+            "rate_all": null
+          },
+          "static_behavior": {
+            "pass": 0,
+            "n": 0,
+            "verified_n": 0,
+            "rate_all": null
+          },
+          "runtime_behavior": {
+            "pass": 0,
+            "n": 0,
+            "verified_n": 0,
+            "rate_all": null
+          },
+          "all_attempts": {
+            "workflow_seconds": {
+              "n": 2,
+              "known_n": 2,
+              "unknown_n": 0,
+              "median": 38.843735599992215,
+              "p95": 54.65536529998644
+            },
+            "input_tokens": {
+              "n": 2,
+              "known_n": 2,
+              "unknown_n": 0,
+              "median": 92268.0,
+              "p95": 106688
+            },
+            "output_tokens": {
+              "n": 2,
+              "known_n": 2,
+              "unknown_n": 0,
+              "median": 5972.0,
+              "p95": 9158
+            },
+            "total_tokens": {
+              "n": 2,
+              "known_n": 2,
+              "unknown_n": 0,
+              "median": 98240.0,
+              "p95": 109474
+            }
+          },
+          "accepted_attempts": {
+            "workflow_seconds": {
+              "n": 2,
+              "known_n": 2,
+              "unknown_n": 0,
+              "median": 38.843735599992215,
+              "p95": 54.65536529998644
+            },
+            "input_tokens": {
+              "n": 2,
+              "known_n": 2,
+              "unknown_n": 0,
+              "median": 92268.0,
+              "p95": 106688
+            },
+            "output_tokens": {
+              "n": 2,
+              "known_n": 2,
+              "unknown_n": 0,
+              "median": 5972.0,
+              "p95": 9158
+            },
+            "total_tokens": {
+              "n": 2,
+              "known_n": 2,
+              "unknown_n": 0,
+              "median": 98240.0,
+              "p95": 109474
+            }
+          },
+          "known_partial_tokens": {
+            "input_tokens": 184536,
+            "output_tokens": 11944,
+            "total_tokens": 196480
+          },
+          "tool_errors": 0,
+          "api_retries": 0,
+          "repair_cycles": 0,
+          "statuses": {
+            "completed": 2
+          }
+        },
+        "tasks": {
+          "inspect": {
+            "cases": 1,
+            "completion": {
+              "pass": 1,
+              "n": 1,
+              "verified_n": 1,
+              "rate_all": 1.0
+            },
+            "accepted": {
+              "pass": 1,
+              "n": 1,
+              "verified_n": 1,
+              "rate_all": 1.0
+            },
+            "build": {
+              "pass": 0,
+              "n": 0,
+              "verified_n": 0,
+              "rate_all": null
+            },
+            "static_behavior": {
+              "pass": 0,
+              "n": 0,
+              "verified_n": 0,
+              "rate_all": null
+            },
+            "runtime_behavior": {
+              "pass": 0,
+              "n": 0,
+              "verified_n": 0,
+              "rate_all": null
+            },
+            "all_attempts": {
+              "workflow_seconds": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 23.032105899997987,
+                "p95": 23.032105899997987
+              },
+              "input_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 106688,
+                "p95": 106688
+              },
+              "output_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 2786,
+                "p95": 2786
+              },
+              "total_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 109474,
+                "p95": 109474
+              }
+            },
+            "accepted_attempts": {
+              "workflow_seconds": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 23.032105899997987,
+                "p95": 23.032105899997987
+              },
+              "input_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 106688,
+                "p95": 106688
+              },
+              "output_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 2786,
+                "p95": 2786
+              },
+              "total_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 109474,
+                "p95": 109474
+              }
+            },
+            "known_partial_tokens": {
+              "input_tokens": 106688,
+              "output_tokens": 2786,
+              "total_tokens": 109474
+            },
+            "tool_errors": 0,
+            "api_retries": 0,
+            "repair_cycles": 0,
+            "statuses": {
+              "completed": 1
+            }
+          },
+          "weighing": {
+            "cases": 1,
+            "completion": {
+              "pass": 1,
+              "n": 1,
+              "verified_n": 1,
+              "rate_all": 1.0
+            },
+            "accepted": {
+              "pass": 1,
+              "n": 1,
+              "verified_n": 1,
+              "rate_all": 1.0
+            },
+            "build": {
+              "pass": 0,
+              "n": 0,
+              "verified_n": 0,
+              "rate_all": null
+            },
+            "static_behavior": {
+              "pass": 0,
+              "n": 0,
+              "verified_n": 0,
+              "rate_all": null
+            },
+            "runtime_behavior": {
+              "pass": 0,
+              "n": 0,
+              "verified_n": 0,
+              "rate_all": null
+            },
+            "all_attempts": {
+              "workflow_seconds": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 54.65536529998644,
+                "p95": 54.65536529998644
+              },
+              "input_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 77848,
+                "p95": 77848
+              },
+              "output_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 9158,
+                "p95": 9158
+              },
+              "total_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 87006,
+                "p95": 87006
+              }
+            },
+            "accepted_attempts": {
+              "workflow_seconds": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 54.65536529998644,
+                "p95": 54.65536529998644
+              },
+              "input_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 77848,
+                "p95": 77848
+              },
+              "output_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 9158,
+                "p95": 9158
+              },
+              "total_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 87006,
+                "p95": 87006
+              }
+            },
+            "known_partial_tokens": {
+              "input_tokens": 77848,
+              "output_tokens": 9158,
+              "total_tokens": 87006
+            },
+            "tool_errors": 0,
+            "api_retries": 0,
+            "repair_cycles": 0,
+            "statuses": {
+              "completed": 1
+            }
+          }
+        }
+      }
+    },
+    "regraded_conditions": {}
+  },
+  {
+    "path": "20261123T210125Z-simulator-4e135a7d",
+    "run_id": "20261123T210125Z-simulator-4e135a7d",
+    "provider": "deepseek",
+    "model": {
+      "id": "deepseek-flash",
+      "identity": "alias",
+      "reasoning_effort": "high",
+      "max_output_tokens": 12000
+    },
+    "harness": {
+      "revision": "a28ec8a8e9609d62bbd44d1944155deb0df20558",
+      "dirty": true,
+      "dirty_fingerprint": "ad3f6faab71b2ab299b1bd4c170942b71b3a210ea53bb2e8639bf1553e4c359d"
+    },
+    "servers": {
+      "SIMULATOR": {
+        "source": {
+          "revision": "a28ec8a8e9609d62bbd44d1944155deb0df20558",
+          "dirty": true,
+          "dirty_fingerprint": "ad3f6faab71b2ab299b1bd4c170942b71b3a210ea53bb2e8639bf1553e4c359d"
+        },
+        "runtime_package_sha256": "f7b67e42fb1f22905ddf544c0819ca2d0bdedda9d11acf521bddcf19e10a91f8",
+        "dependencies": {
+          "control-expert-mcp": "0.9.2",
+          "mcp": "2.3.0"
+        },
+        "documentation_available": false,
+        "corpus_sha256": null,
+        "corpus_files": 0,
+        "environment_sha256": "4d37e868975edc0c26181cbd9f578faac111ab3c5a35fbbfc49f44222a0cb82d"
+      }
+    },
+    "complete": true,
+    "conditions": {
+      "SIMULATOR": {
+        "overall": {
+          "cases": 1,
+          "completion": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "accepted": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "build": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "static_behavior": {
+            "pass": 0,
+            "n": 1,
+            "verified_n": 0,
+            "rate_all": 0.0
+          },
+          "runtime_behavior": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "all_attempts": {
+            "workflow_seconds": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 101.00225079999655,
+              "p95": 101.00225079999655
+            },
+            "input_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 877602,
+              "p95": 877602
+            },
+            "output_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 6513,
+              "p95": 6513
+            },
+            "total_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 884115,
+              "p95": 884115
+            }
+          },
+          "accepted_attempts": {
+            "workflow_seconds": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 101.00225079999655,
+              "p95": 101.00225079999655
+            },
+            "input_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 877602,
+              "p95": 877602
+            },
+            "output_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 6513,
+              "p95": 6513
+            },
+            "total_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 884115,
+              "p95": 884115
+            }
+          },
+          "known_partial_tokens": {
+            "input_tokens": 877602,
+            "output_tokens": 6513,
+            "total_tokens": 884115
+          },
+          "tool_errors": 1,
+          "api_retries": 0,
+          "repair_cycles": 0,
+          "statuses": {
+            "completed": 1
+          }
+        },
+        "tasks": {
+          "simulator_counter": {
+            "cases": 1,
+            "completion": {
+              "pass": 1,
+              "n": 1,
+              "verified_n": 1,
+              "rate_all": 1.0
+            },
+            "accepted": {
+              "pass": 1,
+              "n": 1,
+              "verified_n": 1,
+              "rate_all": 1.0
+            },
+            "build": {
+              "pass": 1,
+              "n": 1,
+              "verified_n": 1,
+              "rate_all": 1.0
+            },
+            "static_behavior": {
+              "pass": 0,
+              "n": 1,
+              "verified_n": 0,
+              "rate_all": 0.0
+            },
+            "runtime_behavior": {
+              "pass": 1,
+              "n": 1,
+              "verified_n": 1,
+              "rate_all": 1.0
+            },
+            "all_attempts": {
+              "workflow_seconds": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 101.00225079999655,
+                "p95": 101.00225079999655
+              },
+              "input_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 877602,
+                "p95": 877602
+              },
+              "output_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 6513,
+                "p95": 6513
+              },
+              "total_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 884115,
+                "p95": 884115
+              }
+            },
+            "accepted_attempts": {
+              "workflow_seconds": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 101.00225079999655,
+                "p95": 101.00225079999655
+              },
+              "input_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 877602,
+                "p95": 877602
+              },
+              "output_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 6513,
+                "p95": 6513
+              },
+              "total_tokens": {
+                "n": 1,
+                "known_n": 1,
+                "unknown_n": 0,
+                "median": 884115,
+                "p95": 884115
+              }
+            },
+            "known_partial_tokens": {
+              "input_tokens": 877602,
+              "output_tokens": 6513,
+              "total_tokens": 884115
+            },
+            "tool_errors": 1,
+            "api_retries": 0,
+            "repair_cycles": 0,
+            "statuses": {
+              "completed": 1
+            }
+          }
+        }
+      }
+    },
+    "regraded_conditions": {}
   }
 ]

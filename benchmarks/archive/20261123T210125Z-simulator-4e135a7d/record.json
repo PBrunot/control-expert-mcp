@@ -1,0 +1,595 @@
+{
+  "archive_version": 1,
+  "run_id": "20261123T210125Z-simulator-4e135a7d",
+  "fingerprint": "c3880904ba3a10999c5f17af76790d802dba66b10c80cb615c24d2ead0bf9e38",
+  "complete": true,
+  "unfinished_cases": [],
+  "scheduled_cases": 1,
+  "model": {
+    "id": "deepseek-flash",
+    "identity": "alias",
+    "reasoning_effort": "high",
+    "max_output_tokens": 12000
+  },
+  "provider": "deepseek",
+  "cpu": {
+    "part_number": "BME P58 3040",
+    "version": "03.20"
+  },
+  "ce_version": "16.4",
+  "machine_sha256": "a41fca9484390d13b1ac9c53a119a7880bcbee96ebcb9a9c40ef26e7f2e738e7",
+  "harness": {
+    "revision": "a28ec8a8e9609d62bbd44d1944155deb0df20558",
+    "dirty": true,
+    "dirty_fingerprint": "ad3f6faab71b2ab299b1bd4c170942b71b3a210ea53bb2e8639bf1553e4c359d"
+  },
+  "dependencies": {
+    "control-expert-mcp": "0.9.0",
+    "mcp": "2.3.0",
+    "openai": "2.54.0",
+    "pywin32": "312"
+  },
+  "servers": {
+    "SIMULATOR": {
+      "source": {
+        "revision": "a28ec8a8e9609d62bbd44d1944155deb0df20558",
+        "dirty": true,
+        "dirty_fingerprint": "ad3f6faab71b2ab299b1bd4c170942b71b3a210ea53bb2e8639bf1553e4c359d"
+      },
+      "runtime_package_sha256": "f7b67e42fb1f22905ddf544c0819ca2d0bdedda9d11acf521bddcf19e10a91f8",
+      "dependencies": {
+        "control-expert-mcp": "0.9.2",
+        "mcp": "2.3.0"
+      },
+      "documentation_available": false,
+      "corpus_sha256": null,
+      "corpus_files": 0,
+      "environment_sha256": "4d37e868975edc0c26181cbd9f578faac111ab3c5a35fbbfc49f44222a0cb82d"
+    }
+  },
+  "fixture_sha256": "5243304e7c0289eb56b63359b4c2c8fd406ec39612dd513293abda3cb2e45538",
+  "demo_inputs": {},
+  "rubric_version": "simulator-counter-1",
+  "prompt_sha256": {
+    "simulator_counter": "d94a9b1e0ccc3800956965755465ca983903e970d254b64a672a49f78aae8ed6"
+  },
+  "orientation_sha256": "b7fe35e78ec9d1a3049e0943f30ef150bf4a0558b898b96d532409d3f1688fe3",
+  "demo_orientation_sha256": "ab95fe37b465a65ab6601fa6cefd5b034aa67191c8d928c0bd6bb0f01b184e5c",
+  "contexts": "671b3b92b3c04da4be90679501d8fbf2d0cde5f5fa42dbc7b115b2db011247b4",
+  "provider_retry_policy": {
+    "error": "APIConnectionError",
+    "max_retries": 2,
+    "backoff_seconds": [
+      1.0,
+      2.0
+    ],
+    "sdk_retries": 0,
+    "mcp_retries": 0
+  },
+  "seed": 0,
+  "schedule": [
+    {
+      "case_id": "simulator-counter-000",
+      "task": "simulator_counter",
+      "repeat": 0,
+      "condition": "SIMULATOR"
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "simulator-counter-000",
+      "task": "simulator_counter",
+      "repeat": 0,
+      "condition": "SIMULATOR",
+      "fingerprint": "c3880904ba3a10999c5f17af76790d802dba66b10c80cb615c24d2ead0bf9e38",
+      "status": "completed",
+      "cold_start": true,
+      "provider": "deepseek",
+      "requested_model": "deepseek-flash",
+      "returned_models": [
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash",
+        "deepseek-flash"
+      ],
+      "model_identity": "alias",
+      "startup_seconds": 1.1113785000052303,
+      "discovery_seconds": 0.014017300010891631,
+      "workflow_seconds": 101.00225079999655,
+      "total_seconds": 121.46900000001187,
+      "tool_calls": 38,
+      "tool_errors": 1,
+      "repair_cycles": 0,
+      "api_retries": 0,
+      "transport_retries": 0,
+      "model_requests": 36,
+      "usage": {
+        "requests": 36,
+        "tokens": {
+          "input_tokens": 877602,
+          "output_tokens": 6513,
+          "total_tokens": 884115,
+          "cached_input_tokens": 851712,
+          "reasoning_tokens": 3319
+        },
+        "known_partial_tokens": {
+          "input_tokens": 877602,
+          "output_tokens": 6513,
+          "total_tokens": 884115,
+          "cached_input_tokens": 851712,
+          "reasoning_tokens": 3319
+        }
+      },
+      "success": true,
+      "durable_completed": true,
+      "cpu": {
+        "family": "M580",
+        "part_number": "BME P58 3040",
+        "version": "03.20"
+      },
+      "attempt_id": "attempt-001",
+      "interaction_metrics": {
+        "model_request_seconds": {
+          "n": 36,
+          "known_n": 36,
+          "unknown_n": 0,
+          "median": 1.4984900999988895,
+          "p95": 4.6001606000063475
+        },
+        "mcp_round_trip_seconds": {
+          "get_status": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.009782799985259771,
+            "p95": 0.009782799985259771
+          },
+          "get_live_access_setup": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.002046400011749938,
+            "p95": 0.002046400011749938
+          },
+          "open_project": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 13.343639800004894,
+            "p95": 13.343639800004894
+          },
+          "get_project_structure": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.1575412999955006,
+            "p95": 0.1575412999955006
+          },
+          "list_variables": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.9173637999920174,
+            "p95": 0.9173637999920174
+          },
+          "get_language_reference": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.003355699998792261,
+            "p95": 0.003355699998792261
+          },
+          "create_variable": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.0726859999995213,
+            "p95": 0.0726859999995213
+          },
+          "write_st_logic": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.11867799999890849,
+            "p95": 0.11867799999890849
+          },
+          "read_section": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.08148540000547655,
+            "p95": 0.08148540000547655
+          },
+          "build_project": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 1.465917499997886,
+            "p95": 1.465917499997886
+          },
+          "save_project": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 2.4147061000112444,
+            "p95": 2.4147061000112444
+          },
+          "start_simulator": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.35547090001637116,
+            "p95": 0.35547090001637116
+          },
+          "plc_setup_connection": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.003242299979319796,
+            "p95": 0.003242299979319796
+          },
+          "plc_connect": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 1.123689000000013,
+            "p95": 1.123689000000013
+          },
+          "plc_transfer": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 6.990183899994008,
+            "p95": 6.990183899994008
+          },
+          "plc_command": {
+            "n": 3,
+            "known_n": 3,
+            "unknown_n": 0,
+            "median": 0.6458034999959636,
+            "p95": 0.9396728999854531
+          },
+          "plc_state": {
+            "n": 2,
+            "known_n": 2,
+            "unknown_n": 0,
+            "median": 0.0032493500038981438,
+            "p95": 0.003270599991083145
+          },
+          "opc_connect": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.17246159998467192,
+            "p95": 0.17246159998467192
+          },
+          "opc_browse": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.008819900016533211,
+            "p95": 0.008819900016533211
+          },
+          "opc_read_tags": {
+            "n": 14,
+            "known_n": 14,
+            "unknown_n": 0,
+            "median": 0.03309869999065995,
+            "p95": 0.06809679997968487
+          },
+          "opc_disconnect": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.06851899999310263,
+            "p95": 0.06851899999310263
+          }
+        }
+      },
+      "validation": {
+        "rubric": "simulator-counter-1",
+        "runtime_behavior": "pass",
+        "compile_pass": true,
+        "success": true,
+        "runtime_checks": {
+          "variable_exists": true,
+          "unit_increments": true,
+          "one_second_period": true
+        },
+        "observation_policy": {
+          "duration_seconds": 8.0,
+          "poll_seconds": 0.1,
+          "max_sample_gap": 0.35,
+          "min_increments": 6,
+          "interval_tolerance": 0.35,
+          "mean_period_tolerance": 0.15
+        },
+        "increments": 7,
+        "intervals_seconds": [
+          1.077999999979511,
+          1.0625,
+          1.117500000022119,
+          0.9684999999881256,
+          1.1014999999897555,
+          1.0705000000307336
+        ],
+        "mean_period_seconds": 1.066416666668374
+      },
+      "artifact_sha256": {
+        "project.stu": "1ce34a00e2675dde19900c273de90fe2f731b52064f7e4ad83e5c902cd6c3bea",
+        "saved-section.xml": "171b7f0057c84d573e1024249aa524db28ce6d9259b6cc5ebf3173aa7f7b37dc",
+        "counter-samples.json": "66968ba2e1d2fd39e656fc15819b8133342d1e59f057bdcea8694ea108897db9"
+      }
+    }
+  ],
+  "conditions": {
+    "SIMULATOR": {
+      "overall": {
+        "cases": 1,
+        "completion": {
+          "pass": 1,
+          "n": 1,
+          "verified_n": 1,
+          "rate_all": 1.0
+        },
+        "accepted": {
+          "pass": 1,
+          "n": 1,
+          "verified_n": 1,
+          "rate_all": 1.0
+        },
+        "build": {
+          "pass": 1,
+          "n": 1,
+          "verified_n": 1,
+          "rate_all": 1.0
+        },
+        "static_behavior": {
+          "pass": 0,
+          "n": 1,
+          "verified_n": 0,
+          "rate_all": 0.0
+        },
+        "runtime_behavior": {
+          "pass": 1,
+          "n": 1,
+          "verified_n": 1,
+          "rate_all": 1.0
+        },
+        "all_attempts": {
+          "workflow_seconds": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 101.00225079999655,
+            "p95": 101.00225079999655
+          },
+          "input_tokens": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 877602,
+            "p95": 877602
+          },
+          "output_tokens": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 6513,
+            "p95": 6513
+          },
+          "total_tokens": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 884115,
+            "p95": 884115
+          }
+        },
+        "accepted_attempts": {
+          "workflow_seconds": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 101.00225079999655,
+            "p95": 101.00225079999655
+          },
+          "input_tokens": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 877602,
+            "p95": 877602
+          },
+          "output_tokens": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 6513,
+            "p95": 6513
+          },
+          "total_tokens": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 884115,
+            "p95": 884115
+          }
+        },
+        "known_partial_tokens": {
+          "input_tokens": 877602,
+          "output_tokens": 6513,
+          "total_tokens": 884115
+        },
+        "tool_errors": 1,
+        "api_retries": 0,
+        "repair_cycles": 0,
+        "statuses": {
+          "completed": 1
+        }
+      },
+      "tasks": {
+        "simulator_counter": {
+          "cases": 1,
+          "completion": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "accepted": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "build": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "static_behavior": {
+            "pass": 0,
+            "n": 1,
+            "verified_n": 0,
+            "rate_all": 0.0
+          },
+          "runtime_behavior": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "all_attempts": {
+            "workflow_seconds": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 101.00225079999655,
+              "p95": 101.00225079999655
+            },
+            "input_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 877602,
+              "p95": 877602
+            },
+            "output_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 6513,
+              "p95": 6513
+            },
+            "total_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 884115,
+              "p95": 884115
+            }
+          },
+          "accepted_attempts": {
+            "workflow_seconds": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 101.00225079999655,
+              "p95": 101.00225079999655
+            },
+            "input_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 877602,
+              "p95": 877602
+            },
+            "output_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 6513,
+              "p95": 6513
+            },
+            "total_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 884115,
+              "p95": 884115
+            }
+          },
+          "known_partial_tokens": {
+            "input_tokens": 877602,
+            "output_tokens": 6513,
+            "total_tokens": 884115
+          },
+          "tool_errors": 1,
+          "api_retries": 0,
+          "repair_cycles": 0,
+          "statuses": {
+            "completed": 1
+          }
+        }
+      }
+    }
+  },
+  "paired_differences": {},
+  "suite": "simulator-counter",
+  "limitations": [
+    "Small repetition counts are exploratory, not statistically strong comparisons.",
+    "Sampled one-second OPC DA counter behavior on PLC Simulator; no scan-level or physical-hardware proof.",
+    "API client/model experiment, distinct from ChatGPT UI.",
+    "Dirty source fingerprints identify uncommitted code; do not label them a clean revision.",
+    "Mutable provider alias: matching model IDs do not guarantee identical weights over time."
+  ],
+  "runtime_environment": {
+    "protocol": "opc-da",
+    "cleanup_verified": true,
+    "alias_sha256": "8159ae854dcc8fa1cd166ea94ecddf9c2b35ede2fec71651524856a06d3ca023"
+  },
+  "observation_policy": {
+    "duration_seconds": 8.0,
+    "poll_seconds": 0.1,
+    "max_sample_gap": 0.35,
+    "min_increments": 6,
+    "interval_tolerance": 0.35,
+    "mean_period_tolerance": 0.15
+  },
+  "inspection_regrades": [],
+  "regraded_conditions": {}
+}

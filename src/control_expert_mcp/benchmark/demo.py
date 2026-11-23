@@ -30,33 +30,59 @@ def table_rows(text: str) -> list[list[str]]:
             for line in text.splitlines() if line.strip().startswith("|")]
 
 
+def _mapping_text(text: str) -> str:
+    return text.lower().replace('`', '').replace('**', '').translate(
+        str.maketrans({'–': '-', '—': '-', '‑': '-', '…': '..'}))
+
+
 def _mapping_rows(text: str) -> list[tuple[list[str], int, bool]]:
-    """Read Markdown table context, including grouped signal columns."""
+    """Read scoped unmapped lists and tables without borrowing unrelated facts."""
     result = []
-    heading, header = "", []
+    headings, header, previous = [], [], []
+    classification = r'unmapped|unlocated|no physical|not mapped|no.*mapping|without.*physical.*mapping'
     for line in text.splitlines():
-        if line.lstrip().startswith("#"):
-            heading = line.lower()
-            header = []
+        heading = re.match(r'^\s*(#{1,6})\s+(.+)', line)
+        if heading:
+            level, title = len(heading[1]), _mapping_text(heading[2])
+            headings = [(n, s) for n, s in headings if n < level] + [(level, title)]
+        unmapped_context = False
+        for _, title in reversed(headings):
+            if re.search(classification, title):
+                unmapped_context = True
+                break
+            if re.search(r'physical mappings?|mapped signals|signals with.*(?:physical|real)', title):
+                break
         if not line.strip().startswith("|"):
-            header = []
+            header, previous = [], []
+            # Only explicit identifier lists inside an unmapped section qualify.
+            if unmapped_context and re.match(r'^\s*(?:[-*]\s+)?`[a-z_]\w*`', line, re.I):
+                result.append(([_mapping_text(line)], 0, True))
             continue
-        row = table_rows(line)[0]
-        row = [cell.replace("**", "").replace("–", "-").replace("—", "-") for cell in row]
+        row = [_mapping_text(cell) for cell in table_rows(line)[0]]
         if not header:
             header = row
             continue
         if all(re.fullmatch(r"[-: ]*", cell) for cell in row):
             continue
-        index = next((i for i, cell in enumerate(header)
-                      if re.search(r"\bsignals\b|\bsignal\(s\)", cell)), None)
-        if index is None:
-            index = next((i for i, cell in enumerate(header)
-                          if re.search(r"\bsignal\b(?!\s+(?:group|category|aliases?)\b)", cell)), 0)
-        context = " ".join([heading, *header, *row])
-        unmapped = bool(re.search(r"unmapped|unlocated|no physical|not mapped|no.*mapping|without.*physical.*mapping", context))
-        if index < len(row):
-            result.append((row, index, unmapped))
+        for index, cell in enumerate(row):
+            if (index < len(header) and 'module' in header[index] and cell == 'same'
+                    and index < len(previous) and re.search(r'\bbmx\s*(?:ddi|ddo|ami)\s*\d+', previous[index])):
+                row[index] = previous[index]
+        previous = row
+        indices = [i for i, cell in enumerate(header) if re.search(
+            r'\bsignal(?:s|\(s\))?\b(?!\s+(?:group|category|aliases?)\b)|\bsignal\(s\)', cell)]
+        if not indices:
+            indices = [0]
+        for number, index in enumerate(indices):
+            if index >= len(row):
+                continue
+            # Repeated Signal/Type/Use columns describe independent records.
+            start = index if len(indices) > 1 else 0
+            end = indices[number + 1] if number + 1 < len(indices) else len(row)
+            cells = row[start:end]
+            context = ' '.join([*header[start:end], *cells])
+            unmapped = unmapped_context or bool(re.search(classification, context))
+            result.append((cells, index - start, unmapped))
     return result
 
 

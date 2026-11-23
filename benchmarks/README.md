@@ -34,7 +34,7 @@ reference answer is private to the evaluator and never included in model context
   device-DDT fields, modules, and channels, covering the complete application-signal
   inventory and flagging unmapped signals. Report module-owned device-DDT hardware
   bindings and channel ranges separately from application use of their fields.
-  Rubric `demo-io-mapping-4` uses the approved saved reference as ground truth.
+  Rubric `demo-io-mapping-6` uses the approved saved reference as ground truth.
   It checks all 11 physical instances in Markdown table rows (signal, address or
   DDT, module type, channel), both internal-memory instances, 14 representative
   unmapped process signals, and unmapped Robot_one data. It rejects physical
@@ -52,7 +52,11 @@ reference answer is private to the evaluator and never included in model context
   diagnostic, while acceptance still requires every check to pass. It also
   recognizes `Signal(s)` and singular signal-column headings, and spelled-out
   channel counts such as `32 digital input channels`. Count direction must agree
-  with the module. Regrades evaluate saved replies without adding facts.
+  with the module. Rubric 6 additionally supports nested unmapped headings,
+  explicit identifier lists, repeated signal columns, same-table module `same`
+  cells, discrete channel counts, Unicode ranges and group/bit labels. It does
+  not borrow module context across tables or classify sibling sections as unmapped.
+  Regrades evaluate saved replies without adding facts.
 
 An explicit deterministic answer regrade preserves original summaries and
 responses, validates their hashes and the original reference hash, and makes
@@ -63,13 +67,17 @@ ce-bench regrade --results benchmarks/results --run-id RUN_ID --task io_mapping
 ```
 
 Archive both score views with `archive`, then regenerate with `visualize`.
+Selecting `--rubric` writes a new rubric-named archive snapshot; earlier archives
+remain immutable. The overview chooses the newest scoring snapshot per run and
+does not count the same attempts twice. Apply the same rubric to every saved
+I/O mapping campaign before comparing models or revisions.
 
 The [current scoring results](archive/README.md) and regenerated overview
-use `demo-io-mapping-4` for I/O mapping. The overview shows I/O correctness as
+use `demo-io-mapping-6` for I/O mapping. The overview shows I/O correctness as
 the percentage of matched rubric checks, alongside the all-or-nothing pass count.
 Missing scoring evidence is shown as unknown rather than zero correctness.
 Select only this grader when creating an archive with
-`ce-bench archive --results benchmarks/results --run-id RUN_ID --archive DESTINATION --rubric demo-io-mapping-4`
+`ce-bench archive --results benchmarks/results --run-id RUN_ID --archive DESTINATION --rubric demo-io-mapping-6`
 (add `--allow-incomplete` for an unfinished campaign).
 
 Each case must obtain source through MCP and leave its project file unchanged.
@@ -77,6 +85,21 @@ One A/B repetition with both demo cases produces 14 independently scored cases.
 Keep older five-task campaigns separate when comparing acceptance rates.
 
 ## M580 simulator counter benchmark
+
+For a **full DeepSeek suite** run, execute the seven-task offline A/B campaign
+(14 cases per repetition) and then this M580 one-second increment campaign.
+Both are required; report their acceptance results separately. With the existing
+local configurations on this host, use:
+
+```powershell
+ce-bench run --config benchmarks/local.json --condition A B --repeats 1 --seed 1729
+ce-bench simulator run --config benchmarks/.local/simulator-deepseek.json --alias Dev_Alias_2 --allow-live --confirm-ofs-running --allow-closed-loop --allow-simulator-replacement --repeats 1
+```
+
+The simulator command requires the dedicated simulator/OFS setup and consent
+described below. Run sequentially, even if an offline case fails acceptance.
+Apply documentation/source changes after both campaigns finish so their
+immutable fingerprints remain valid throughout execution.
 
 `ce-bench simulator` is a separate opt-in **OPC DA** suite. Its task is to open
 a disposable copy of `samples/demo_ControlExpert_M580.STU`, create ST section
@@ -486,6 +509,16 @@ code hash and matplotlib version. Offline tests detect data/image mismatches.
 `--scoring original` plots original scores; the default `latest` applies the latest
 explicit inspection regrade and shows original-to-current counts in the image.
 See [the archived overview](archive/README.md).
+
+The overview can display a full suite in one row using `overview.groups.json`
+in the archive directory. Its explicit run IDs join the offline campaign,
+any continuation, and the simulator campaign for display only; archived records
+remain unchanged. The latest DeepSeek row combines both A/B conditions (two
+cases per offline task) and one M580 counter case, totaling 15 cases. Medians in
+that row combine A/B samples within each task. The plot validates the expected
+condition/task/repetition inventory and rejects missing or duplicate cases.
+When refreshing a full suite, update this manifest to the new run IDs and
+expected cases, then regenerate the PNG and metadata together.
 
 Individual archive directories are immutable and checksummed. `index.json` and
 README are derived navigation. Missing cases require `archive --allow-incomplete`,

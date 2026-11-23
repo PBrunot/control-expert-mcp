@@ -14,3 +14,6 @@ Regenerate from this archive with `ce-bench visualize --archive benchmarks/archi
 | [20261121T200704Z-5bbd9b33](20261121T200704Z-5bbd9b33/report.md) | deepseek | deepseek-flash | 0b53d53d8b5e | 12/14 | demo-io-mapping-4: 14/14 | True |
 | [20261121T204037Z-e4c05842](20261121T204037Z-e4c05842-partial-be63ed1b57/report.md) | openai | gpt-5.5-2026-04-23 | c17ace01f2bd | 4/7 | demo-io-mapping-4: 6/7 | False |
 | [20261121T211320Z-ec8c65a1](20261121T211320Z-ec8c65a1/report.md) | openai | gpt-6-luna | c17ace01f2bd | 12/14 | demo-io-mapping-4: 12/14 | True |
+| [20261123T203810Z-2c2576bd](20261123T203810Z-2c2576bd-partial-636ad52638/report.md) | deepseek | deepseek-flash | a28ec8a8e960 | 7/9 | none | False |
+| [20261123T205344Z-37142f78](20261123T205344Z-37142f78/report.md) | deepseek | deepseek-flash | a28ec8a8e960 | 5/5 | none | True |
+| [20261123T210125Z-simulator-4e135a7d](20261123T210125Z-simulator-4e135a7d/report.md) | deepseek | deepseek-flash | a28ec8a8e960 | 1/1 | none | True |

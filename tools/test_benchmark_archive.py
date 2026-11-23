@@ -14,6 +14,35 @@ from control_expert_mcp.benchmark.report import aggregate
 
 
 class ArchiveTests(unittest.TestCase):
+    def test_explicit_suite_row_requires_complete_unique_cases(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            identities = [("A", "inspect", 0), ("B", "inspect", 0),
+                          ("SIMULATOR", "simulator_counter", 0)]
+            for index, (condition, task, repeat) in enumerate(identities):
+                case = {"case_id": str(index), "task": task, "condition": condition,
+                        "repeat": repeat, "success": True, "status": "completed"}
+                record = {"run_id": str(index), "model": {"id": "model"}, "provider": "deepseek",
+                          "cases": [case], "servers": {condition: {"source": {"revision": "same"}}},
+                          "conditions": {condition: {"overall": aggregate([case])}}, "rubric_version": "test"}
+                path = root / str(index) / "record.json"
+                write_json(path, record)
+                write_json(path.parent / "checksums.json", {"record.json": digest(path.read_bytes())})
+            group = {"id": "latest", "label": "Latest DeepSeek A+B+simulator",
+                     "run_ids": ["0", "1", "2"], "expected_cases": identities}
+            write_json(root / "overview.groups.json", {"groups": [group]})
+            rows, inputs = chart_rows(root)
+            self.assertEqual(len(rows), 1)
+            self.assertEqual(rows[0]["overall"]["accepted"]["pass"], 3)
+            self.assertEqual(rows[0]["tasks"]["inspect"]["cases"], 2)
+            self.assertEqual(rows[0]["tasks"]["simulator_counter"]["cases"], 1)
+            self.assertEqual(len(rows[0]["members"]), 3)
+            self.assertIn("overview.groups.json", inputs)
+            group["expected_cases"] = identities[:-1]
+            write_json(root / "overview.groups.json", {"groups": [group]})
+            with self.assertRaisesRegex(ValueError, "missing or duplicate"):
+                chart_rows(root)
+
     def test_mapping_correctness_reports_partial_and_unknown_answers(self):
         def case(matched, required=29):
             return {'task': 'io_mapping', 'validation': {'checks': {
@@ -88,15 +117,25 @@ class ArchiveTests(unittest.TestCase):
             self.assertEqual(archive_run(root / "results", "run", root / "archive"), archive)
             response = summary_path.parent / "final-response.txt"
             response.write_text("saved answer", encoding="utf-8")
+            original_record = (archive / 'record.json').read_bytes()
             for rubric in ("feeder-2", "feeder-3"):
                 write_json(root / "results/run/regrades" / rubric / "inspect-0-A/attempt-1.json",
                            {"rubric": rubric, "case_id": "inspect-0-A", "attempt_id": "attempt-1",
                             "summary_sha256": digest(summary_path.read_bytes()),
                             "response_sha256": digest(response.read_bytes()),
-                            "success": True, "validation": {"answer_pass": True}})
+                            "success": rubric != 'feeder-3',
+                            "validation": {"answer_pass": rubric != 'feeder-3'}})
             selected = archive_run(root / "results", "run", root / "selected", rubric="feeder-3")
             self.assertEqual([g['rubric'] for g in read_json(selected / 'record.json')['inspection_regrades']],
                              ['feeder-3'])
+            snapshot = archive_run(root / 'results', 'run', root / 'archive', rubric='feeder-3')
+            self.assertNotEqual(snapshot, archive)
+            self.assertEqual((archive / 'record.json').read_bytes(), original_record)
+            latest, _ = chart_rows(root / 'archive')
+            self.assertEqual(len(latest), 1)
+            self.assertEqual(latest[0]['overall']['accepted']['pass'], 0)
+            originals, _ = chart_rows(root / 'archive', scoring='original')
+            self.assertEqual(originals[0]['overall']['accepted']['pass'], 1)
             with self.assertRaisesRegex(ValueError, "No saved regrades"):
                 archive_run(root / "results", "run", root / "missing", rubric="absent")
             summary["success"] = False

@@ -210,19 +210,21 @@ def archive_run(results: Path, run_id: str, destination: Path, *, allow_incomple
     if rubric is not None and not regrades:
         raise ValueError("No saved regrades match the selected rubric")
     record["regraded_conditions"] = {}
-    for rubric in sorted({grade["rubric"] for grade in regrades}):
+    for saved_rubric in sorted({grade["rubric"] for grade in regrades}):
         revised = []
         for row in rows:
             value = dict(row)
-            grade = next((g for g in regrades if g["rubric"] == rubric and g["case_id"] == row["case_id"] and g["attempt_id"] == row["attempt_id"]), None)
+            grade = next((g for g in regrades if g["rubric"] == saved_rubric and g["case_id"] == row["case_id"] and g["attempt_id"] == row["attempt_id"]), None)
             if grade:
                 value.update(success=grade["success"], validation=grade["validation"])
             revised.append(value)
-        record["regraded_conditions"][rubric] = {condition: aggregate([row for row in revised if row["condition"] == condition])
+        record["regraded_conditions"][saved_rubric] = {condition: aggregate([row for row in revised if row["condition"] == condition])
                                                for condition in sorted({row["condition"] for row in rows})}
     if config["model"].get("identity") == "alias":
         record["limitations"].append("Mutable provider alias: matching model IDs do not guarantee identical weights over time.")
-    target = destination / (run_id + ("-partial-" + digest(record)[:10] if missing else ""))
+    # A newly selected rubric is a new snapshot; never overwrite prior scoring.
+    suffix = ("-" + rubric) if rubric is not None else ""
+    target = destination / (run_id + suffix + ("-partial-" + digest(record)[:10] if missing else ""))
     if target.exists():
         if read_json(target / "record.json") != record:
             raise ValueError("Archive is immutable; use a new run ID for changed evidence")
