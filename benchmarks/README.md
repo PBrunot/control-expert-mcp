@@ -1,5 +1,19 @@
 # Local Control Expert benchmark
 
+## Native IEC suite
+
+`ce-bench iec` is a dedicated five-case ST/LD/FBD/SFC/IL suite starting from
+disposable copies of the native M580 demo, with `IEC_<language>_` sections and
+variables. It preserves the demo hardware configuration, captures outputs inside
+MAST and grades independently through OFS. It reports percentage correctness
+over evaluated output cells alongside strict verdicts and verified counts.
+PNG/SVG overviews compare cases/configurations and show infrastructure blockers.
+
+Use [iec.example.json](iec.example.json) and the
+[IEC implementation and command guide](../docs/Benchmark_IEC_Implementation.md)
+for prepare/validate/run, consent requirements, scoring and graphics. This suite
+does not replace the offline, OPC or simulator counter campaigns below.
+
 `ce-bench` compares MCP server configurations/revisions using one explicitly
 configured API provider and model ID. OpenAI and DeepSeek use separate Responses
 API parameter adapters. This measures the API client/model, not ChatGPT's hidden

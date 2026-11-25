@@ -104,6 +104,17 @@ def validate(xml_text: str, schema_dir: str) -> dict:
     schema = _load_schema(xsd_path)
     ok = schema.validate(doc)
     errors = [f"line {e.line}: {e.message}" for e in schema.error_log]
+    if not ok and root == "FBDExchangeFile":
+        for source in doc.iter("FBDSource"):
+            try:
+                columns = int(source.get("nbColumns", "36"))
+                rows = int(source.get("nbRows", "24"))
+            except ValueError:
+                continue  # The XSD already explains non-integer dimensions.
+            if not 6 <= columns <= 36 or not 24 <= rows <= 144:
+                errors.append("FBD grid limits (CE 16.4): nbColumns 6..36, nbRows 24..144. "
+                              "36 columns is the maximum; arrange vertically or split sections, "
+                              "then validate again before import.")
     # Semantic LD rules only make sense once the structure is grammatical.
     if ok and root == "LDExchangeFile":
         sem = _ld_semantic_errors(doc)

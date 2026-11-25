@@ -217,7 +217,7 @@ async def workflow(mcp, task: str, config: dict, provider, evidence, result: dic
                                     except ValueError:
                                         pass
                         failed_build = bool(payload.get("is_error") or build.get("error") or build.get("build_state") != "built_ok")
-                    if call["name"] == "write_st_logic" and failed_build:
+                    if call["name"] in {"write_st_logic", "submit_candidate"} and failed_build:
                         result["repair_cycles"] += 1
                     output = {"type": "function_call_output", "call_id": call["call_id"], "output": encode(payload)}
                     history.append(output)

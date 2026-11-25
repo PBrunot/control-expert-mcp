@@ -145,7 +145,7 @@ class MCP:
             visible_bytes=len(encode(visible).encode()), **outcome)
         return result
 
-    async def checked(self, name: str, **arguments):
+    async def checked(self, name: str, /, **arguments):
         return tool_value(await self.call(name, arguments))
 
     def adapter(self, task: str) -> tuple[str, list]:

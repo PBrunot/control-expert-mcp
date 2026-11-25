@@ -1640,6 +1640,16 @@ class ControlExpertBridge:
             raise CEError(f"Unknown PLC command '{command}'. Use one of {sorted(C.PLC_COMMANDS)}.")
         app = self._ensure_app()
         proj = self._project(write=True)
+        before = self._do_plc_state()
+        if before.get("connected") is True:
+            observed = before.get("plc_state")
+            if ((command.lower() == "stop" and observed in {"stop", "no_conf"})
+                    or (command.lower() == "run" and observed == "run")):
+                return {"command": command, "command_sent": False,
+                        "reason": "Target already in the requested execution state", **before}
+            if command.lower() in {"run", "init"} and observed == "no_conf":
+                raise CEError("Target is NO_CONF (no application). Download a successfully built project "
+                              "before RUN or INIT; STOP is unnecessary in NO_CONF.")
         app.TargetSendCommand(code, proj)
         # The PLC state lags the command by a beat; re-read until it settles.
         import time
@@ -1651,7 +1661,7 @@ class ControlExpertBridge:
                 break
             time.sleep(0.3)
             state = self._do_plc_state()
-        return {"command": command, **state}
+        return {"command": command, "command_sent": True, **state}
 
     # ------------------------------------------------------------- QI helpers
 

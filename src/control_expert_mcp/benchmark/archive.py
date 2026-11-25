@@ -21,7 +21,8 @@ def summarize_validation(value: dict) -> dict:
         "rubric", "answer_pass", "scope", "static_behavior", "runtime_behavior", "compile_pass",
         "declarations_pass", "model_built", "model_saved", "success", "obtained_source_through_mcp",
         "checks", "limitation", "evaluator_seconds", "partition_cases", "int_domain", "runtime_checks",
-        "observation_policy", "increments", "intervals_seconds", "mean_period_seconds") if key in value}
+        "observation_policy", "increments", "intervals_seconds", "mean_period_seconds",
+        "verdict", "correctness_percent", "matched_outputs", "evaluated_outputs", "vector_scores", "first_mismatch") if key in value}
     build = value.get("build", {})
     if build:
         capture = build.get("diagnostics_capture", {})
@@ -104,6 +105,9 @@ def archive_run(results: Path, run_id: str, destination: Path, *, allow_incomple
     config = snapshot["config"]
     live = snapshot.get("suite") == "opc-live"
     simulator = snapshot.get("suite") == "simulator-counter"
+    iec = snapshot.get("suite") == "iec"
+    if iec and (plan.get("mode") != "run" or not read_json(run / "outcome.json").get("cleanup_verified")):
+        raise ValueError("Only model IEC runs with verified cleanup can be archived; keep scripted validation separate")
     if simulator and (plan.get("mode") != "run" or not read_json(run / "outcome.json").get("cleanup_verified")):
         raise ValueError("Only LLM simulator runs with verified cleanup can be archived")
     if live and plan.get("mode") != "run":
@@ -126,13 +130,15 @@ def archive_run(results: Path, run_id: str, destination: Path, *, allow_incomple
                 "cold_start", "provider", "requested_model", "returned_models", "model_identity",
                 "startup_seconds", "discovery_seconds", "setup_seconds", "reset_seconds", "workflow_seconds",
                 "total_seconds", "tool_calls", "tool_errors", "repair_cycles", "api_retries", "transport_retries",
-                "model_requests", "usage", "success", "durable_completed", "provider_failure_code") if key in row}
+                "model_requests", "usage", "success", "durable_completed", "provider_failure_code",
+                "variant", "language") if key in row}
             safe["cpu"] = row.get("ce_status", {}).get("project", {}).get("cpu")
             safe["attempt_id"] = attempt.name
             safe["interaction_metrics"] = interaction_metrics(attempt)
             safe["validation"] = summarize_validation(row.get("validation", {}))
             safe["artifact_sha256"] = {name: digest((attempt / name).read_bytes())
-                for name in ("project.stu", "saved-section.xml", "saved-variables.xml", "counter-samples.json") if (attempt / name).exists()}
+                for name in ("project.stu", "saved-section.xml", "saved-variables.xml", "counter-samples.json",
+                             "candidate.stu", "artifact.json", "capture.json", "capture-identity.json") if (attempt / name).exists()}
             rows.append(safe)
         if not any(row["case_id"] == case["case_id"] and row.get("durable_completed") for row in rows):
             missing.append(case["case_id"])
@@ -185,7 +191,8 @@ def archive_run(results: Path, run_id: str, destination: Path, *, allow_incomple
         "limitations": ["Small repetition counts are exploratory, not statistically strong comparisons.",
             ("Live scalar OPC input/output checks on PLC Simulator; no physical hardware validation."
              if live else "Sampled one-second OPC DA counter behavior on PLC Simulator; no scan-level or physical-hardware proof."
-             if simulator else "Static recognized-subset acceptance; PLC runtime behavior remains unverified."),
+             if simulator else "Native IEC in-MAST output traces on M580 Simulator; no physical-hardware validation."
+             if iec else "Static recognized-subset acceptance; PLC runtime behavior remains unverified."),
             "API client/model experiment, distinct from ChatGPT UI.",
             "Dirty source fingerprints identify uncommitted code; do not label them a clean revision."]}
     if live:
@@ -197,6 +204,10 @@ def archive_run(results: Path, run_id: str, destination: Path, *, allow_incomple
         record["runtime_environment"] = {"protocol": "opc-da", "cleanup_verified": True,
                                          "alias_sha256": digest(plan["alias"])}
         record["observation_policy"] = snapshot["observation_policy"]
+    if iec:
+        record["runtime_environment"] = {"protocol": "opc-da", "cleanup_verified": True,
+                                         "alias_sha256": digest(plan["alias"])}
+        record["fixtures_sha256"] = snapshot["fixtures_sha256"]
     regrades = []
     for path in sorted((run / "regrades").glob("*/*/*.json")):
         from .regrade import regraded_row

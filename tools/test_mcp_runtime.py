@@ -58,7 +58,9 @@ class MCPRuntimeTests(unittest.IsolatedAsyncioTestCase):
             async with ClientSession(read, write) as session:
                 initialized = await session.initialize()
                 self.assertEqual(initialized.server_info.version, version("control-expert-mcp"))
-                tools = {tool.name for tool in (await session.list_tools()).tools}
+                tool_list = (await session.list_tools()).tools
+                tools = {tool.name for tool in tool_list}
+                self.assertIn("nbColumns 6..36", next(t.description for t in tool_list if t.name == "import_xml"))
                 self.assertIn("get_language_reference", tools)
                 self.assertIn("get_simulator_status", tools)
                 self.assertNotIn("plc_connect", tools)
@@ -67,6 +69,10 @@ class MCPRuntimeTests(unittest.IsolatedAsyncioTestCase):
                 self.assertEqual(json.loads(result.content[0].text)["session"], "no application open")
                 language = await session.read_resource("reference://language/ST")
                 self.assertIn("ST", language.contents[0].text)
+                fbd = await session.read_resource("reference://language/FBD")
+                self.assertIn("36 is the MAXIMUM", fbd.contents[0].text)
+                fbd_prompt = await session.get_prompt("author_logic", {"language": "FBD"})
+                self.assertIn("36 columns", fbd_prompt.messages[0].content.text)
                 prompts = {prompt.name for prompt in (await session.list_prompts()).prompts}
                 self.assertIn("consult_installed_manuals", prompts)
                 prompt = await session.get_prompt("consult_installed_manuals", {})

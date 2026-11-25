@@ -27,7 +27,7 @@ def aggregate(rows: list) -> dict:
         return {"workflow_seconds": distribution([r.get("workflow_seconds") for r in selected]),
                 **{key: distribution([r.get("usage", {}).get("tokens", {}).get(key) for r in selected])
                    for key in ("input_tokens", "output_tokens", "total_tokens")}}
-    return {"cases": len(rows), "completion": rate([r.get("status") == "completed" for r in rows]),
+    result = {"cases": len(rows), "completion": rate([r.get("status") == "completed" for r in rows]),
             "accepted": rate([r.get("success", False) for r in rows]),
             "build": rate([r.get("validation", {}).get("compile_pass") for r in rows if r.get("task") not in read_only and not r.get("task", "").startswith("opc_")]),
             "static_behavior": rate([True if r.get("validation", {}).get("static_behavior") == "pass" else None for r in rows if r.get("task") not in read_only and not r.get("task", "").startswith("opc_")]),
@@ -39,6 +39,11 @@ def aggregate(rows: list) -> dict:
             "api_retries": sum(r.get("api_retries", 0) for r in rows),
             "repair_cycles": sum(r.get("repair_cycles", 0) for r in rows),
             "statuses": {status: sum(r["status"] == status for r in rows) for status in sorted({r["status"] for r in rows})}}
+    iec_rows = [r for r in rows if r.get("validation", {}).get("rubric", "").startswith("iec-native-trace-")]
+    if iec_rows:
+        from .iec_report import summarize
+        result["iec_correctness"] = summarize(iec_rows)
+    return result
 
 
 def compare(results: Path, output: Path, rubric: str | None = None) -> dict:

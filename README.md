@@ -118,6 +118,12 @@ More cases are in the [troubleshooting guide](docs/guide.md#troubleshooting). Re
 
 ## Benchmarks
 
+The dedicated `ce-bench iec` suite covers native ST, LD, FBD, SFC and IL logic
+on disposable M580 demo copies. It adds deterministic in-MAST capture, percentage
+correctness, strict verdicts and PNG/SVG progress overviews. See the
+[IEC benchmark guide](docs/Benchmark_IEC_Implementation.md) and
+[example configuration](benchmarks/iec.example.json).
+
 The offline suite covers seven tasks: project inspection, threshold and temperature
 logic changes, fault repair, gated hysteresis alarms, weighing analysis, and I/O
 mapping. Each task runs on a disposable project copy in two conditions: without

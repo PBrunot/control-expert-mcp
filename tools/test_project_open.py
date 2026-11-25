@@ -13,6 +13,40 @@ from control_expert_mcp.bridge import (
 
 
 class ProjectOpenTests(unittest.TestCase):
+    def test_plc_execution_commands_are_idempotent_without_resetting_memory(self):
+        for command, observed in (("stop", "stop"), ("stop", "no_conf"), ("run", "run")):
+            bridge = object.__new__(ControlExpertBridge)
+            app = Mock()
+            bridge._ensure_app = Mock(return_value=app)
+            bridge._project = Mock(return_value="write-token")
+            bridge._do_plc_state = Mock(return_value={"connected": True, "plc_state": observed})
+            result = bridge._do_plc_command(command)
+            self.assertFalse(result["command_sent"])
+            self.assertEqual(result["plc_state"], observed)
+            app.TargetSendCommand.assert_not_called()
+            bridge._project.assert_called_once_with(write=True)
+
+    def test_no_configuration_explains_required_download_for_run_and_init(self):
+        for command in ("run", "init"):
+            bridge = object.__new__(ControlExpertBridge)
+            app = Mock()
+            bridge._ensure_app = Mock(return_value=app)
+            bridge._project = Mock(return_value="write-token")
+            bridge._do_plc_state = Mock(return_value={"connected": True, "plc_state": "no_conf"})
+            with self.assertRaisesRegex(CEError, "Download a successfully built project"):
+                bridge._do_plc_command(command)
+            app.TargetSendCommand.assert_not_called()
+
+    def test_init_on_stopped_application_still_reinitializes(self):
+        bridge = object.__new__(ControlExpertBridge)
+        app = Mock()
+        bridge._ensure_app = Mock(return_value=app)
+        bridge._project = Mock(return_value="write-token")
+        bridge._do_plc_state = Mock(return_value={"connected": True, "plc_state": "stop"})
+        result = bridge._do_plc_command("init")
+        self.assertTrue(result["command_sent"])
+        app.TargetSendCommand.assert_called_once_with(1, "write-token")
+
     def test_simulator_status_distinguishes_process_from_plc_execution(self):
         bridge = object.__new__(ControlExpertBridge)
         bridge._app = Mock(SelectTarget=1)

@@ -22,6 +22,7 @@ HELPERS = {
     "check_simulator.py",
     "test_opc_benchmark.py",
     "test_simulator_benchmark.py",
+    "test_iec_benchmark.py",
 }
 
 
@@ -67,6 +68,8 @@ def check_sdist(path: Path, expected_modules: set[str]) -> None:
         "benchmarks/deepseek.example.json",
         "benchmarks/opc.example.json", "tools/lang_refs/OPC_Bench.xml",
         "benchmarks/simulator.example.json",
+        "benchmarks/iec.example.json", "docs/Benchmark_IEC_Implementation.md",
+        "docs/Specifica_Benchmark_IEC_Control_Expert.md", "docs/Prompts_Implementazione_Benchmark_IEC.md",
         "tools/lang_refs/ST_2_Feeder.xml",
         *("tools/" + name for name in HELPERS),
         *(p.relative_to(ROOT).as_posix() for p in (ROOT / "samples").glob("*.json")),

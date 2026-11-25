@@ -21,6 +21,9 @@ GENERAL RULES (all languages)
   (TON, RS, CTU, DFB types...) must be declared as variables of the FB type.
 - Import with import_xml(kind="section", xml_content=..., task="MAST").
   Importing a section that already exists deletes and replaces it.
+- Exports can carry identProgram SectionOrder, an absolute position in that
+  project. When transporting logic into another project, omit the old position
+  and verify the destination order with get_project_structure after import.
 - ALWAYS run build_project afterwards; the returned 'output' field contains
   per-section error lines like
     {FBD_Demo : [MAST]} : (l: 12, c: 7) E1189 converter error: ...
@@ -41,6 +44,10 @@ calls `MyTon(IN := x, PT := t#3s, Q => y);`, SET/RESET via `set(v);`/`reset(v);`
 (`StepName.t`), arithmetic/comparison operators.
 The XML envelope (used by import_xml/read_section) wraps the source in
 <STSource> with XML-escaped text (&gt; for >, &amp; for &, &lt; for <).
+For arithmetic over the full INT domain, widen operands BEFORE subtraction or
+addition (e.g. INT_TO_DINT(a) - INT_TO_DINT(b)); widening an already-overflowed
+INT result cannot recover the mathematical value. Typed decimal literals such
+as DINT#0 can make the intended arithmetic type explicit.
 """
 
 ST_EXAMPLE = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -186,6 +193,11 @@ FBD_GUIDE = """\
 FBD (Function Block Diagram) — blocks + links on a grid
 =======================================================
 <FBDSource nbRows="24" nbColumns="36"> contains <networkFBD> with:
+GRID LIMITS (CE 16.4 exchange schema): nbColumns is 6..36, nbRows is 24..144.
+36 is the MAXIMUM, not just an example; nbColumns="40" is invalid. Keep blocks
+and wires within the grid. Fit larger diagrams vertically or split networks
+or sections; never increase nbColumns past 36. Call validate_xml before import
+and fix schema errors first; then build_project to check geometry and types.
 - <FFBBlock instanceName=".." typeName="AND_BOOL|OR_BOOL|TON|RS|CTU|<DFB>..."
   additionnalPinNumber="0" enEnO="false" width="8" height="H">
   * instanceName: ".1", ".2"... for stateless EF blocks (anonymous);
@@ -299,6 +311,12 @@ between them, same posX for a linear chain. Close the loop with
   </actionSource> — action sections run while their step is active
   (qualifier NONE/N). XML-escape the ST (&gt; etc.).
 Note: SFC sections are allowed in the MAST task only.
+CE creates compiler-owned SFCCHART_STATE (chart) and SFCSTEP_STATE (step)
+declarations on import. Inspect list_variables afterwards; do not redeclare
+chart/step names as BOOL. StepName.x already exposes the native active bit.
+An assignment in a step action can retain its value after leaving that step.
+Set/clear outputs explicitly in the other step actions, or publish step .x
+bits in a following ST section. Keep that publisher after the native chart.
 """
 
 SFC_EXAMPLE = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>

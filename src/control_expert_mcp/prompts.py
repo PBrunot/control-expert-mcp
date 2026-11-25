@@ -20,6 +20,24 @@ from __future__ import annotations
 
 def register_prompts(mcp) -> None:
     @mcp.prompt()
+    def iec_benchmark_workflow() -> str:
+        """Prepare and run the separate demo-based native IEC benchmark."""
+        return (
+            "Use ce-bench iec with benchmarks/iec.example.json. Start from disposable "
+            "copies of demo_ControlExpert_M580.STU, preserving hardware and demo logic. "
+            "Case objects use IEC_<language>_ prefixes; Bench_ is runner-owned. "
+            "prepare verifies native engineering round trips without live access. "
+            "validate exercises scripted references and mutants; run uses the configured "
+            "paid provider. Simulator runs require explicit live, OFS, closed-loop, "
+            "replacement and loopback-alias confirmations. Only simulator/127.0.0.1/TCPIP "
+            "is in scope. Private fixture traces and references must never be supplied "
+            "to the model during generation. Grade frozen in-MAST captures, report "
+            "output-cell correctness with verified counts and strict verdicts, and "
+            "use ce-bench iec overview for PNG/SVG graphics. See "
+            "docs/Benchmark_IEC_Implementation.md for commands and prerequisites."
+        )
+
+    @mcp.prompt()
     def export_project_backup() -> str:
         """Export the loaded application using its supported exchange format."""
         return (
@@ -296,7 +314,10 @@ def register_prompts(mcp) -> None:
             f"1. get_language_reference('{lang}') FIRST — it returns the exchange-XML structure "
             "rules and a validated example that builds with 0 errors. Mirror its shapes exactly "
             "(FBD pin geometry, LD cell model, SFC chart layout).\n"
-            "2. import_xml(kind='section', task=..., xml_content=...).\n" + common +
+            "2. import_xml(kind='section', task=..., xml_content=...).\n" +
+            ("FBD grid limits in CE 16.4: nbColumns=6..36, nbRows=24..144. "
+             "Never use more than 36 columns (40 is invalid); arrange vertically "
+             "or split sections and validate_xml before importing.\n" if lang == "FBD" else "") + common +
             "SFC is the right choice for stepwise sequences (steps + transitions + ST actions)."
         )
 
