@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import re
 
-IO_MAPPING_OUTPUT_FORMAT = """Output format (required in the final answer):
+IO_MAPPING_OUTPUT_FORMAT = """Output format (required in the submitted report):
 Use a Markdown section named "## Application signal inventory" containing one
 pipe-delimited table with exactly these columns, in this order:
 | Signal | Type | Address or DDT | Module | Channel | Status | Meaning | Executable sections |
@@ -36,7 +36,7 @@ outside tables; the tables must contain all mapping and classification facts.
 
 DEMO_PROMPTS = {
     "weighing": "Explain how material weighing starts, stops, and advances to mixing. Identify the relevant conditions and variables.",
-    "io_mapping": "Produce a table linking application signals to I/O addresses or device-DDT fields, modules, and channels. Cover the complete application-signal inventory, including unmapped signals. For module-owned device DDTs, report the hardware binding and channel range separately from whether application logic uses their fields. Flag signals without a physical mapping.\n\n" + IO_MAPPING_OUTPUT_FORMAT,
+    "io_mapping": "Produce a table linking application signals to I/O addresses or device-DDT fields, modules, and channels. Cover the complete application-signal inventory, including unmapped signals. For module-owned device DDTs, report the hardware binding and channel range separately from whether application logic uses their fields. Flag signals without a physical mapping. Submit the complete Markdown answer with submit_answer(report=...); your final message may be a short confirmation.\n\n" + IO_MAPPING_OUTPUT_FORMAT,
 }
 DEMO_ORIENTATION = (
     "Inspect only the already-open disposable M580 demo project through MCP. Offline only. "

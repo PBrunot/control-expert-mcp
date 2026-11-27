@@ -21,6 +21,49 @@ READ_TOOLS = {"get_status", "get_project_structure", "list_variables", "read_sec
 EDIT_TOOLS = {"write_st_logic", "build_project", "analyze_project", "save_project"}
 DOC_GUIDANCE = ("For installed manuals, call get_documentation_status, search_manuals, "
                 "then get_manual_topic; citations distinguish installation and manual versions. ")
+_EDGE = {"type": "object", "properties": {"edge": {"type": "string", "enum": ["rising", "falling"]},
+                                          "variable": {"type": "string"}},
+         "required": ["edge", "variable"], "additionalProperties": False}
+# Harness-local answer tools: structured submission removes formatting failures
+# (fences, prose) from scoring; the content is graded exactly as before.
+ANSWER_SCHEMAS = {
+    "inspect": {"type": "object", "additionalProperties": False, "properties": {
+        "task": {"type": "string"}, "section": {"type": "string"}, "language": {"type": "string"},
+        "initialization_event": _EDGE, "initialization_expression": {"type": "string"},
+        "decrement_event": _EDGE, "full_condition": {"type": "string"}, "empty_condition": {"type": "string"},
+        "temperature": {"type": "object", "additionalProperties": False, "properties": {
+            key: {"type": "string"} for key in ("conversion", "input", "converted", "comparison", "setpoint")},
+            "required": ["conversion", "input", "converted", "comparison", "setpoint"]}},
+        "required": ["task", "section", "language", "initialization_event", "initialization_expression",
+                     "decrement_event", "full_condition", "empty_condition", "temperature"]},
+    "io_mapping": {"type": "object", "additionalProperties": False, "properties": {
+        "report": {"type": "string", "description": "Complete Markdown answer in the requested format"}},
+        "required": ["report"]},
+}
+SUBMIT_DESCRIPTION = ("Submit the final answer for grading. Call with the complete answer; a later call "
+                      "replaces the earlier one. Structure is validated; content is graded later.")
+
+
+def schema_errors(schema: dict, value, path: str = "answer") -> list[str]:
+    """Validate the small JSON-schema subset used by ANSWER_SCHEMAS."""
+    if schema["type"] == "string":
+        if not isinstance(value, str):
+            return [f"{path} must be a string"]
+        if "enum" in schema and value not in schema["enum"]:
+            return [f"{path} must be one of {schema['enum']}"]
+        return []
+    if not isinstance(value, dict):
+        return [f"{path} must be an object"]
+    errors = [f"{path}.{key} is required" for key in schema["required"] if key not in value]
+    errors += [f"{path}.{key} is not allowed" for key in value if key not in schema["properties"]]
+    for key, child in schema["properties"].items():
+        if key in value:
+            errors += schema_errors(child, value[key], f"{path}.{key}")
+    return errors
+
+
+def answer_text(task: str, submitted: dict) -> str:
+    return submitted["report"] if task == "io_mapping" else json.dumps(submitted)
 
 
 def plain(value):
@@ -74,6 +117,7 @@ class MCP:
         self.phase = "setup"
         self.tools = []
         self.tainted = False
+        self.submitted = None
 
     def server_environment(self) -> dict:
         return environment(self.condition)
@@ -169,11 +213,27 @@ class MCP:
                     "description": tool.get("description", ""),
                     "parameters": tool["input_schema"], "strict": False}
                    for tool in self.tools if tool["name"] in allowed]
+        if task in ANSWER_SCHEMAS:
+            schemas.append({"type": "function", "name": "submit_answer", "description": SUBMIT_DESCRIPTION,
+                            "parameters": ANSWER_SCHEMAS[task], "strict": False})
         return instructions, schemas
+
+    def submit(self, arguments: dict, schemas: list) -> dict:
+        schema = next(tool["parameters"] for tool in schemas if tool["name"] == "submit_answer")
+        errors = schema_errors(schema, arguments)
+        self.evidence.events.emit("answer_submitted", phase=self.phase, accepted=not errors,
+                                  answer_ref=self.evidence.blob(arguments), errors=errors)
+        if errors:
+            return {"is_error": True, "error": "Answer structure invalid: " + "; ".join(errors[:10])}
+        self.submitted = arguments
+        return {"is_error": False, "structured_content": {
+            "accepted": True, "note": "Answer recorded for grading; finish with a brief confirmation."}}
 
     async def dispatch(self, name: str, arguments: dict, schemas: list) -> dict:
         if name not in {tool["name"] for tool in schemas}:
             return {"is_error": True, "error": "Tool unavailable under benchmark policy"}
+        if name == "submit_answer":
+            return self.submit(arguments, schemas)
         if name in {"read_section", "write_st_logic"} and not getattr(self, "demo_task", False):
             if arguments.get("task", "").upper() != "MAST" or arguments.get("section", "").lower() != "feeder":
                 return {"is_error": True, "error": "Only MAST/Feeder is in scope"}

@@ -10,6 +10,12 @@ from .alarms import ALARM_RUBRIC
 from .demo import io_mapping_grade
 
 
+def answer_file(attempt: Path) -> Path:
+    """The graded answer: a structured submission when present, else the final message."""
+    submitted = attempt / "graded-answer.txt"
+    return submitted if submitted.exists() else attempt / "final-response.txt"
+
+
 def regrade_alarms(run: Path, plan: dict) -> Path:
     """Re-prove saved alarm sections with the current interpreter; build/save evidence is retained."""
     fixture = Path(plan["snapshot"]["config"]["fixture"])
@@ -72,7 +78,7 @@ def regrade_inspection(results: Path, run_id: str, task: str = "inspect") -> Pat
             continue
         for summary_path in sorted((run / case["case_id"]).glob("attempt-*/summary.json")):
             old = read_json(summary_path)
-            answer_path = summary_path.parent / "final-response.txt"
+            answer_path = answer_file(summary_path.parent)
             if old["fingerprint"] != plan["fingerprint"]:
                 raise ValueError("Case fingerprint differs from campaign")
             grade = grader(answer_path.read_text(encoding="utf-8"))
@@ -114,7 +120,7 @@ def regraded_row(summary_path: Path, rubric: str) -> dict:
         return row  # No saved section was available to regrade.
     grade = read_json(path)
     evidence, name = (("section_sha256", "saved-section.xml") if expected_task == "alarms"
-                      else ("response_sha256", "final-response.txt"))
+                      else ("response_sha256", answer_file(summary_path.parent).name))
     if grade["summary_sha256"] != digest(summary_path.read_bytes()) or grade[evidence] != digest((summary_path.parent / name).read_bytes()):
         raise ValueError("Regrade source evidence changed")
     row = copy.deepcopy(row)

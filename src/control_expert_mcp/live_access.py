@@ -38,6 +38,13 @@ class LiveAccessPolicy:
                     "preferred_protocol": "opc", "default_test_ofs_alias": "Dev_Alias_2", **self.config,
                     "setup_required": not self.configured}
 
+    def require_closed_loop(self, action: str):
+        """Changes to a running target need the same approval as downloads/writes."""
+        with self.lock:
+            if not (self.configured and self.config["allow_live_connection"] and self.config["allow_closed_loop"]):
+                raise ValueError(f"{action} requires explicit user approval for closed-loop operation "
+                                 "in configure_live_access.")
+
     @contextmanager
     def guard(self, tool: str):
         live = tool.startswith(("opc_", "modbus_", "plc_")) or tool in ("read_tags", "write_tags")

@@ -130,6 +130,7 @@ class SimulatorMCP(MCP):
         self.existing = {name.casefold() for name in existing}
         self.model_calls = []
         self.opened = self.built = self.deployed = self.simulator_connected = False
+        self.downloaded = False  # This case transferred at least once.
         self.connection_configured = False
 
     def server_environment(self):
@@ -206,15 +207,23 @@ class SimulatorMCP(MCP):
         if not result.is_error:
             if name == "open_project":
                 self.opened = True
+                self.downloaded = False
                 self.connection_configured = False
             elif name == "plc_setup_connection":
                 self.connection_configured = True
             elif name == "build_project":
                 self.built = clean_build(value)
+                # A connected build after this case's own download is an online change;
+                # CE then reports the running application equal to the project.
+                target = value.get("target_after_build") or {}
+                if (self.built and self.downloaded and value.get("online_change_applied")
+                        and target.get("pc_equals_plc") is True):
+                    self.deployed = True
             elif name == "plc_connect":
                 self.simulator_connected = value.get("connected") is True
             elif name == "plc_transfer":
                 self.deployed = value.get("transferred") == "pc_to_plc"
+                self.downloaded = self.downloaded or self.deployed
         self.model_calls.append({"tool": name, "arguments": arguments, "value": value,
                                  "is_error": result.is_error})
         return visible_payload(plain(result))

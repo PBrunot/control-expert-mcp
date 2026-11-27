@@ -16,7 +16,7 @@ from .provider import client_factory, workflow
 from .tasks import (BROKEN_IDENTIFIER, PROMPTS, broken_source, declarations,
                     alarm_fixture, alarm_source, inspect_grade, normalize, source,
                     static_grade, threshold_source)
-from .transport import Evidence, MCP
+from .transport import Evidence, MCP, answer_text
 from .demo import DEMO_PROMPTS, weighing_grade, io_mapping_grade
 
 
@@ -307,9 +307,14 @@ async def run_case(config, case, manifest, directory, fingerprint, provider_fact
             except Exception as exc:
                 result.update(status="timeout" if isinstance(exc, TimeoutError) else "workflow_failure",
                               failure_reason=type(exc).__name__, provider_failure_code=getattr(exc, "status_code", None))
+            answer = result.get("final_response", "")
+            if mcp.submitted is not None:
+                answer = answer_text(case["task"], mcp.submitted)
+                (directory / "graded-answer.txt").write_text(answer, encoding="utf-8")
+            result["answer_channel"] = "submit_answer" if mcp.submitted is not None else "final_response"
             if not mcp.tainted:
                 result["validation"] = await evaluate(mcp, case["task"], manifest, output,
-                    result.get("final_response", ""), [json.loads(line) for line in events.path.read_text(encoding="utf-8").splitlines()])
+                    answer, [json.loads(line) for line in events.path.read_text(encoding="utf-8").splitlines()])
     except Exception as exc:
         result["failure_reason"] = type(exc).__name__
         if result["status"] == "completed":

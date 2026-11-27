@@ -132,6 +132,10 @@ The tool creates the section or replaces its existing logic. For LD, FBD, SFC, a
 
 `build_project` and `analyze_project` return `build_state`, raw `output`, an `error` when present, parsed `diagnostics`, and capture metadata. Recognized diagnostic lines include severity, code, task/section, and line/column where available; unknown or localized formats remain in raw output.
 
+E1061 undefined-symbol diagnostics also carry `undefined_symbol` and `candidates`: declared variables ranked by name similarity, each with its type. The ranking is by name only; the LLM is told to choose by type and context and never to replace the symbol with a constant or declare a new variable to hide the error.
+
+**Builds while connected are online changes.** When a PLC or simulator is connected, Control Expert applies build changes to the running target ("Executing On Line Changes"). `build_project` refuses this unless called with `allow_online_change=true`, which also requires closed-loop approval in `configure_live_access`; otherwise disconnect with `plc_disconnect` first. Connected builds return `online_change_applied` and `target_after_build` (`pc_equals_plc`, `plc_state`). Earlier runtime evidence no longer applies.
+
 An empty diagnostic list does **not** prove a clean build. Check `build_state`, `error`, raw output, and `diagnostics_summary` together. `diagnostics_available` distinguishes an empty Build tab from unavailable output. Capture metadata reports freshness and snapshot/appended scope, but attribution remains `unverified`: the COM output API provides no operation identifier, and identical output may belong to a repeated build or an older operation.
 
 ## Tool reference

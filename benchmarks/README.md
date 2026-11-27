@@ -56,15 +56,29 @@ ce-bench simulator run --config benchmarks/.local/simulator-claude-haiku.json --
 `claude-haiku-4-5-20251001` snapshot (a low-cost model). The first full Claude
 Code suite (2026-11-27, CLI 2.1.332, Haiku 4.5) is archived as
 `20261127T185620Z-558a4028` (offline, 8/14 original, 12/14 with `feeder-3` +
-`feeder-alarms-2`) and `20261127T192306Z-simulator-30511c7e` (simulator, 0/1:
-the model edited and rebuilt after download without transferring again, so the
-running application was stale and the counter judge had nothing to attribute;
-the model still claimed success). Remaining offline failures are real: both
+`feeder-alarms-2`) and `20261127T192306Z-simulator-30511c7e` (simulator, 0/1,
+**harness false negative**: after download the model saw `TEST_LLM` stuck at 1,
+fixed the timer reset and rebuilt while connected; Control Expert applied it as
+an online change (`pc_equals_plc: true`) and the model's own OPC reads rose
+4→27 at about 1/s, but the harness only counts `plc_transfer` as deployment, so
+the independent judge never sampled. Behavior is therefore unverified, not failed). Remaining offline failures are real: both
 repair arms replaced the broken operand with the constant `0` instead of
 `Measured_temp`. The earlier attempt `20261127T183256Z-d960f39f` stopped after
 11 cases when the CLI auto-updated (2.1.289 → 2.1.332) and is archived as partial.
 List-price cost (`cost_usd`): $1.01 for the 14 offline cases and $0.21 for the
 simulator case.
+
+Follow-up changes (later campaigns are not directly comparable to the ones above):
+inspection and I/O-mapping answers are submitted through a harness-local
+`submit_answer` tool with a validated structure (graded text is saved as
+`graded-answer.txt`; `answer_channel` records whether a submission or the final
+message was graded). The simulator harness counts a connected build as deployment
+when this case already downloaded, the build reports `online_change_applied`, and
+`target_after_build.pc_equals_plc` is true. The server now refuses connected
+builds without `allow_online_change=true`, returns ranked candidates for E1061
+undefined symbols, documents a self-restarting TON tick in the ST reference, and
+tells the model to check the language reference and manuals for Modicon-specific
+constructs instead of guessing.
 
 ## Full M580 demo inspection cases
 

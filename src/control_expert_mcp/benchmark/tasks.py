@@ -18,7 +18,7 @@ ORIENTATION = (
 )
 PROMPTS = {
     "inspect": (
-        "Inspect without modifying the project. Return ONLY a JSON object with keys: "
+        "Inspect without modifying the project. Submit the answer with submit_answer, fields: "
         "task, section, language, initialization_event {edge, variable}, initialization_expression, "
         "decrement_event {edge, variable}, full_condition, empty_condition, "
         "temperature {conversion, input, converted, comparison, setpoint}. "
@@ -38,9 +38,8 @@ PROMPTS = {
         "from variable names or comments. For each edge event, verify the transition "
         "direction before choosing 'rising' or 'falling'. Check each reported event against "
         "its exact source expression. "
-        "Return one raw JSON object without Markdown fences, introductory text, or trailing "
-        "commentary. The first non-whitespace character must be { and the last must be }. "
-        "Check that the complete response parses as JSON and matches the requested fields."
+        "submit_answer validates the field structure; fix any reported structure error and "
+        "submit again. Your final message may be a one-line confirmation."
     ),
     "threshold": (
         "Training change: increase the existing Feeder demand trigger from 2 to 5; "

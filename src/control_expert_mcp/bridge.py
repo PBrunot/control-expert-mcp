@@ -23,7 +23,7 @@ from concurrent.futures import ThreadPoolExecutor
 from typing import Any, Callable
 
 from . import constants as C
-from .diagnostics import diagnostic_capture
+from .diagnostics import attach_symbol_candidates, diagnostic_capture, undefined_symbols
 
 log = logging.getLogger(__name__)
 
@@ -496,11 +496,26 @@ class ControlExpertBridge:
 
     # --------------------------------------------------------- public: build
 
-    def build_project(self, rebuild_all: bool) -> dict:
-        return self._run(self._do_build, rebuild_all)
+    def build_project(self, rebuild_all: bool, allow_online_change: bool = False) -> dict:
+        return self._run(self._do_build, rebuild_all, allow_online_change)
 
-    def _do_build(self, rebuild_all: bool) -> dict:
+    def _target_connected(self) -> bool:
+        """True only when Control Expert reports a connected PLC/simulator."""
+        try:
+            return bool(int(self._ensure_app().IsTargetConnected))
+        except Exception:
+            return False
+
+    def _do_build(self, rebuild_all: bool, allow_online_change: bool = False) -> dict:
         proj = self._project(write=True)
+        connected = self._target_connected()
+        if connected and not allow_online_change:
+            # While connected, Control Expert downloads build changes into the running
+            # target ("Executing On Line Changes"); never do that implicitly.
+            raise CEError(
+                "A PLC/simulator is connected: building now would apply the changes online to "
+                "the running target. Disconnect with plc_disconnect to build offline, or call "
+                "build_project(allow_online_change=true) after closed-loop approval.")
         before = self._do_capture_build_output()
         error: str | None = None
         fell_back = False
@@ -542,7 +557,32 @@ class ControlExpertBridge:
         if error:
             result["error"] = error
         result.update(diagnostic_capture(before, self._do_capture_build_output(), "build"))
+        self._attach_symbol_candidates(proj, result)
+        if connected:
+            text = str(result.get("diagnostics_output") or "").lower()
+            result["online_change_applied"] = "on line changes" in text or "online changes" in text
+            result["target_after_build"] = self._do_plc_state()
+            result["online_change_note"] = (
+                "Connected build: changes may now run on the target. Prior runtime evidence is "
+                "invalid; confirm pc_equals_plc and plc_state, then retest.")
         return result
+
+    def _attach_symbol_candidates(self, proj, result: dict) -> None:
+        """Suggest declared variables for E1061 undefined-symbol errors."""
+        if not undefined_symbols(result.get("diagnostics", [])):
+            return
+        variables = []
+        try:
+            for var in _iter_collection(proj.Variables):
+                entry = {"name": str(var.Name)}
+                try:
+                    entry["type"] = str(var.TypeName)
+                except Exception:
+                    pass
+                variables.append(entry)
+        except Exception:
+            return
+        attach_symbol_candidates(result["diagnostics"], variables)
 
     def get_project_setting(self, ident: str) -> dict:
         return self._run(self._do_get_project_setting, ident)
@@ -602,6 +642,7 @@ class ControlExpertBridge:
         if error:
             result["error"] = error
         result.update(diagnostic_capture(before, self._do_capture_build_output(), "analyze"))
+        self._attach_symbol_candidates(proj, result)
         return result
 
     def _do_capture_build_output(self) -> dict:

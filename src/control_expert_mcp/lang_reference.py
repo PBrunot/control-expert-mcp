@@ -48,6 +48,17 @@ For arithmetic over the full INT domain, widen operands BEFORE subtraction or
 addition (e.g. INT_TO_DINT(a) - INT_TO_DINT(b)); widening an already-overflowed
 INT result cannot recover the mathematical value. Typed decimal literals such
 as DINT#0 can make the intended arithmetic type explicit.
+
+Periodic tick (e.g. +1 every second): a TON called with IN := TRUE fires once
+and then stays Q = TRUE forever, so it never ticks again. Restart it from its
+own output (Tick is a declared TON instance, Count a DINT):
+    Tick(IN := NOT Tick.Q, PT := t#1s);
+    IF Tick.Q THEN
+        Count := Count + 1;
+    END_IF;
+Q is TRUE for one scan per period, and the next call resets the timer. The
+period is PT plus about one task cycle; verify the rate by sampling the value
+over several periods, not from one read.
 """
 
 ST_EXAMPLE = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>

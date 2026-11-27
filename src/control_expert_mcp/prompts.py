@@ -201,7 +201,10 @@ def register_prompts(mcp) -> None:
             "plc_command('stop') and require 'stop' before transfer.\n"
             "6. plc_transfer(direction='pc_to_plc').\n"
             "7. plc_command('run'); confirm with plc_state (expect plc_state='run', "
-            "pc_equals_plc=true). get_simulator_status also exposes process presence "
+            "pc_equals_plc=true). Later edits while connected need "
+            "build_project(allow_online_change=true) (online change; check "
+            "online_change_applied and target_after_build) or plc_disconnect, rebuild and "
+            "transfer again. get_simulator_status also exposes process presence "
             "and the connected simulator PLC state; process presence alone is not RUN.\n\n"
             "If plc_transfer reports 'Family check failed', seed the matching CPU family "
             "once through the Control Expert GUI (PLC -> Simulation Mode -> Connect -> "
@@ -300,8 +303,15 @@ def register_prompts(mcp) -> None:
             "(pin geometry, type rules — things the schema can't catch); fix and repeat "
             "until build_state='built_ok' with no error. Check diagnostics availability "
             "and capture freshness; empty diagnostics alone do not prove success. "
-            "Building does not save, deploy or verify runtime behavior.\n"
+            "Offline, building does not save, deploy or verify runtime behavior. While a "
+            "target is connected, a build applies online changes and needs "
+            "allow_online_change=true with closed-loop approval.\n"
+            "For E1061 undefined symbols, use the ranked declared 'candidates' (check types); "
+            "never substitute a constant or declare a variable to hide the error.\n"
             "Declare referenced variables first (create_variable) or include a <dataBlock>.\n"
+            "If unsure about a Modicon-specific construct (EBOOL edges, SET/RESET, system "
+            "bits/words, timers, vendor blocks), check get_language_reference and then the "
+            "installed manuals (consult_installed_manuals) instead of guessing.\n"
         )
         if lang == "ST":
             return (
