@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "control-expert": {
+      "command": "uvx",
+      "args": ["control-expert-mcp@0.9.5"],
+      "env": { "CE_MCP_ENABLE_ONLINE": "${user_config.enable_online}" }
+    }
+  }
+}

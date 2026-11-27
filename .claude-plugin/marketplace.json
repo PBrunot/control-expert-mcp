@@ -1,0 +1,16 @@
+{
+  "name": "control-expert-mcp",
+  "owner": {
+    "name": "Pascal Brunot"
+  },
+  "metadata": {
+    "description": "Claude Code plugin for the control-expert-mcp server: Schneider EcoStruxure Control Expert automation."
+  },
+  "plugins": [
+    {
+      "name": "control-expert",
+      "source": "./plugin",
+      "description": "EcoStruxure Control Expert automation: MCP server plus a workflow skill."
+    }
+  ]
+}

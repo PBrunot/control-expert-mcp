@@ -33,7 +33,7 @@ A request to run the **full DeepSeek suite** includes both the seven-task offlin
 
 ## Commit & Pull Request Guidelines
 
-Use concise subjects with optional component prefixes. PRs should explain behavior, link issues, and report validation/limitations. Update README and prompts for capability changes. Releases require matching `pyproject.toml` versions and `vX.Y.Z` tags; publishing a GitHub release triggers validated PyPI publication.
+Use concise subjects with optional component prefixes. PRs should explain behavior, link issues, and report validation/limitations. Update README and prompts for capability changes. Releases require matching `pyproject.toml`, `plugin/.claude-plugin/plugin.json` and `plugin/.mcp.json` versions (checked by `tools/test_plugin.py`) and `vX.Y.Z` tags; publishing a GitHub release triggers validated PyPI publication.
 
 ## Security & Configuration
 

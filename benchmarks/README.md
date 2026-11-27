@@ -1,661 +1,225 @@
 # Local Control Expert benchmark
 
-## Native IEC suite
+`ce-bench` compares MCP server configurations/revisions with one explicitly
+configured provider and model ID (`openai`, `deepseek` or `claude-code`). It
+measures the API client/model, not ChatGPT. Only `run` and `resume` send paid
+requests; tests, `doctor`, `prepare`, `validate`, `compare`, `regrade` and
+`run --dry-run` never call a provider. Results: [archive/README.md](archive/README.md).
 
-`ce-bench iec` is a dedicated five-case ST/LD/FBD/SFC/IL suite starting from
-disposable copies of the native M580 demo, with `IEC_<language>_` sections and
-variables. It preserves the demo hardware configuration, captures outputs inside
-MAST and grades independently through OFS. It reports percentage correctness
-over evaluated output cells alongside strict verdicts and verified counts.
-PNG/SVG overviews compare cases/configurations and show infrastructure blockers.
+| Suite | Command | Grading |
+| --- | --- | --- |
+| Offline Feeder + demo (7 tasks, A/B) | `ce-bench run` | Static/deterministic rubrics, no PLC execution |
+| M580 simulator counter | `ce-bench simulator` | Independent OPC sampling of `TEST_LLM` |
+| Live OPC read/write | `ce-bench opc` | Independent OPC device reads |
+| Native IEC (ST/LD/FBD/SFC/IL) | `ce-bench iec` | Captured MAST traces graded through OFS |
 
-Use [iec.example.json](iec.example.json) and the
-[IEC implementation and command guide](../docs/Benchmark_IEC_Implementation.md)
-for prepare/validate/run, consent requirements, scoring and graphics. This suite
-does not replace the offline, OPC or simulator counter campaigns below.
-
-`ce-bench` compares MCP server configurations/revisions using one explicitly
-configured API provider and model ID. OpenAI and DeepSeek use separate Responses
-API parameter adapters. This measures the API client/model, not ChatGPT's hidden
-system prompt or orchestration. A ChatGPT subscription does not supply API access
-or an API key. Only `run` and `resume` can send paid requests; tests, `doctor`,
-`prepare`, `validate`, `compare`, and `run --dry-run` never call a provider.
-
-## Claude Code CLI provider
-
-`"provider": {"name": "claude-code"}` drives the Claude Code CLI (`claude -p`)
-as the agent loop instead of a Responses API. It uses the CLI's own login
-(a Claude subscription works; no API key is read or forwarded). Each case runs
-one `claude -p` session in a fresh temporary directory outside the repository with:
-
-- built-in tools disabled (`--tools ""`), no user/project settings, no slash
-  commands, no session persistence and `--permission-mode dontAsk`;
-- the same server instructions + orientation that other providers receive, as a
-  replacement system prompt (not Claude Code's default coding prompt);
-- one relay MCP server (`control_expert_mcp.benchmark.claude_bridge`) exposing
-  exactly the benchmark-filtered tool schemas. Every call returns over a
-  token-authenticated loopback socket to the harness's own MCP session, so
-  dispatch policy, `mcp_call` evidence, tool limits and independent grading are
-  identical to the API providers.
-
-Only `id`, `identity` and optional `reasoning_effort` (passed as `--effort`)
-are accepted under `model`. Usage comes from the CLI's cumulative per-model
-usage (input includes cache reads/writes); `cost_usd` is the CLI's list-price
-estimate, also reported for subscription logins. The CLI version is part of the
-campaign fingerprint. Claude Code auto-updates its shared install, which would
-abort a campaign midway, so pin a frozen copy for the campaign:
+## Setup and commands (PowerShell)
 
 ```powershell
-# Copy the current native binary, e.g. to benchmarks\.local\claude-cli\<version>\claude.exe
-$env:CE_BENCH_CLAUDE_EXE = "E:\GitHub\control-expert-mcp\benchmarks\.local\claude-cli\2.1.332\claude.exe"
-ce-bench run --config benchmarks/.local/claude-haiku.json --condition A B --repeats 1 --seed 1729
-ce-bench simulator run --config benchmarks/.local/simulator-claude-haiku.json --alias Dev_Alias_2 --allow-live --confirm-ofs-running --allow-closed-loop --allow-simulator-replacement --repeats 1
+.venv\Scripts\python.exe -m pip install -e ".[benchmark,test]"
+Copy-Item benchmarks\example.json benchmarks\local.json   # or deepseek.example.json / claude-code.example.json
+
+ce-bench doctor   --config benchmarks\local.json
+ce-bench prepare  --config benchmarks\local.json
+ce-bench validate --config benchmarks\local.json
+ce-bench run      --config benchmarks\local.json --condition A B --repeats 5 --seed 1729 --dry-run
+
+# PAID
+ce-bench run     --config benchmarks\local.json --condition A B --repeats 5 --seed 1729
+ce-bench resume  --run-id RUN_ID --config benchmarks\local.json
+ce-bench compare --results benchmarks\results --output benchmarks\comparison [--rubric RUBRIC]
 ```
 
-[claude-code.example.json](claude-code.example.json) uses the pinned
-`claude-haiku-4-5-20251001` snapshot (a low-cost model). The first full Claude
-Code suite (2026-11-27, CLI 2.1.332, Haiku 4.5) is archived as
-`20261127T185620Z-558a4028` (offline, 8/14 original, 12/14 with `feeder-3` +
-`feeder-alarms-2`) and `20261127T192306Z-simulator-30511c7e` (simulator, 0/1,
-**harness false negative**: after download the model saw `TEST_LLM` stuck at 1,
-fixed the timer reset and rebuilt while connected; Control Expert applied it as
-an online change (`pc_equals_plc: true`) and the model's own OPC reads rose
-4→27 at about 1/s, but the harness only counts `plc_transfer` as deployment, so
-the independent judge never sampled. Behavior is therefore unverified, not failed). Remaining offline failures are real: both
-repair arms replaced the broken operand with the constant `0` instead of
-`Measured_temp`. The earlier attempt `20261127T183256Z-d960f39f` stopped after
-11 cases when the CLI auto-updated (2.1.289 → 2.1.332) and is archived as partial.
-List-price cost (`cost_usd`): $1.01 for the 14 offline cases and $0.21 for the
-simulator case.
+Module form: `python -m control_expert_mcp.benchmark.cli <command> ...`.
+`--condition A B` interleaves both arms in a seeded randomized order (paired per
+task/repetition); separate `--condition A` / `--condition B` campaigns have no
+paired differences.
 
-Follow-up changes (later campaigns are not directly comparable to the ones above):
-inspection and I/O-mapping answers are submitted through a harness-local
-`submit_answer` tool with a validated structure (graded text is saved as
-`graded-answer.txt`; `answer_channel` records whether a submission or the final
-message was graded). The simulator harness counts a connected build as deployment
-when this case already downloaded, the build reports `online_change_applied`, and
-`target_after_build.pc_equals_plc` is true. The server now refuses connected
-builds without `allow_online_change=true`, returns ranked candidates for E1061
-undefined symbols, documents a self-restarting TON tick in the ST reference, and
-tells the model to check the language reference and manuals for Modicon-specific
-constructs instead of guessing.
+## Full DeepSeek suite
 
-## Full M580 demo inspection cases
-
-Configure both `demo_project` (a disposable source STU) and `io_mapping_reference`
-(the approved Markdown answer) to add `weighing` and `io_mapping` to the five
-Feeder tasks. Paths are relative to the config. The provider examples enable
-these cases using `samples/demo_ControlExpert_M580.STU` and
-`samples/demo_ControlExpert_M580_io_mapping.md`. Existing configurations without
-these fields retain the five-task suite.
-
-On this Windows host the DeepSeek example sets `CommonProgramFiles` to the
-32-bit Common Files directory for the vendor integrity check. No vendor
-integrity checks are disabled. `validate` checks the full demo exports and the
-reference rubric as well as the canonical Feeder edits.
-
-Both cases use independent copies of the full demo, read-only tools, all
-application sections, and no live access. They do not build or save the project.
-The source project and reference hashes are fingerprinted and archived; the
-reference answer is private to the evaluator and never included in model context.
-
-- `weighing`: "Explain how material weighing starts, stops, and advances to mixing.
-  Identify the relevant conditions and variables." Rubric `demo-weighing-1`
-  requires `Weighing_Material_A` and `Weighing_Material_B` in the response. This
-  scores identifier discovery only; explanation semantics remain unverified.
-- `io_mapping`: Produce a table linking application signals to I/O addresses or
-  device-DDT fields, modules, and channels, covering the complete application-signal
-  inventory and flagging unmapped signals. Report module-owned device-DDT hardware
-  bindings and channel ranges separately from application use of their fields.
-  Rubric `demo-io-mapping-6` uses the approved saved reference as ground truth.
-  It checks all 11 physical instances in Markdown table rows (signal, address or
-  DDT, module type, channel), both internal-memory instances, 14 representative
-  unmapped process signals, and unmapped Robot_one data. It rejects physical
-  addresses/modules on reference-unmapped rows. The complete software inventory
-  and device-DDT leaf expansion are not automatically scored. Unsupported table
-  representations remain unverified. This is a narrow deterministic rubric,
-  not a semantic judge. Equivalent module spacing, channel labels/ranges or counts,
-  signal annotations and explicitly grouped unmapped rows are supported. It
-  recognizes direction labels such as `Output 3`, memory declarations in
-  prose, and device-DDT channel facts from a separate hardware table joined by
-  explicit slot and module. It does not infer channels from the module name.
-  Contradictory physical rows fail even when a correct row also exists.
-  Results include per-check `matched`, `missing`, or `incorrect` status, coverage,
-  and evidence hashes; missing facts cannot silently become passes. Coverage is
-  diagnostic, while acceptance still requires every check to pass. It also
-  recognizes `Signal(s)` and singular signal-column headings, and spelled-out
-  channel counts such as `32 digital input channels`. Count direction must agree
-  with the module. Rubric 6 additionally supports nested unmapped headings,
-  explicit identifier lists, repeated signal columns, same-table module `same`
-  cells, discrete channel counts, Unicode ranges and group/bit labels. It does
-  not borrow module context across tables or classify sibling sections as unmapped.
-  Regrades evaluate saved replies without adding facts.
-
-### I/O mapping answer format
-
-The model's task prompt includes the output contract from
-`IO_MAPPING_OUTPUT_FORMAT` in `benchmark/demo.py`. The final answer must contain
-`## Application signal inventory` and a Markdown table with these exact columns:
-
-| Signal | Type | Address or DDT | Module | Channel | Status | Meaning | Executable sections |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-
-Use one global instance per row, exact identifiers, and repeat every mapping fact
-on each row. Module cells use `Rack <number>, slot <number>: <exact module part number>`;
-channels use decimal indices or inclusive ASCII ranges (`0-7`). Status is one of
-`PHYSICAL INPUT`, `PHYSICAL OUTPUT`, `PHYSICAL CHANNEL STRUCTURE`,
-`PHYSICAL DEVICE DDT`, `INTERNAL MEMORY`, `CPU COMMUNICATION DDT`, `UNMAPPED`,
-or `UNKNOWN`. Internal memory retains its `%MW` address with `-` for module/channel;
-unmapped instances use `-` for address/module/channel. Unknown evidence must be
-explained rather than guessed. Hardware binding and executable use are separate.
-
-Keep parent instances in the inventory; expand process/robot members separately
-under `## Structured signal members`, using the same columns and fully qualified
-identifiers. Optional device-DDT leaf rows go under `## Device-DDT channel fields`
-with the same columns. Do not group identifiers, use `same`, wrap tables in code
-fences, or put literal pipes/newlines inside cells. Prose may supplement the tables
-but must not supply facts missing from them. The contract does not expose reference
-answers or change rubric 6 acceptance; the grader still supports older saved reply
-layouts. Prompt changes affect campaign fingerprints, so compare new campaigns
-separately from campaigns using the earlier unconstrained prompt.
-
-An explicit deterministic answer regrade preserves original summaries and
-responses, validates their hashes and the original reference hash, and makes
-no provider or Control Expert calls:
-
-```powershell
-ce-bench regrade --results benchmarks/results --run-id RUN_ID --task io_mapping
-```
-
-Archive both score views with `archive`, then regenerate with `visualize`.
-Selecting `--rubric` writes a new rubric-named archive snapshot; earlier archives
-remain immutable. The overview chooses the newest scoring snapshot per run and
-does not count the same attempts twice. Apply the same rubric to every saved
-I/O mapping campaign before comparing models or revisions.
-
-The [current scoring results](archive/README.md) and regenerated overview
-use `demo-io-mapping-6` for I/O mapping. The overview shows I/O correctness as
-the percentage of matched rubric checks, alongside the all-or-nothing pass count.
-Missing scoring evidence is shown as unknown rather than zero correctness.
-Select only this grader when creating an archive with
-`ce-bench archive --results benchmarks/results --run-id RUN_ID --archive DESTINATION --rubric demo-io-mapping-6`
-(add `--allow-incomplete` for an unfinished campaign).
-
-Each case must obtain source through MCP and leave its project file unchanged.
-One A/B repetition with both demo cases produces 14 independently scored cases.
-Keep older five-task campaigns separate when comparing acceptance rates.
-
-## M580 simulator counter benchmark
-
-For a **full DeepSeek suite** run, execute the seven-task offline A/B campaign
-(14 cases per repetition) and then this M580 one-second increment campaign.
-Both are required; report their acceptance results separately. With the existing
-local configurations on this host, use:
+A **full DeepSeek suite** is the seven-task offline A/B campaign (14 cases per
+repetition) followed by the M580 simulator `TEST_LLM` campaign. Run both,
+sequentially, even if an offline case fails; report their acceptance separately.
+Edit docs/source only after both finish (fingerprints are immutable during a campaign).
 
 ```powershell
 ce-bench run --config benchmarks/local.json --condition A B --repeats 1 --seed 1729
 ce-bench simulator run --config benchmarks/.local/simulator-deepseek.json --alias Dev_Alias_2 --allow-live --confirm-ofs-running --allow-closed-loop --allow-simulator-replacement --repeats 1
 ```
 
-The simulator command requires the dedicated simulator/OFS setup and consent
-described below. Run sequentially, even if an offline case fails acceptance.
-Apply documentation/source changes after both campaigns finish so their
-immutable fingerprints remain valid throughout execution.
+## Configuration
 
-`ce-bench simulator` is a separate opt-in **OPC DA** suite. Its task is to open
-a disposable copy of `samples/demo_ControlExpert_M580.STU`, create ST section
-`MAST/LLM`, declare numeric `TEST_LLM`, implement +1 every second, build/fix/save,
-download to the local simulator, RUN, and check the variable through OFS.
-The model chooses its ST implementation; helper declarations use `LLM_*`.
+| Key | Notes |
+| --- | --- |
+| `provider` | `name` (`openai`/`deepseek`/`claude-code`), optional `api_key_env`, `api_key_file` |
+| `model` | `id` (required), `identity` (`pinned`/`alias`), `reasoning_effort`, `max_output_tokens`, `temperature`, `top_p` |
+| `cpu`, `ce_version` | Catalog CPU `{part_number, version}` (examples: `BMX P34 2020`, `02.70`) and Control Expert version (`16.4`) |
+| `fixture`, `workspace`, `results` | Paths relative to the config file |
+| `demo_project`, `io_mapping_reference` | Set together to add `weighing` and `io_mapping` |
+| `tool_timeout`, `request_timeout`, `workflow_timeout`, `max_turns`, `max_tool_calls` | Positive values required |
+| `conditions.<name>` | `command`, `args`, `cwd`, `env`, `documentation` (explicit boolean) |
 
-**Success is determined only by independently observed counter behavior:**
-`TEST_LLM` exists with good-quality numeric values and repeatedly increases by
-exactly 1 at one-second intervals. The judge samples for 8 seconds, nominally
-every 100 ms, requires at least 6 increments, permits 0.35 s variation per
-observed transition interval and 0.15 s variation in the mean period. Any
-negative/non-unit increment, frozen counter or wrong rate fails. Missing/bad
-quality, insufficient observation time or sample gaps exceeding 0.35 s leave
-behavior **unverified**. These fixed tolerances are fingerprinted; sampling is
-not proof of exact scan-level timing. Initial counter value is unrestricted.
-Model prose, model readback, build results and artifacts are diagnostic evidence,
-not additional acceptance criteria. A current-case download and matching RUN
-state are required to attribute OPC observations to this case; an old counter
-already running in the simulator cannot pass an idle model.
+- Credentials: `OPENAI_API_KEY` / `DEEPSEEK_API_KEY` or an ignored `api_key_file`
+  (bare `sk-...` or one labeled line). Read only by paid commands; never logged.
+- DeepSeek requires `reasoning_effort` `none`/`low`/`high`/`max` and rejects
+  `temperature`/`top_p`. OpenAI: send only parameters the snapshot supports.
+- To compare revisions, point each condition's `command` at its own venv Python,
+  `args` `["-m", "control_expert_mcp"]`, `cwd` at its checkout. The harness never
+  checks out branches.
+- `CE_MCP_ENABLE_ONLINE=0` is forced for offline cases. Secrets are stripped
+  from child environments.
+- Source tree, Git HEAD/dirty state, dependencies, corpus, schemas and prompts
+  are fingerprinted; changes require a new campaign.
 
-Use a dedicated CE/simulator session. This suite **replaces the simulator's
-application** and stops it after each case; it does not restore the previous
-application. Preserve it first. Confirm the OFS alias resolves to
-`MBT:127.0.0.1/U` (PLC Simulator), not a physical PLC. OFS must be running and
-`CE_MCP_OPC_PYTHON` must match the OPC Automation wrapper bitness. Seed the same
-CPU family once with a manual CE GUI transfer if the simulator is fresh or
-reports `Family check failed`. No automatic process killing or GUI workaround
-is attempted. The native demo is a local prerequisite, not shipped in PyPI.
+## Offline tasks
+
+| Task | Rubric | Accepts |
+| --- | --- | --- |
+| `inspect` | `feeder-3` | Structured answer via `submit_answer`; all JSON facts correct (one whole-answer fence tolerated) |
+| `threshold`, `repair` | static | Original statement sequence with exactly the prescribed change |
+| `temperature` | `feeder-temperature-2` | Inclusive ABS or two-sided `Setpoint_temp +/- 2.0` predicate, rest unchanged |
+| `alarms` | `feeder-alarms-2` | Hysteretic `Temp_fault_1`/`Temp_fault_2` logic proven over the whole INT domain |
+| `weighing` | `demo-weighing-1` | Names `Weighing_Material_A` and `Weighing_Material_B` |
+| `io_mapping` | `demo-io-mapping-6` | All 29 checks against the private reference (see [CHECKPOINT.md](CHECKPOINT.md)) |
+
+- Unsupported but possibly valid code is **unverified**, not failed.
+  `runtime_behavior` is always `unverified` offline.
+- `prepare` imports `tools/lang_refs/ST_2_Feeder.xml`, builds a baseline, a
+  broken repair fixture and the alarm baseline. `validate` runs canonical
+  solutions through real MCP build/save/reopen without a model.
+- Demo cases use read-only tools on copies of `samples/demo_ControlExpert_M580.STU`;
+  the reference (`samples/demo_ControlExpert_M580_io_mapping.md`) never reaches the model.
+  The required answer format is `IO_MAPPING_OUTPUT_FORMAT` in `benchmark/demo.py`.
+- Conditions: **A** blocks the three manual tools; **B** adds
+  `get_documentation_status`, `search_manuals`, `get_manual_topic` over a corpus
+  prepared with `tools/export_ce_help.py` and `tools/index_ce_help.py`.
+  Edits are limited to MAST/Feeder; no shell, filesystem or arbitrary paths.
+- Evidence per attempt: `events.jsonl`, content-addressed blobs, `summary.json`,
+  `final-response.txt`, `graded-answer.txt`, `validation.json`, saved project.
+  Stays local.
+
+## Claude Code CLI provider
+
+`"provider": {"name": "claude-code"}` runs each case as one `claude -p` session:
+
+- Uses the CLI's own login; no API key is read.
+- Built-in tools off (`--tools ""`), no settings/slash commands/session
+  persistence, `--permission-mode dontAsk`; server instructions are the system prompt.
+- One relay MCP server (`control_expert_mcp.benchmark.claude_bridge`) forwards
+  calls to the harness session, so tool policy and grading match API providers.
+- `model` accepts only `id`, `identity`, `reasoning_effort` (`--effort`:
+  `low`/`medium`/`high`/`xhigh`/`max`). `cost_usd` is the CLI's list-price estimate.
+- The CLI version is fingerprinted; pin a frozen copy so auto-update cannot abort a campaign.
+
+```powershell
+$env:CE_BENCH_CLAUDE_EXE = "E:\GitHub\control-expert-mcp\benchmarks\.local\claude-cli\2.1.332\claude.exe"
+ce-bench run --config benchmarks/.local/claude-haiku.json --condition A B --repeats 1 --seed 1729
+```
+
+[claude-code.example.json](claude-code.example.json) uses `claude-haiku-4-5-20251001`.
+Haiku 4.5 results are in [archive/README.md](archive/README.md).
+
+## M580 simulator counter benchmark
+
+Opt-in OPC DA suite (rubric `simulator-counter-1`). The model edits a disposable
+copy of `samples/demo_ControlExpert_M580.STU`: ST section `MAST/LLM`, numeric
+`TEST_LLM` +1 every second (helpers `LLM_*`), build/fix/save, download, RUN.
+
+**Acceptance:** independent OPC sampling for 8 s (100 ms poll) sees at least 6
+increments of exactly +1, each interval within 0.35 s and mean period within
+0.15 s of 1 s. Non-unit/negative steps, frozen counter or wrong rate fail;
+bad quality or sample gaps > 0.35 s are unverified. The case must have
+downloaded (or applied an online change with `pc_equals_plc`) and be in RUN.
+
+**Safety and prerequisites:**
+
+- Replaces the simulator's application and stops it after each case; preserve it first.
+- The OFS alias must resolve to `MBT:127.0.0.1/U` (PLC Simulator), never a physical PLC.
+- OFS running; `CE_MCP_OPC_PYTHON` matches the OPC Automation wrapper bitness.
+- Fresh simulator or `Family check failed`: seed once with a manual CE GUI transfer.
+- The model cannot write OPC values, edit other sections or save over the source.
 
 ```powershell
 Copy-Item benchmarks\simulator.example.json benchmarks\.local\simulator.json
-# Edit model/provider, paths (relative to the copied config), CE version and OPC Python.
-# Prepare uses offline MCP on a unique copy; it never touches the source demo or downloads.
 ce-bench simulator prepare --config benchmarks\.local\simulator.json
-
-# Scripted end-to-end feasibility test: actual CE/simulator/OFS, zero API requests.
+# Reference implementation, zero API requests; not LLM performance:
 ce-bench simulator validate --config benchmarks\.local\simulator.json --alias Dev_Alias_2 --allow-live --confirm-ofs-running --allow-closed-loop --allow-simulator-replacement
-
-# No COM/OPC connections and no API requests; validates configuration only.
 ce-bench simulator run --config benchmarks\.local\simulator.json --alias Dev_Alias_2 --allow-live --confirm-ofs-running --allow-closed-loop --allow-simulator-replacement --dry-run
-
-# Paid LLM run, with a fresh copy and conversation per repetition.
 ce-bench simulator run --config benchmarks\.local\simulator.json --alias Dev_Alias_2 --allow-live --confirm-ofs-running --allow-closed-loop --allow-simulator-replacement --repeats 1
 ```
 
-Only `run` calls a provider. `validate` uses a reference TON implementation and
-must not be reported or archived as LLM performance. Consent flags attest to the
-local simulator replacement, live access and running OFS; the harness records
-these in session setup, so the model does not need to request them again.
-Prepared copies have data dictionary enabled and Only HMI variables cleared.
-The source/baseline hashes, server instructions/schemas, model, timing rubric
-and environment are recorded; changed baselines require preparation again.
-The judge is read-only and the model cannot write OPC values, connect to a
-physical PLC, edit other sections or save over the source demo. Existing demo
-sections are preserved by task/policy; arbitrary ST semantics are not statically
-proved safe by this suite. Keep all work on the isolated simulator.
-
-Local evidence includes `project.stu`, `saved-section.xml`, `counter-samples.json`,
-request/tool events, `validation.json`, `summary.json` and campaign `outcome.json`.
-Provider completion and behavioral acceptance are reported separately. Cleanup
-failure stops the campaign without erasing behavioral results. After a timed-out
-CE call no further project/control operations are issued; verify the session
-idle and use the existing `ce-bench recover --verified-idle` flow before retrying.
-There is no automatic resume or write replay. Compare/archive paid campaigns
-with the existing commands; only runs with verified cleanup can be archived.
-Keep this suite separate from offline Feeder and the scalar OPC benchmark.
+Evidence: `project.stu`, `saved-section.xml`, `counter-samples.json`,
+`validation.json`, `summary.json`, `outcome.json`. No automatic resume; only
+runs with verified cleanup can be archived.
 
 ## Live OPC read/write benchmark
 
-`ce-bench opc` is a separate, opt-in suite. The original Feeder suite below
-always forces online access off. This suite expects **OFS connected to PLC
-Simulator**, default alias **`Dev_Alias_2`**, device **`MBT:127.0.0.1/U`**. The
-operator must confirm OFS is available/running and approve live connections and
-closed-loop tests explicitly. `CE_MCP_OPC_PYTHON` must point to a Python with
-pywin32 matching the installed Automation wrapper bitness (usually 32-bit).
+Opt-in suite (rubric `opc-live-1`) against OFS + PLC Simulator, default alias
+`Dev_Alias_2`, device `MBT:127.0.0.1/U`. Fixture `tools/lang_refs/OPC_Bench.xml`:
+`Output = INT_TO_REAL(Input) * Gain` when enabled; only Enable/Input/Gain are
+writable. Cases `positive`, `negative`, `disabled`: the model must write the
+inputs and read inputs/outputs with good quality; independent OPC reads verify
+values and scan-counter movement.
 
-The application must be **built and downloaded with Data dictionary enabled
-and Only HMI variables cleared**, including **non-HMI variables with write
-access**. Keeping non-HMI variables read-only does not meet this requirement.
-Enable OFS dictionary use and unlocated support. The fixture deliberately uses
-unlocated, non-HMI BOOL/INT/REAL variables; no Modbus addresses or mirrors.
-
-`tools/lang_refs/OPC_Bench.xml` is an original simple ST fixture: when enabled,
-`Output = INT_TO_REAL(Input) * Gain`; otherwise output is zero. `Positive`
-reports output > 0; `Tick` advances every scan. Only Enable/Input/Gain are
-model-writable. Seeded positive, negative and disabled cases require the model
-to discover/read variables, write every requested input, then read inputs and
-outputs with good quality. Independent OPC device reads verify inputs, outputs
-and scan-counter movement. A correct final answer or write acknowledgement
-alone cannot pass. Model tool policy prevents writing calculated outputs.
+Prerequisites: build/download with Data dictionary enabled and Only HMI
+variables cleared (non-HMI variables writable); `CE_MCP_OPC_PYTHON` with
+matching pywin32 bitness; preserve the simulator application first.
 
 ```powershell
 Copy-Item benchmarks\opc.example.json benchmarks\.local\opc-openai.json
-# Edit model/provider, paths and CE_MCP_OPC_PYTHON. JSON paths are relative to config.
 ce-bench opc prepare --config benchmarks\.local\opc-openai.json
-# Open the printed native fixture in Control Expert, build/download it explicitly
-# to PLC Simulator and RUN. Preserve the original simulator application first.
-
-# No API requests; validates all live cases through the real MCP/OPC path:
+# Build/download the printed fixture to PLC Simulator manually and RUN.
 ce-bench opc validate --config benchmarks\.local\opc-openai.json --allow-live --confirm-ofs-running --allow-closed-loop
-
-# Single paid smoke case before an official campaign:
 ce-bench opc run --config benchmarks\.local\opc-openai.json --allow-live --confirm-ofs-running --allow-closed-loop --case positive --repeats 1
-
-# Official run: all three cases; repeat separately for the DeepSeek config.
 ce-bench opc run --config benchmarks\.local\opc-openai.json --allow-live --confirm-ofs-running --allow-closed-loop --repeats 1
-ce-bench archive --results benchmarks/results --run-id PRINTED_RUN_ID --archive benchmarks/archive
-ce-bench visualize --archive benchmarks/archive --output benchmarks/archive/overview.png
 ```
 
-Use `--alias` to confirm a non-default alias. `run --dry-run` makes no live
-connection or API request. `prepare` builds an offline native fixture with
-dictionary settings checked, but never downloads it. `validate` is scripted
-feasibility validation and cannot be archived as LLM performance. Only `run`
-calls a provider; credentials, Responses parameters, connection-only retry
-policy, usage reporting and model identity rules match the existing adapters.
-Live cases use a fresh MCP process and model conversation. The judge records
-initial inputs and attempts restoration in finally, verifies calculated outputs
-after restoration, and records failures. Interruption or communication loss can
-prevent restoration; inspect `outcome.json`. Archive publication requires verified
-restoration. Raw evidence stays ignored; sanitized archives mark this suite as
-live simulator execution and are displayed separately from offline checks.
+`--alias` selects another alias; `run --dry-run` makes no connection. The judge
+restores initial inputs; archiving requires verified restoration.
 
-## Setup and commands (PowerShell)
+## Native IEC suite
 
-From the existing checkout:
+`ce-bench iec prepare|validate|run|grade|overview`: five cases (ST/LD/FBD/SFC/IL)
+on copies of the native M580 demo, rubric `iec-native-trace-1`, reporting
+percentage correctness plus strict verdicts. Live commands take `--alias` and
+`--allow-live --confirm-ofs-running --allow-closed-loop --allow-simulator-replacement --confirm-simulator-alias`.
+See [iec.example.json](iec.example.json) and the
+[IEC guide](../docs/Benchmark_IEC_Implementation.md).
+
+## Recovery
+
+A timed-out or disconnected CE call taints the workspace; no further CE
+operations start. Confirm the operation actually stopped, then:
 
 ```powershell
-Set-Location E:\GitHub\control-expert-mcp
-.venv\Scripts\python.exe -m pip install -e ".[benchmark,test]"
-
-# Choose ONE provider template. Customize command paths, corpus and model.
-Copy-Item benchmarks\example.json benchmarks\local.json
-# Or, for DeepSeek (can read the ignored repository-root .secrets):
-Copy-Item benchmarks\deepseek.example.json benchmarks\local.json
-notepad benchmarks\local.json
-
-.venv\Scripts\ce-bench.exe doctor --config benchmarks\local.json
-.venv\Scripts\ce-bench.exe prepare --config benchmarks\local.json
-.venv\Scripts\ce-bench.exe validate --config benchmarks\local.json
-.venv\Scripts\ce-bench.exe run --config benchmarks\local.json --condition A B --repeats 5 --seed 1729 --dry-run
-
-# PAID: invoke explicitly after checking the configuration and API account.
-# Set OPENAI_API_KEY or DEEPSEEK_API_KEY in this shell, or use api_key_file.
-.venv\Scripts\ce-bench.exe run --config benchmarks\local.json --condition A B --repeats 5 --seed 1729
-.venv\Scripts\ce-bench.exe compare --results benchmarks\results --output benchmarks\comparison
-.venv\Scripts\ce-bench.exe resume --run-id YOUR_RUN_ID --config benchmarks\local.json
+ce-bench recover --config benchmarks\local.json --verified-idle
+ce-bench resume  --run-id RUN_ID --config benchmarks\local.json
 ```
 
-The equivalent module invocation is
-`.venv\Scripts\python.exe -m control_expert_mcp.benchmark.cli <command> ...`.
-The interleaved A/B command is preferred: it persists a seeded randomized order,
-pairing arms within each task/repetition. Separate invocations are supported:
+Resume skips completed cases and never replays writes. A per-user lock
+serializes benchmark clients; no token stealing or process killing.
+
+## Regrade, archive and overview
 
 ```powershell
-.venv\Scripts\ce-bench.exe run --config benchmarks\local.json --condition A --repeats 5
-.venv\Scripts\ce-bench.exe run --config benchmarks\local.json --condition B --repeats 5
+ce-bench regrade --results benchmarks\results --run-id RUN_ID [--task inspect|io_mapping|alarms]
+ce-bench archive --results benchmarks\results --run-id RUN_ID --archive benchmarks\archive [--rubric demo-io-mapping-6] [--allow-incomplete]
+ce-bench visualize --archive benchmarks\archive --output benchmarks\archive\overview.png [--scoring original|latest]
 ```
 
-Separate campaigns have no paired differences. Five repetitions per task is a
-starter experiment, not a strong statistical conclusion. All cases start a fresh
-stdio server and conversation; the report labels cold server startup. CE/OS caches
-may still be warm. A controlled warm-server experiment is not implemented.
-
-OpenAI's template requires replacing the placeholder with an accessible exact
-model snapshot. Omit unsupported sampling/effort parameters: only explicitly
-configured settings are sent. DeepSeek's template uses `deepseek-flash`, marked
-`identity: alias`. It cannot guarantee unchanged underlying weights across time.
-Use a pinned identifier if the provider offers one; a matching returned public
-ID alone cannot establish this. Both arms always use the same requested model
-and parameter configuration; a different returned ID terminates that case.
-
-## Configuration and preparation
-
-Paths in JSON (`fixture`, `workspace`, `results`, condition `cwd`, provider
-`api_key_file`) resolve relative to that JSON file. Use absolute executable and
-manual paths. Commands use argument lists, including paths containing spaces.
-For two revisions, set each condition's `command` to its own worktree/venv Python,
-`args` to `["-m", "control_expert_mcp"]`, and `cwd` to that checkout. Install each
-server's dependencies beforehand. The harness never checks out branches.
-
-The selected Python interpreter is probed for its actual package path, source
-tree hash, package versions, Git HEAD and dirty fingerprint (including untracked
-files). Arbitrary wrapper commands cannot be reliably probed; their source
-revision remains null. The harness revision is recorded independently. Secrets
-are removed from child environments; unknown environment values are hashed.
-`CE_MCP_ENABLE_ONLINE=0` is enforced even if enabled by a parent or condition.
-Keep credentials outside the config in the appropriate environment variable or
-an ignored file. A credential file accepts one bare `sk-...` key or one labeled
-line, including `Deepseek API KEY : ...`; UTF-8 and BOM-marked UTF-16 work. It is
-read only for an explicitly invoked paid command. Keys/auth headers are not logged.
-
-`doctor` discovers real MCP schemas, checks documentation status and COM registry
-presence without creating a CE application. Registry presence is not proof of a
-working licensed installation. It reports missing API packages/credentials and
-prepared fixtures without requiring them. `run --dry-run` adds the planned
-schedule, with no project mutations or API request. Missing or stale manual
-prerequisites are reported; a real B campaign requires a current index.
-
-`prepare` uses a new broker application, configurable catalog CPU/version
-(`BMX P34 2020` / `02.70` by default), and imports the complete existing
-`tools/lang_refs/ST_2_Feeder.xml`. It checks source and all 15 declarations,
-builds, saves and reopens a native baseline. It creates a separate broken project
-by replacing exactly one conversion operand with a unique undefined identifier,
-then requires actual compiler error evidence before and after reopening.
-Unsupported catalog entries fail through the server with actionable tool evidence.
-Each preparation gets its own directory; old outputs are retained.
-
-`validate` checks canonical threshold, temperature, repair and alarm solutions through
-real MCP build/save/reopen/rebuild cycles without a model. This checks training
-fixture feasibility, not API-provider behavior. Generated native projects,
-exports and evidence stay under the ignored workspace.
-
-The Feeder extract is an offline injection-molding demo attributed in its header
-to Stefan Probst (07.05.2003), distributed in Schneider's Premium example;
-[Schneider provenance](https://www.se.com/us/en/faqs/FA364303/). No download is
-needed. Its EBOOL inputs, initial values and executable statement order are kept.
-This isolated section has **no upstream process simulation**: Mixing_done,
-Forming, Sec, materials and temperatures require external stimulus. The harness
-does not invent a ticking Sec assignment. Threshold changes are training tasks,
-not claims that Schneider's original demo is defective.
-
-### Demo-derived alarm extension
-
-The fifth task, `alarms`, uses a separate native copy of the same Feeder project.
-Its original 15 declarations and executable statements are preserved; only this
-copy predeclares `Start_process`, `Temp_fault_1` and `Temp_fault_2` as EBOOLs.
-The names and 200/400 temperature trip points come from Stefan Probst's
-[`LD_1_Heating.xml`](../tools/lang_refs/LD_1_Heating.xml); the associated
-[`IL_0_Alarming.xml`](../tools/lang_refs/IL_0_Alarming.xml) feeds these flags into
-`ALRM_DIA` instances. These are demo examples, not an original automated test suite.
-
-The training addition appends logic after all existing Feeder statements. While
-enabled, low trips at <=200 and clears at >=205; high trips at >=400 and clears
-at <=395. Both flags retain their previous states in their respective deadbands.
-Disabling clears both, including on the next scan after either alarm trips.
-The 5-degree hysteresis and disable/reset contract are new benchmark requirements,
-not behavior attributed to the original author. No `ALRM_DIA` instances, simulation
-inputs, timers or new model-authored declarations are needed.
-
-Rubric `feeder-alarms-1` accepts a restricted ST grammar: nested IF/ELSIF/ELSE,
-Boolean assignments, AND/OR/NOT, parentheses and numeric comparisons of
-`Cmeasured_temp` with constants. Only the two fault flags may be assigned.
-It preserves the complete original statement-token prefix and all declarations.
-The evaluator partitions the entire INT domain [-32768,32767] at every candidate
-and specification comparison constant, checks boundary neighbors and every
-enable/prior-flag combination, and reports a counterexample for a wrong supported
-transition. Without arithmetic or calls, comparison truth values are constant in
-each remaining interval; this covers the full input domain without pretending to
-execute a PLC. Unsupported syntax stays unverified. Regression tests include
-heating/cooling sequences, retained alarms, disable/re-enable, exact boundaries,
-INT extremes, changed thresholds and off-target writes.
-
-Run `prepare` again when upgrading from four tasks: old manifests lack the alarm
-baseline. One A/B repetition now schedules ten cases (five repetitions: fifty).
-Older eight-case campaigns remain separate and show no alarm measurement in the
-archive graphics. Their success rates must not be pooled with the expanded suite.
-
-## Conditions and model context
-
-- A: project automation and embedded language reference, with all three installed
-  manual tools removed from discovery and blocked in dispatch.
-- B: the same base policy, plus `get_documentation_status`, `search_manuals`, and
-  `get_manual_topic`, backed by the same explicitly prepared corpus.
-
-Both arms use the same neutral orientation and task prompts. B is not forced to
-retrieve a manual. Corpus file/manifest/index hashes and status freshness are
-recorded. Prepare manuals explicitly with `tools/export_ce_help.py` and
-`tools/index_ce_help.py`; see the repository documentation service instructions.
-
-The adapter snapshots initialization instructions and schemas. It removes the
-existing exact documentation-only recommendation sentence from BOTH arms,
-retaining all other server guidance. Changed/unrecognized guidance remains visible
-and fingerprinted. MCP prompts/resources are not automatically loaded in either
-arm; the embedded `get_language_reference` tool remains available. Models receive
-no shell, filesystem, open-project or arbitrary path tool. Editing is restricted
-to MAST/Feeder without declarations; saving accepts only the already-selected path.
-Inspection exposes read tools only. This deliberately controlled tool subset
-measures this client's policy, not every possible MCP client behavior.
-
-MCP tools become Responses function schemas (`strict: false`, preserving optional
-MCP parameters). Discovery follows public pagination. Returned MCP errors,
-structured results and content blocks are retained. Only an exact duplicate JSON
-text block is removed when the same structured object is present. This policy is
-identical in both arms. Necessary reasoning/function-call response items are
-replayed in original order; no history truncation is applied.
-
-OpenAI uses `store: false` and encrypted reasoning items when reasoning effort is
-configured. DeepSeek omits unsupported `store`/`include`/`parallel_tool_calls`
-parameters and retains its plain `reasoning` content items. DeepSeek may emit
-multiple calls; dispatch is always serial. Its adapter accepts explicit effort
-`none`, `low`, `high` or `max`, and omits sampling knobs whose effect depends on
-model/mode. See the official [OpenAI reasoning guide](https://developers.openai.com/api/docs/guides/reasoning)
-and [DeepSeek Responses compatibility tables](https://api-docs.deepseek.com/guides/responses_api/).
-
-## Reset, evidence, scoring and recovery
-
-Before every task/repetition/condition/attempt the harness verifies baseline
-hashes, copies a unique disposable project and opens it through MCP. Only repair
-starts from the broken fixture. The evaluator closes without saving and reopens
-the saved output, exports source/declarations, verifies scope and independently
-rebuilds edits. Model-requested builds belong inside workflow time; evaluator
-builds do not. Parsed empty diagnostics alone never establish build success;
-`build_state=built_ok` with no `error` is required and capture metadata is retained.
-
-The private `feeder-2` rubric grades inspection JSON deterministically. Gold data
-and evaluation results are never sent to the model. Threshold/repair checks accept
-the original normalized executable statement sequence with exactly the prescribed
-change. Temperature checks accept unchanged surrounding statements with recognized
-inclusive ABS or two-sided comparison predicates; the exact accepted family is in
-`tasks.py`. Tests cover threshold 4/5/6, both previous request latch states,
-reset/decrement ordering, integer conversion, inclusive temperature boundaries,
-just-outside values, negative and nonintegral setpoints. Other potentially valid
-implementations remain **unverified**, rather than a fabricated behavioral pass or
-a claim that they are incorrect. This intentionally narrow static proof/check is
-not PLC execution. `runtime_behavior` is always `unverified` in this release;
-reports separate build, scope, static acceptance and runtime verification.
-
-Temperature rubric `feeder-temperature-2` also accepts redundant parentheses
-around the exact `Setpoint_temp +/- 2.0` bounds (including nested grouping).
-Boolean/comparison grouping and all other arithmetic remain unchanged; exclusive
-bounds, OR, wrong tolerances and unrelated edits remain unverified.
-
-No simulator execution mode is implemented. Any later runtime experiment needs
-explicit simulator isolation, the first-transfer CPU-family GUI seeding procedure,
-and located `%M`/`%MW` tags (the fixture's unlocated variables are not Modbus-readable).
-Do not mix such results with this offline benchmark.
-
-Each attempt retains append-only fsynced `events.jsonl`, content-addressed JSON
-blobs, `summary.json`, `final-response.txt`, `validation.json`, the native saved
-project, and exported section/declarations when evaluation reaches them. Request
-events reference exact instruction/schema/input blobs, avoiding repeatedly copying
-large histories. A blob's filename is its canonical JSON SHA-256; reconstruct a
-request from `model_context`, `model_request.parameters_ref` and ordered
-`input_refs`. Raw responses and model-visible tool payloads have separate references
-which can point to the same blob. All evidence remains local and can contain
-project source/manual excerpts.
-
-Usage accumulates provider input/output/total fields across every request. Cached
-input and reasoning details are subsets, never added to total. Missing usage is
-null; known partial totals are separate. `APIConnectionError` (including SDK connection
-timeouts) retries the identical API request up to twice, after 1 and 2 seconds,
-within the workflow timeout. Every attempt, error and delay is recorded; failed
-requests retain unknown usage even when a retry succeeds. Responses/history and
-MCP calls advance only after a received response, so writes are never replayed.
-SDK-internal and MCP transport retries remain disabled. HTTP errors, malformed
-responses, cancellation and harness timeouts are not retried. The policy is
-fingerprinted and archived; retry time remains in workflow time. Model
-repair cycles count writes following a failed model build. Wall time, request
-elapsed time and MCP round-trip latency are recorded separately; MCP latency is
-not pure COM time and remaining wall time is not labeled model thinking time.
-
-Campaign plans persist immutable config/model/prompt/fixture/environment/source/
-dependency/corpus/effective-schema fingerprints and randomized ordering. Resume
-skips only matching durable terminal summaries, including recorded task failures;
-an interrupted attempt gets a fresh directory and fixture. It never replays writes
-into uncertain state. Changes require a new campaign; distinct fingerprints are
-reported in separate groups. Reports retain failures/timeouts/interrupted attempts
-and partial usage, per-task/overall rates, median/nearest-rank p95 with known/unknown
-sample counts, successful-run efficiency and within-campaign paired differences.
-Scheduled but unstarted cases are listed separately. JSON contains full details;
-Markdown supplies a compact overview. API and manual/UI results are never combined.
-
-A per-user OS lock serializes benchmark clients across workspaces. It does not
-control independent third-party CE clients: leave their projects alone and let
-write-token conflicts fail. No project/token stealing or process killing is used.
-A timed-out/disconnected MCP operation taints both the workspace and per-user
-guard; no subsequent CE operation is started. Verify the operation has stopped
-and recover the disposable session before acknowledging recovery:
-
-```powershell
-.venv\Scripts\ce-bench.exe recover --config benchmarks\local.json --verified-idle
-.venv\Scripts\ce-bench.exe resume --run-id YOUR_RUN_ID --config benchmarks\local.json
-```
-
-Recovery requires the operator's attestation because closing a client or timing
-out does not prove that a COM worker stopped. Recovery evidence is retained.
-
-## Optional manual ChatGPT procedure
-
-Use a separate, clearly labeled `chatgpt_manual` experiment: reset a unique fixture,
-start a new chat, use one task prompt and the same tool-availability policy, record
-the displayed model label, times and exported artifacts, then independently evaluate
-them. Public/manual UI inspection cannot guarantee a fixed hidden model snapshot
-or expose complete internal orchestration. Record `input_tokens`, `output_tokens`,
-`total_tokens`, cached/reasoning details and unavailable request IDs as **null**.
-Do not infer them from MCP bytes. No website automation/private endpoints are used.
-
-## GitHub archive and graphical overview
-
-After a campaign, archive its sanitized metrics and regenerate the image:
-
-```powershell
-.venv\Scripts\ce-bench.exe archive --results benchmarks\results --run-id YOUR_RUN_ID --archive benchmarks\archive
-.venv\Scripts\ce-bench.exe visualize --archive benchmarks\archive --output benchmarks\archive\overview.png
-git add benchmarks/archive
-git commit -m "Archive Control Expert benchmark results and overview"
-```
-
-Commit the data, PNG and `overview.metadata.json` together. The graphical overview
-reads only archived JSON: task acceptance, workflow medians and provider tokens,
-with separate rows for each campaign/model/measured source/condition. It expands
-as more models and revisions are archived; incompatible experiments are not pooled.
-The PNG's metadata sidecar records exact source-data and image hashes, plotting
-code hash and matplotlib version. Offline tests detect data/image mismatches.
-`--scoring original` plots original scores; the default `latest` applies the latest
-explicit inspection regrade and shows original-to-current counts in the image.
-See [the archived overview](archive/README.md).
-
-The overview can display a full suite in one row using `overview.groups.json`
-in the archive directory. Its explicit run IDs join the offline campaign,
-any continuation, and the simulator campaign for display only; archived records
-remain unchanged. The latest DeepSeek row combines both A/B conditions (two
-cases per offline task) and one M580 counter case, totaling 15 cases. Medians in
-that row combine A/B samples within each task. The plot validates the expected
-condition/task/repetition inventory and rejects missing or duplicate cases.
-When refreshing a full suite, update this manifest to the new run IDs and
-expected cases, then regenerate the PNG and metadata together.
-
-Individual archive directories are immutable and checksummed. `index.json` and
-README are derived navigation. Missing cases require `archive --allow-incomplete`,
-which creates a separate labeled snapshot. Raw native projects, transcripts,
-manual excerpts, credentials, local paths and machine names are not copied.
-Allowlisted scores/metrics, source/dependency/corpus fingerprints and artifact
-hashes are retained. Keep the original local evidence for detailed audits.
-
-The first real run used rubric `feeder-1`: both factually correct inspection
-answers included optional assignment/function-expression forms that it rejected.
-Rubric `feeder-2` accepts these equivalent forms without relaxing any required
-facts. Original summaries remain 6/8; explicit deterministic regrading gives 8/8:
-
-```powershell
-.venv\Scripts\ce-bench.exe regrade --results benchmarks\results --run-id 20261121T100834Z-be7edc84
-.venv\Scripts\ce-bench.exe compare --results benchmarks\results --output benchmarks\comparison-feeder-2 --rubric feeder-2
-```
-
-Regrading sends no API requests and performs no new CE operations. It verifies
-original summary/response hashes, retains saved-artifact scope evidence, and
-appends a new rubric record. Both score versions are in the archive. The measured
-dirty Python package was verified against commit `d94539a9068ae11474460caeb9c3224462138d7f`
-before further code changes; the archive preserves that proof and original dirty
-metadata rather than relabeling the run as a clean checkout.
+- `regrade` makes no provider or CE calls; it verifies saved hashes and appends
+  a new rubric record.
+- `--rubric` writes a separate rubric snapshot; archives are immutable and
+  contain no projects, transcripts, credentials or local paths.
+- `overview.groups.json` joins run IDs (offline + simulator) into one display row.
+- Commit archive data, `overview.png` and `overview.metadata.json` together.
 
 ## Offline checks
 
 ```powershell
-.venv\Scripts\python.exe -m compileall -q src
-.venv\Scripts\python.exe -m unittest discover -s tools -p "test_*.py" -v
-.venv\Scripts\python.exe -m pip check
-.venv\Scripts\python.exe -m build --outdir tmp\benchmark-dist
-.venv\Scripts\python.exe -m twine check --strict tmp\benchmark-dist\*
-.venv\Scripts\python.exe tools\check_distribution.py --dist-dir tmp\benchmark-dist
+python -m compileall -q src
+python -m unittest discover -s tools -p "test_*.py" -v
 ```
 
-Offline integration uses a synthetic MCP stdio server and scripted provider; it
-does not validate real Control Expert or either paid provider. See
-[CHECKPOINT.md](CHECKPOINT.md) for exact host validations and next actions.
+These use a synthetic MCP server and scripted provider; they do not exercise
+real Control Expert or paid providers.

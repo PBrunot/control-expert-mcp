@@ -1,0 +1,18 @@
+{
+  "name": "control-expert",
+  "description": "Automate Schneider EcoStruxure Control Expert (Unity Pro) on Windows: projects, IEC logic, builds, manuals, and opt-in simulator/OPC access.",
+  "version": "0.9.5",
+  "author": { "name": "Pascal Brunot" },
+  "homepage": "https://github.com/PBrunot/control-expert-mcp",
+  "repository": "https://github.com/PBrunot/control-expert-mcp",
+  "license": "MIT",
+  "keywords": ["plc", "control-expert", "unity-pro", "modicon", "iec-61131-3", "mcp"],
+  "userConfig": {
+    "enable_online": {
+      "type": "boolean",
+      "title": "Expose online tools",
+      "description": "Sets CE_MCP_ENABLE_ONLINE. Only exposes PLC/simulator/OPC tools; every session still needs explicit consent via configure_live_access.",
+      "default": false
+    }
+  }
+}

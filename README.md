@@ -6,45 +6,39 @@
 
 English · [Italiano](README.it.md)
 
-Connect an MCP client to a local **EcoStruxure Control Expert** (Unity Pro) installation. Inspect, create, edit, and build PLC projects through Schneider Electric's UDE COM automation API.
-
-The foundation is Control Expert's **Unity Developer Edition (UDE)** interface: this server exposes its project engineering operations to MCP clients. Schneider Electric's [public Control Expert V16 documentation](https://www.se.com/us/en/download/document/EcoStruxureControlExpert_EN/) identifies UDE as the API for automating engineering tasks; the detailed API reference is installed locally in Control Expert's `Extra` folder.
-
-This is an experimental project for LLM-assisted PLC programming and debugging.
+An MCP server for a local **EcoStruxure Control Expert** (Unity Pro) installation. It lets an MCP client inspect, create, edit, and build PLC projects through Control Expert's **Unity Developer Edition (UDE)** COM API. Experimental, for LLM-assisted PLC programming.
 
 [PyPI](https://pypi.org/project/control-expert-mcp/) · [Detailed guide](docs/guide.md) · [Benchmarks](benchmarks/README.md)
 
 > [!WARNING]
-> Online tools can download applications, start or stop controllers, and write process values. They are disabled by default. Use a simulator or a supervised test bench; production equipment requires qualified supervision.
+> Online tools can download applications, start or stop controllers, and write process values. They are disabled by default. Use a simulator or a supervised test bench; production equipment requires qualified supervision. A build while a target is connected is an online change and is refused unless `build_project` is called with `allow_online_change=true` after closed-loop approval.
 
 ## Features
 
-- **Projects:** create, open, save, import, and export Control Expert projects.
-- **Logic:** inspect and edit ST, LD, FBD, SFC, and IL; manage variables, DFBs, and DDTs.
-- **Hardware and communications:** configure CPUs, racks, modules, DTMs, Ethernet services, and Modbus scan requests.
-- **Validation:** validate exchange XML, analyze and build projects, and inspect diagnostics.
-- **Documentation:** search locally converted vendor manuals with source citations.
-- **Live access (opt-in):** use OFS OPC DA for symbolic values or Modbus TCP for located values; commission and test with PLC Simulator.
+- **Projects:** create, open, save, import, and export.
+- **Logic:** read and edit ST, LD, FBD, SFC, and IL; manage variables, DFBs, and DDTs.
+- **Hardware:** configure CPUs, racks, modules, DTMs, Ethernet services, and Modbus scan requests.
+- **Validation:** validate exchange XML, analyze and build, read diagnostics.
+- **Manuals:** search locally converted vendor manuals with citations.
+- **Live access (opt-in):** OFS OPC DA for symbolic values, Modbus TCP for located `%M`/`%MW` values, PLC Simulator commissioning.
 
-Availability depends on the installed Control Expert version, license, hardware catalog, and DTM libraries. Clients expose the tools' argument schemas and descriptions; see the [tool reference](docs/guide.md#tool-reference) and [guided workflows](docs/guide.md#guided-workflows).
+Availability depends on your installation, license, and catalogs. See the [tool reference](docs/guide.md#tool-reference) and [guided workflows](docs/guide.md#guided-workflows).
 
 ## Requirements
 
-- Windows with Python **3.11+**.
-- A licensed local installation of **Control Expert or Unity Pro** and its registered UDE COM broker (`PSBroker.PServerBroker.1`). Tested with Control Expert 14.0 and 16.4.
-- An MCP client supporting **stdio**, such as Claude Desktop, Claude Code, VS Code with GitHub Copilot, Codex, or DeepSeek Harness.
+- Windows, Python **3.11+**.
+- Licensed local **Control Expert or Unity Pro** with its UDE COM broker (`PSBroker.PServerBroker.1`) registered. Tested with Control Expert 14.0 and 16.4.
+- An MCP client with **stdio** support (Claude Desktop, Claude Code, VS Code with GitHub Copilot, Codex, DeepSeek Harness).
 
-Run the server on the same machine as Control Expert. The UDE automation server is included with Control Expert; the separate UDE package is needed only for its documentation.
+Run the server on the Control Expert machine.
 
-## Quick start
-
-Install on the Windows machine running Control Expert:
+## Install and configure
 
 ```powershell
 py -3.11 -m pip install --upgrade control-expert-mcp
 ```
 
-Configure your MCP client to launch `control-expert-mcp` with no arguments. For clients using `mcpServers` JSON, such as Claude Desktop:
+Configure the client to launch `control-expert-mcp` (for example in Claude Desktop):
 
 ```json
 {
@@ -52,92 +46,55 @@ Configure your MCP client to launch `control-expert-mcp` with no arguments. For 
     "control-expert": {
       "command": "control-expert-mcp",
       "args": [],
-      "env": {
-        "CE_MCP_ENABLE_ONLINE": "0"
-      }
+      "env": { "CE_MCP_ENABLE_ONLINE": "0" }
     }
   }
 }
 ```
 
-For Codex CLI:
+Codex CLI: `codex mcp add control-expert --env CE_MCP_ENABLE_ONLINE=0 -- control-expert-mcp`
 
-```powershell
-codex mcp add control-expert --env CE_MCP_ENABLE_ONLINE=0 -- control-expert-mcp
+Claude Code plugin (MCP server via `uvx` plus a workflow skill; needs [uv](https://docs.astral.sh/uv/)):
+
+```text
+/plugin install control-expert --marketplace PBrunot/control-expert-mcp
 ```
 
-The client starts and manages the server. If it cannot find the command, use the executable's absolute path, or the installing Python interpreter with arguments `["-m", "control_expert_mcp"]`.
+Online tools stay off unless you enable the plugin option "Expose online tools".
 
-See the [client configuration guide](docs/guide.md#mcp-client-configuration) for Claude Desktop, Claude Code, VS Code, Codex, and DeepSeek Harness. Ready-to-edit examples are in [samples/](samples/).
+If the command is not found, use its absolute path, or the installing Python with arguments `["-m", "control_expert_mcp"]`. Other clients: [client configuration](docs/guide.md#mcp-client-configuration) and [samples/](samples/).
 
-## Usage
-
-Start with a disposable project or a copy. Example requests:
-
-- “Open this project and summarize its CPU, tasks, sections, and global variables.”
-- “Create an ST section for a motor interlock, declare its variables, and build the project.”
-- “Inspect the hardware tree and list the configured Modbus devices.”
-- “Search the local manuals for `READ_VAR` and cite the relevant topic.”
-
-Build after changes, inspect the result, and save explicitly. Imports can replace existing sections; `close_project` discards changes unless `save=true`. Opening a `.sta` archive creates an unsaved application: save it to an explicit `.stu` path.
-
-A successful build does not prove runtime correctness. Check `build_state`, errors, and raw output alongside parsed diagnostics. For runtime tests, observe outputs against expected results and restore test inputs. See [authoring and build results](docs/guide.md#usage).
-
-## Configuration
-
-Set these variables in the MCP client's server environment:
+Environment variables:
 
 | Variable | Purpose |
 | --- | --- |
-| `CE_MCP_ENABLE_ONLINE` | Set to `1` and restart to expose online tools. Disabled by default; session consent is still required. |
-| `CE_MCP_OPC_PYTHON` | Python matching the OPC Automation DLL bitness, with `pywin32` installed. OFS commonly needs a separate 32-bit interpreter. |
-| `CE_MCP_SCHEMA_DIR` | Override the auto-discovered Control Expert `SrcXmlSchema` directory. |
-| `CE_MCP_MANUALS_DIR` | Converted and indexed local manuals. Set an absolute path for packaged installations. |
-| `CE_MCP_SIMULATOR_EXE` | Optional simulator executable override for custom installation paths or startup without an open project. |
+| `CE_MCP_ENABLE_ONLINE` | `1` exposes online tools (restart required). Session consent is still required. |
+| `CE_MCP_OPC_PYTHON` | Python matching the OPC Automation DLL bitness, with `pywin32` (often 32-bit for OFS). |
+| `CE_MCP_SCHEMA_DIR` | Override the auto-discovered `SrcXmlSchema` directory. |
+| `CE_MCP_MANUALS_DIR` | Absolute path to converted, indexed manuals. |
+| `CE_MCP_SIMULATOR_EXE` | Optional simulator executable path. |
 
-### PLC and simulator access
+## Usage
 
-Enabling online tools does **not** grant access to a controller. Use `get_live_access_setup` and `configure_live_access` to record the user's choices for each server session. Confirm OFS availability and the device alias for OPC; obtain separate approval for closed-loop writes and PLC control.
+Work on a disposable project or a copy. Example requests:
 
-Prefer **OFS OPC DA** for simulator tests and symbolic variables, including exposed unlocated variables and DFB members. The running application's data dictionary must expose the required symbols. **Modbus TCP** supports located `%M` / `%MW` values.
+- "Open this project and summarize its CPU, tasks, sections, and global variables."
+- "Create an ST section for a motor interlock, declare its variables, and build the project."
+- "Search the local manuals for `READ_VAR` and cite the relevant topic."
 
-Follow the [live-access and commissioning guide](docs/guide.md#plc-and-simulator-access) for setup, dictionary settings, download steps, and the conditional “Family check failed” workaround.
+Build after changes and save explicitly: `close_project` discards changes unless `save=true`, and an opened `.sta` archive must be saved to a `.stu` path. A successful build does not prove runtime correctness. See [usage](docs/guide.md#usage).
 
-### Local manuals
+**Live access:** enabling online tools does not grant access to a controller. Call `get_live_access_setup` and `configure_live_access` each session; closed-loop writes and PLC control need separate approval. Prefer OFS OPC DA. See [PLC and simulator access](docs/guide.md#plc-and-simulator-access).
 
-Manual search works without a COM session or PLC connection. Convert your locally installed help and build its index first; generated vendor content stays local. See [manual conversion and search](docs/guide.md#searchable-local-manuals).
+**Manuals:** convert and index your installed help first; see [searchable local manuals](docs/guide.md#searchable-local-manuals).
 
-## Troubleshooting
-
-- **COM startup fails:** check licensing and UDE registration. If the broker reports an integrity error, restart it after checking the Windows `CommonProgramFiles` environment paths.
-- **CPU or module not found:** use the exact reference and version from the installed catalog.
-- **First call times out:** project loading can take 30–120 seconds; increase the client's tool timeout.
-- **XML import fails:** export a similar object and run `validate_xml` before importing.
-
-More cases are in the [troubleshooting guide](docs/guide.md#troubleshooting). Report reproducible problems in [GitHub Issues](https://github.com/PBrunot/control-expert-mcp/issues), with versions, tool calls, and sanitized errors.
+Problems: [troubleshooting](docs/guide.md#troubleshooting) and [GitHub Issues](https://github.com/PBrunot/control-expert-mcp/issues).
 
 ## Benchmarks
 
-The dedicated `ce-bench iec` suite covers native ST, LD, FBD, SFC and IL logic
-on disposable M580 demo copies. It adds deterministic in-MAST capture, percentage
-correctness, strict verdicts and PNG/SVG progress overviews. See the
-[IEC benchmark guide](docs/Benchmark_IEC_Implementation.md) and
-[example configuration](benchmarks/iec.example.json).
-
-The offline suite covers seven tasks: project inspection, threshold and temperature
-logic changes, fault repair, gated hysteresis alarms, weighing analysis, and I/O
-mapping. Each task runs on a disposable project copy in two conditions: without
-and with installed-manual search. Edits are independently reopened and built;
-inspection answers use deterministic grading, including a fixed Markdown table
-format for I/O mappings. A separate M580 simulator test checks that `TEST_LLM`
-increments once per second through OFS OPC DA observations.
+`ce-bench` runs an offline seven-task suite (with and without manual search), an IEC language suite, and an M580 simulator test. Results are exploratory and do not prove PLC runtime correctness. See the [benchmark guide](benchmarks/README.md) and [archived results](benchmarks/archive/README.md).
 
 ![Benchmark overview: acceptance, I/O mapping correctness, time, and token usage](benchmarks/archive/overview.png)
-
-Results are exploratory; offline acceptance does not establish PLC runtime
-correctness. See the [benchmark guide](benchmarks/README.md) for test definitions,
-scoring, setup, and limitations, and the [archived results](benchmarks/archive/README.md)
-for individual run reports.
 
 ## Development
 
@@ -146,16 +103,13 @@ git clone https://github.com/PBrunot/control-expert-mcp.git
 cd control-expert-mcp
 py -3.11 -m venv .venv
 .venv\Scripts\python.exe -m pip install -e ".[benchmark,test]"
-.venv\Scripts\python.exe -m compileall -q src
 .venv\Scripts\python.exe -m unittest discover -s tools -p "test_*.py"
 ```
 
-For a source installation, point the MCP client to the absolute `.venv\Scripts\python.exe` path with arguments `["-m", "control_expert_mcp"]`.
-
-See [AGENTS.md](AGENTS.md) for repository conventions, the [development guide](docs/guide.md#development-and-validation) for architecture and integration checks, and [packaging and releases](docs/guide.md#packaging-and-releases) for distribution commands. Review integration scripts before running them: they can modify projects or terminate Control Expert.
+See [AGENTS.md](AGENTS.md), [development and validation](docs/guide.md#development-and-validation), and [packaging and releases](docs/guide.md#packaging-and-releases).
 
 ## License and credits
 
-This repository is a fork of [apexsotjo-blip/control-expert-mcp](https://github.com/apexsotjo-blip/control-expert-mcp), with additional work by Pascal Brunot. The upstream repository did not include a license file, so the MIT license in this fork applies to Pascal Brunot's contributions and does not relicense upstream contributions or third-party materials. See [LICENSE](LICENSE) and the upstream repository history for provenance. This project is also inspired by [tiaportal-mcp](https://github.com/heilingbrunner/tiaportal-mcp).
+This repository is a fork of [apexsotjo-blip/control-expert-mcp](https://github.com/apexsotjo-blip/control-expert-mcp), with additional work by Pascal Brunot. The upstream repository did not include a license file, so the MIT license in this fork applies to Pascal Brunot's contributions and does not relicense upstream contributions or third-party materials. See [LICENSE](LICENSE) and the upstream repository history for provenance. Inspired by [tiaportal-mcp](https://github.com/heilingbrunner/tiaportal-mcp).
 
 Not affiliated with or endorsed by Schneider Electric. Control Expert and Unity Pro software, licenses, and documentation are supplied separately.
