@@ -69,6 +69,30 @@ class AlarmTests(unittest.TestCase):
         modified = alarm_source(self.baseline).replace("feeder_state=2", "feeder_state=3")
         self.assertEqual(static_grade("alarms", self.baseline, modified)["scope"], "unverified")
 
+    def test_set_reset_form_with_nested_else_if(self):
+        # Observed Claude Haiku form: EBOOL SET/RESET and ELSE IF instead of ELSIF.
+        set_reset = """
+IF NOT Start_process THEN
+    RESET(Temp_fault_1); RESET(Temp_fault_2);
+ELSE
+    IF Cmeasured_temp <= 200.0 THEN SET(Temp_fault_1);
+    ELSE IF Cmeasured_temp >= 205.0 THEN RESET(Temp_fault_1); END_IF;
+    END_IF;
+    IF Cmeasured_temp >= 400.0 THEN SET(Temp_fault_2);
+    ELSE IF Cmeasured_temp <= 395.0 THEN RESET(Temp_fault_2); END_IF;
+    END_IF;
+END_IF;
+"""
+        result = self.grade(set_reset)
+        self.assertEqual((result["scope"], result["static_behavior"], result["rubric"]),
+                         ("pass", "pass", "feeder-alarms-2"))
+        failing = self.grade(set_reset.replace("<= 395.0", "< 395.0"))
+        self.assertIn("counterexample", failing)
+        for candidate in (set_reset.replace("RESET(Temp_fault_1); RESET(Temp_fault_2);", "RESET(Temp_fault_1); RESET(Sec);"),
+                          set_reset.replace("SET(Temp_fault_1);", "SET(Temp_fault_1, TRUE);")):
+            with self.subTest(candidate=candidate):
+                self.assertEqual(self.grade(candidate)["static_behavior"], "unverified")
+
     def test_hysteresis_scan_sequence_and_disable_reset(self):
         parser = Parser(tokens(BOOLEAN_FORM))
         program = parser.block()

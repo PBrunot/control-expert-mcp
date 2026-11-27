@@ -7,7 +7,7 @@ import xml.etree.ElementTree as ET
 
 from .alarms import CANONICAL, alarm_grade
 
-RUBRIC_VERSION = "feeder-2"
+RUBRIC_VERSION = "feeder-3"
 ORIENTATION = (
     "Work only on the already-open disposable training project, MAST/Feeder. "
     "Obtain its source through MCP. Offline only. Reference tools are available as listed. "
@@ -132,9 +132,15 @@ def alarm_source(baseline: str) -> str:
     return baseline + "\n" + CANONICAL
 
 
+def unfence(answer: str) -> str:
+    """Remove exactly one whole-answer ```/```json fence; other prose stays invalid."""
+    match = re.fullmatch(r"\s*```(?:json)?[ \t]*\n(.*?)\n?[ \t]*```\s*", answer, flags=re.S | re.I)
+    return match[1] if match else answer
+
+
 def inspect_grade(answer: str) -> dict:
     try:
-        data = json.loads(answer)
+        data = json.loads(unfence(answer))
         expression = normalize(data["initialization_expression"]).removesuffix(";")
         expression = expression.removeprefix("feeder_state:=")
         temperature = {k: v.lower() for k, v in data["temperature"].items()}

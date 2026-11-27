@@ -97,7 +97,7 @@ def main(argv=None) -> int:
     sub = subs.add_parser("regrade")
     sub.add_argument("--results", type=Path, required=True)
     sub.add_argument("--run-id", required=True)
-    sub.add_argument("--task", choices=["inspect", "io_mapping"], default="inspect")
+    sub.add_argument("--task", choices=["inspect", "io_mapping", "alarms"], default="inspect")
     sub = subs.add_parser("archive")
     sub.add_argument("--results", type=Path, required=True)
     sub.add_argument("--run-id", required=True)

@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import copy
 from importlib.metadata import version
+import json
 from pathlib import Path
 import re
 
@@ -26,6 +27,14 @@ def mapping_correctness(cases: list[dict]) -> dict:
     return {'matched': matched, 'required': required,
             'fraction': matched / required if required else None,
             'known_n': known, 'unknown_n': unknown}
+
+
+def consistent(old, new) -> bool:
+    """Equal case evidence, allowing fields that a newer archiver only adds (old value None/absent)."""
+    if isinstance(old, dict) and isinstance(new, dict):
+        return all(old.get(k) is None or new.get(k) is None or consistent(old[k], new[k])
+                   for k in set(old) | set(new))
+    return old == new
 
 
 def chart_rows(archive: Path, scoring: str = "latest") -> tuple[list, dict]:
@@ -53,13 +62,15 @@ def chart_rows(archive: Path, scoring: str = "latest") -> tuple[list, dict]:
                 raise ValueError('Scoring snapshots have different campaign fingerprints')
             for case in version['cases']:
                 identity = (case['case_id'], case.get('attempt_id'))
-                if identity in originals and originals[identity] != case:
+                if identity in originals and not consistent(originals[identity], case):
                     raise ValueError('Scoring snapshots changed original case evidence')
                 originals[identity] = case
-        grades = record.get("inspection_regrades", []) if scoring == "latest" else []
+        # Each rubric family lives in its own immutable snapshot; merge them all.
+        grades = {json.dumps(grade, sort_keys=True): grade for version in versions
+                  for grade in version.get("inspection_regrades", [])} if scoring == "latest" else {}
         def key(grade):
-            return [int(n) for n in re.findall(r"\d+", grade["rubric"])]
-        grades = sorted(grades, key=key)
+            return (re.sub(r"\d+", "", grade["rubric"]), [int(n) for n in re.findall(r"\d+", grade["rubric"])])
+        grades = sorted(grades.values(), key=key)
         cases = copy.deepcopy(record["cases"])
         original_cases = copy.deepcopy(cases)
         for grade in grades:

@@ -2,10 +2,15 @@
 from __future__ import annotations
 
 import asyncio
+from contextlib import asynccontextmanager
 import json
 import os
 from pathlib import Path
 import re
+import secrets
+import shutil
+import sys
+import tempfile
 from time import perf_counter
 
 from .core import encode
@@ -94,8 +99,28 @@ class DeepSeekResponses:
         return params
 
 
+class ClaudeCodeCLI:
+    """Claude Code CLI (`claude -p`) as the agent loop, using its own login.
+
+    The CLI runs with built-in tools disabled, a replaced system prompt (the same
+    server instructions other providers receive) and only a relay MCP server whose
+    calls return to this harness's session. No API key is read or forwarded.
+    """
+    name = "claude-code"
+    endpoint = None
+    key_env = "ANTHROPIC_API_KEY"
+
+    @staticmethod
+    def parameters(model: dict) -> dict:
+        params = {"model": model["id"]}
+        if "reasoning_effort" in model:
+            params["effort"] = model["reasoning_effort"]
+        return params
+
+
 def adapter(config: dict):
-    return DeepSeekResponses if config.get("provider", {}).get("name") == "deepseek" else OpenAIResponses
+    name = config.get("provider", {}).get("name")
+    return {"deepseek": DeepSeekResponses, "claude-code": ClaudeCodeCLI}.get(name, OpenAIResponses)
 
 
 def credential(config: dict) -> str:
@@ -114,7 +139,32 @@ def credential(config: dict) -> str:
     raise ValueError(f"Set {adapter(config).key_env} or configure an ignored api_key_file before a paid run")
 
 
+def claude_executable() -> str:
+    """Prefer the native binary over the npm .cmd shim (cmd.exe mangles arguments).
+
+    CE_BENCH_CLAUDE_EXE selects a frozen copy: Claude Code auto-updates its shared
+    install, which would change the fingerprinted CLI version mid-campaign.
+    """
+    pinned = os.environ.get("CE_BENCH_CLAUDE_EXE")
+    if pinned:
+        if not Path(pinned).is_file():
+            raise FileNotFoundError("CE_BENCH_CLAUDE_EXE does not name a file")
+        return pinned
+    found = shutil.which("claude")
+    if not found:
+        raise FileNotFoundError("Claude Code CLI `claude` not found on PATH")
+    native = Path(found).parent / "node_modules" / "@anthropic-ai" / "claude-code" / "bin" / "claude.exe"
+    return str(native) if Path(found).suffix.lower() in {".cmd", ".ps1", ""} and native.is_file() else found
+
+
 def client_factory(config: dict):
+    if adapter(config) is ClaudeCodeCLI:
+        executable = claude_executable()
+
+        @asynccontextmanager
+        async def session():
+            yield ClaudeCodeSession(executable)
+        return session
     from openai import AsyncOpenAI
     key = credential(config)
     return lambda: AsyncOpenAI(api_key=key, base_url=adapter(config).endpoint,
@@ -125,8 +175,27 @@ def request_parameters(config: dict) -> dict:
     return adapter(config).parameters(config["model"])
 
 
+class ClaudeCodeSession:
+    def __init__(self, executable: str):
+        self.executable = executable
+
+
+def build_failed(payload: dict) -> bool:
+    build = payload.get("structured_content", {})
+    if not build:
+        for block in payload.get("content", []):
+            if block.get("type") == "text":
+                try:
+                    build = json.loads(block["text"])
+                except ValueError:
+                    pass
+    return bool(payload.get("is_error") or build.get("error") or build.get("build_state") != "built_ok")
+
+
 async def workflow(mcp, task: str, config: dict, provider, evidence, result: dict, *, prompt: str | None = None):
     """Mutate result incrementally so failures preserve partial usage and counts."""
+    if isinstance(provider, ClaudeCodeSession):
+        return await claude_code_workflow(mcp, task, config, provider, evidence, result, prompt=prompt)
     instructions, schemas = mcp.adapter(task)
     user_prompt = {**PROMPTS, **DEMO_PROMPTS}[task] if prompt is None else prompt
     history = [{"role": "user", "content": user_prompt}]
@@ -208,15 +277,7 @@ async def workflow(mcp, task: str, config: dict, provider, evidence, result: dic
                         payload = await mcp.dispatch(call["name"], arguments, schemas)
                     result["tool_errors"] += int(bool(payload.get("is_error")))
                     if call["name"] == "build_project":
-                        build = payload.get("structured_content", {})
-                        if not build:
-                            for block in payload.get("content", []):
-                                if block.get("type") == "text":
-                                    try:
-                                        build = json.loads(block["text"])
-                                    except ValueError:
-                                        pass
-                        failed_build = bool(payload.get("is_error") or build.get("error") or build.get("build_state") != "built_ok")
+                        failed_build = build_failed(payload)
                     if call["name"] in {"write_st_logic", "submit_candidate"} and failed_build:
                         result["repair_cycles"] += 1
                     output = {"type": "function_call_output", "call_id": call["call_id"], "output": encode(payload)}
@@ -226,3 +287,170 @@ async def workflow(mcp, task: str, config: dict, provider, evidence, result: dic
     finally:
         result["workflow_seconds"] = perf_counter() - started
         result["usage"] = usage.result()
+
+
+CLAUDE_STREAM_LIMIT = 1 << 26
+
+
+def claude_usage(final: dict) -> dict:
+    """Map Claude Code's cumulative per-model usage onto the Responses fields."""
+    models = (final or {}).get("modelUsage") or {}
+    totals = {key: sum(item.get(key) or 0 for item in models.values()) for key in
+              ("inputTokens", "outputTokens", "cacheReadInputTokens", "cacheCreationInputTokens", "thinkingTokens")}
+    prompt = totals["inputTokens"] + totals["cacheReadInputTokens"] + totals["cacheCreationInputTokens"]
+    return {"input_tokens": prompt, "output_tokens": totals["outputTokens"],
+            "total_tokens": prompt + totals["outputTokens"],
+            "input_tokens_details": {"cached_tokens": totals["cacheReadInputTokens"]},
+            "output_tokens_details": {"reasoning_tokens": totals["thinkingTokens"]}}
+
+
+async def claude_code_workflow(mcp, task: str, config: dict, provider: ClaudeCodeSession, evidence,
+                               result: dict, *, prompt: str | None = None):
+    """One `claude -p` session; its MCP calls return here through the relay socket."""
+    instructions, schemas = mcp.adapter(task)
+    user_prompt = {**PROMPTS, **DEMO_PROMPTS}[task] if prompt is None else prompt
+    usage = Usage()
+    result.update(tool_calls=0, tool_errors=0, repair_cycles=0, api_retries=0, transport_retries=0,
+                  model_requests=0, returned_models=[], request_ids=[], final_response="")
+    evidence.events.emit("model_context", instructions_ref=evidence.blob(instructions),
+        schemas_ref=evidence.blob(schemas), prompt_ref=evidence.blob(user_prompt),
+        prompt_resource_policy="No automatic prompts/resources; embedded reference tools available")
+    token = secrets.token_hex(16)
+    state = {"failed_build": False, "limit": False, "fatal": None}
+    lock = asyncio.Lock()
+    process = None
+
+    async def handle(reader, writer):
+        try:
+            request = json.loads(await reader.readline())
+            if request.get("token") != token:
+                return
+            name, arguments = request["name"], request.get("arguments") or {}
+            async with lock:
+                if state["fatal"] or result["tool_calls"] >= config["max_tool_calls"]:
+                    state["limit"] = state["limit"] or not state["fatal"]
+                    payload = {"is_error": True, "error": "Tool call limit reached"}
+                else:
+                    result["tool_calls"] += 1
+                    try:
+                        payload = await mcp.dispatch(name, arguments, schemas)
+                    except BaseException as exc:
+                        state["fatal"] = exc
+                        payload = {"is_error": True, "error": "Harness MCP failure"}
+                    else:
+                        result["tool_errors"] += int(bool(payload.get("is_error")))
+                        if name == "build_project":
+                            state["failed_build"] = build_failed(payload)
+                        if name in {"write_st_logic", "submit_candidate"} and state["failed_build"]:
+                            result["repair_cycles"] += 1
+            output = encode(payload)
+            evidence.events.emit("function_output", item_ref=evidence.blob(
+                {"type": "function_call_output", "name": name, "output": output}))
+            writer.write((json.dumps({"output": output, "is_error": bool(payload.get("is_error"))}) + "\n").encode())
+            await writer.drain()
+            state["mark"] = perf_counter()
+        finally:
+            writer.close()
+            if (state["limit"] or state["fatal"]) and process and process.returncode is None:
+                process.kill()
+
+    started = state["mark"] = perf_counter()
+    work = Path(tempfile.mkdtemp(prefix="ce-bench-claude-"))  # Outside any repository/CLAUDE.md tree.
+    server = await asyncio.start_server(handle, "127.0.0.1", 0, limit=CLAUDE_STREAM_LIMIT)
+    final = None
+    try:
+        port = server.sockets[0].getsockname()[1]
+        (work / "schemas.json").write_text(json.dumps(schemas), encoding="utf-8")
+        (work / "system-prompt.txt").write_text(instructions, encoding="utf-8")
+        (work / "mcp.json").write_text(json.dumps({"mcpServers": {"ce": {
+            "command": sys.executable,
+            "args": ["-m", "control_expert_mcp.benchmark.claude_bridge", "--port", str(port),
+                     "--schemas", str(work / "schemas.json")],
+            "env": {"CE_BENCH_BRIDGE_TOKEN": token}}}}), encoding="utf-8")
+        parameters = request_parameters(config)
+        argv = [provider.executable, "-p", "--model", parameters["model"],
+                "--output-format", "stream-json", "--verbose", "--tools", "",
+                "--system-prompt-file", str(work / "system-prompt.txt"),
+                "--mcp-config", str(work / "mcp.json"), "--strict-mcp-config",
+                "--allowedTools", "mcp__ce", "--permission-mode", "dontAsk",
+                "--setting-sources", "", "--no-session-persistence", "--disable-slash-commands",
+                "--max-turns", str(config["max_turns"])]
+        if "effort" in parameters:
+            argv += ["--effort", parameters["effort"]]
+        environment = {**os.environ, "MCP_TOOL_TIMEOUT": str((config["tool_timeout"] + 30) * 1000),
+                       "MCP_TIMEOUT": "60000", "DISABLE_AUTOUPDATER": "1"}
+        evidence.events.emit("model_request", turn=0, connection_attempt=0,
+            parameters_ref=evidence.blob({"argv": [Path(argv[0]).name, *argv[1:]], "parameters": parameters}),
+            input_refs=[evidence.blob({"role": "user", "content": user_prompt})])
+        async with asyncio.timeout(config["workflow_timeout"]):
+            process = await asyncio.create_subprocess_exec(*argv, cwd=work, env=environment,
+                stdin=asyncio.subprocess.PIPE, stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE, limit=CLAUDE_STREAM_LIMIT)
+            stderr = asyncio.create_task(process.stderr.read())
+            process.stdin.write(user_prompt.encode("utf-8"))
+            await process.stdin.drain()
+            process.stdin.close()
+            seen = set()
+            async for line in process.stdout:
+                try:
+                    message = json.loads(line)
+                except ValueError:
+                    continue
+                kind = message.get("type")
+                if kind == "system" and message.get("subtype") == "init":
+                    result["claude_code"] = {"version": message.get("claude_code_version"),
+                        "api_key_source": message.get("apiKeySource"), "tools": message.get("tools"),
+                        "mcp_servers": message.get("mcp_servers"), "model": message.get("model")}
+                    evidence.events.emit("claude_code_init", init_ref=evidence.blob(message))
+                elif kind == "assistant":
+                    body = message.get("message", {})
+                    if body.get("id") in seen:
+                        # Later content blocks of one API response arrive as separate lines.
+                        evidence.events.emit("model_response_part", turn=len(seen) - 1,
+                            request_id=message.get("request_id"), response_ref=evidence.blob(message))
+                        continue
+                    seen.add(body.get("id"))
+                    result["model_requests"] += 1
+                    result["returned_models"].append(body.get("model"))
+                    result["request_ids"].append(message.get("request_id"))
+                    # Approximate latency: since the previous response or returned tool output.
+                    evidence.events.emit("model_response", turn=len(seen) - 1, elapsed=perf_counter() - state["mark"],
+                        request_id=message.get("request_id"), response_ref=evidence.blob(message))
+                    state["mark"] = perf_counter()
+                elif kind == "result":
+                    final = message
+                    evidence.events.emit("claude_code_result", result_ref=evidence.blob(message))
+            await process.wait()
+            error_text = (await stderr).decode("utf-8", "replace")
+        if state["fatal"]:
+            raise state["fatal"]
+        usage.add(claude_usage(final) if final else None)
+        usage.requests = max(result["model_requests"], 1)
+        if final:
+            result["final_response"] = final.get("result") or ""
+            result["cost_usd"] = final.get("total_cost_usd")
+            result.setdefault("claude_code", {}).update(num_turns=final.get("num_turns"),
+                duration_api_ms=final.get("duration_api_ms"), terminal_reason=final.get("terminal_reason"),
+                subtype=final.get("subtype"), model_usage=final.get("modelUsage"))
+        if state["limit"]:
+            result.update(status="tool_limit", failure_reason="Tool call limit reached")
+        elif final is None:
+            evidence.events.emit("claude_code_exit", returncode=process.returncode,
+                                 stderr_ref=evidence.blob(error_text[-4000:]))
+            result.update(status="workflow_failure", failure_reason=f"Claude Code exited without a result ({process.returncode})")
+        elif any(model != config["model"]["id"] for model in result["returned_models"]):
+            result.update(status="model_mismatch", failure_reason="Returned model differs from configured ID; use an exact snapshot")
+        elif final.get("subtype") == "error_max_turns":
+            result.update(status="turn_limit", failure_reason="Model turn limit reached")
+        elif final.get("subtype") == "success" and not final.get("is_error"):
+            result["status"] = "completed"
+        else:
+            result.update(status="incomplete", failure_reason=final.get("terminal_reason") or final.get("subtype"))
+    finally:
+        if process and process.returncode is None:
+            process.kill()
+            await process.wait()
+        server.close()
+        result["workflow_seconds"] = perf_counter() - started
+        result["usage"] = usage.result()
+        shutil.rmtree(work, ignore_errors=True)

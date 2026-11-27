@@ -1,13 +1,14 @@
 """Restricted offline ST transition proof for the demo-derived alarm task.
 
-Only Boolean assignments/IFs and comparisons of the converted INT temperature
-with constants are supported. No PLC execution or ALRM_DIA emulation is claimed.
+Only Boolean assignments/IFs, SET/RESET of the two flags and comparisons of the
+converted INT temperature with constants are supported. No PLC execution or ALRM_DIA emulation is claimed.
 """
 from __future__ import annotations
 
 import math
 import re
 
+ALARM_RUBRIC = "feeder-alarms-2"
 FLAGS = {"temp_fault_1", "temp_fault_2"}
 BOOLS = FLAGS | {"start_process"}
 TOKEN = re.compile(r"\s+|[A-Za-z_][A-Za-z_0-9]*|\d+(?:\.\d+)?|:=|<=|>=|<>|[();=<>+\-,]")
@@ -113,6 +114,16 @@ class Parser:
                 self.take("end_if")
                 self.take(";")
                 statements.append(("if", branches, otherwise))
+            elif self.peek() in {"set", "reset"}:
+                # EBOOL SET/RESET write TRUE/FALSE; edge history is not graded.
+                value = self.take() == "set"
+                self.take("(")
+                target = self.take()
+                if target not in FLAGS:
+                    raise ValueError("Alarm extension may only set/reset the two fault flags")
+                self.take(")")
+                self.take(";")
+                statements.append(("assign", target, ("bool", value)))
             else:
                 target = self.take()
                 if target not in FLAGS:
@@ -182,7 +193,7 @@ def alarm_grade(baseline: str, actual: str) -> dict:
     boundaries. Checking boundary neighbors covers every INT input; enumerating
     both previous flags and enable states proves the one-scan transition table.
     """
-    result = {"rubric": "feeder-alarms-1", "scope": "unverified",
+    result = {"rubric": ALARM_RUBRIC, "scope": "unverified",
               "static_behavior": "unverified", "runtime_behavior": "unverified",
               "method": "restricted ST interpreter + exhaustive INT comparison partitions; no PLC execution"}
     try:

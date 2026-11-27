@@ -101,8 +101,8 @@ def load_config(path: str) -> dict:
         raise ValueError("Unknown configuration fields; credentials belong only in env or an ignored file")
     base = Path(path).resolve().parent
     provider = config.setdefault("provider", {"name": "openai"})
-    if provider.get("name") not in {"openai", "deepseek"} or set(provider) - {"name", "api_key_env", "api_key_file"}:
-        raise ValueError("Provider must be openai or deepseek; credentials belong in env or ignored file")
+    if provider.get("name") not in {"openai", "deepseek", "claude-code"} or set(provider) - {"name", "api_key_env", "api_key_file"}:
+        raise ValueError("Provider must be openai, deepseek or claude-code; credentials belong in env or ignored file")
     if provider.get("api_key_file"):
         provider["api_key_file"] = str((base / provider["api_key_file"]).resolve())
     for key in ("workspace", "results", "fixture"):
@@ -139,6 +139,11 @@ def load_config(path: str) -> dict:
             raise ValueError("DeepSeek requires explicit reasoning_effort: none/low/high/max")
         if "temperature" in model or "top_p" in model:
             raise ValueError("DeepSeek adapter omits sampling knobs to avoid silently ignored parameters")
+    if provider["name"] == "claude-code":
+        if set(model) - {"id", "identity", "reasoning_effort"} or set(provider) != {"name"}:
+            raise ValueError("Claude Code CLI accepts only model id/identity/reasoning_effort and uses its own login")
+        if model.get("reasoning_effort", "low") not in {"low", "medium", "high", "xhigh", "max"}:
+            raise ValueError("Claude Code effort must be low/medium/high/xhigh/max")
     for key in ("tool_timeout", "request_timeout", "workflow_timeout", "max_turns", "max_tool_calls"):
         if config.get(key, 0) <= 0:
             raise ValueError(f"Positive {key} required")
@@ -155,6 +160,10 @@ def snapshot(config: dict) -> dict:
             deps[name] = version(name)
         except PackageNotFoundError:
             deps[name] = None
+    if config.get("provider", {}).get("name") == "claude-code":
+        from .provider import claude_executable
+        deps["claude-code-cli"] = subprocess.run([claude_executable(), "--version"], capture_output=True,
+                                                 text=True, timeout=60).stdout.strip()
     servers = {}
     for name, condition in config["conditions"].items():
         env = environment(condition)

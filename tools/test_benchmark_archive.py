@@ -9,6 +9,7 @@ from control_expert_mcp.benchmark.core import digest, read_json, write_json
 from control_expert_mcp.benchmark.archive import archive_run
 from control_expert_mcp.benchmark.regrade import regrade_inspection, regraded_row
 from test_benchmark import GOLD
+from control_expert_mcp.benchmark.tasks import RUBRIC_VERSION
 from control_expert_mcp.benchmark.plot import chart_rows, visualize_archive, mapping_correctness
 from control_expert_mcp.benchmark.report import aggregate
 
@@ -163,11 +164,11 @@ class ArchiveTests(unittest.TestCase):
             before = path.read_bytes()
             regrade_inspection(root / "results", "run")
             self.assertEqual(before, path.read_bytes())
-            self.assertTrue(regraded_row(path, "feeder-2")["success"])
+            self.assertTrue(regraded_row(path, RUBRIC_VERSION)["success"])
             self.assertFalse(read_json(path)["success"])
             (path.parent / "final-response.txt").write_text("changed", encoding="utf-8")
             with self.assertRaises(ValueError):
-                regraded_row(path, "feeder-2")
+                regraded_row(path, RUBRIC_VERSION)
 
 
 if __name__ == "__main__":

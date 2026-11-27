@@ -132,6 +132,11 @@ class CoreTests(unittest.TestCase):
         self.assertFalse(inspect_grade("not JSON")["answer_pass"])
         assignment = {**GOLD, "initialization_expression": "wrong_target := material_a_value+material_b_value"}
         self.assertFalse(inspect_grade(json.dumps(assignment))["answer_pass"])
+        # feeder-3: one whole-answer fence is tolerated; surrounding prose is not.
+        self.assertTrue(inspect_grade("```json\n" + json.dumps(GOLD, indent=2) + "\n```")["answer_pass"])
+        self.assertTrue(inspect_grade("```\n" + json.dumps(GOLD) + "\n```\n")["answer_pass"])
+        self.assertFalse(inspect_grade("Answer:\n```json\n" + json.dumps(GOLD) + "\n```")["answer_pass"])
+        self.assertFalse(inspect_grade("```json\n" + json.dumps(GOLD) + "\n```\nDone.")["answer_pass"])
 
     def test_temperature_bound_grouping(self):
         st = source(FIXTURE.read_text(encoding="utf-8-sig"))

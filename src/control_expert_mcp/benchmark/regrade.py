@@ -5,8 +5,47 @@ import copy
 from pathlib import Path
 
 from .core import digest, read_json, write_json
-from .tasks import RUBRIC_VERSION, inspect_grade
+from .tasks import RUBRIC_VERSION, inspect_grade, source, static_grade
+from .alarms import ALARM_RUBRIC
 from .demo import io_mapping_grade
+
+
+def regrade_alarms(run: Path, plan: dict) -> Path:
+    """Re-prove saved alarm sections with the current interpreter; build/save evidence is retained."""
+    fixture = Path(plan["snapshot"]["config"]["fixture"])
+    if digest(fixture.read_bytes()) != plan["snapshot"]["fixture_sha256"]:
+        raise ValueError("Fixture differs from the original campaign")
+    baseline = source(fixture.read_text(encoding="utf-8-sig"))
+    output = run / "regrades" / ALARM_RUBRIC
+    for case in plan["schedule"]:
+        if case["task"] != "alarms":
+            continue
+        for summary_path in sorted((run / case["case_id"]).glob("attempt-*/summary.json")):
+            old = read_json(summary_path)
+            section_path = summary_path.parent / "saved-section.xml"
+            if old["fingerprint"] != plan["fingerprint"]:
+                raise ValueError("Case fingerprint differs from campaign")
+            if not section_path.exists():
+                continue  # No saved artifact to regrade; the original result stands.
+            prior = old["validation"]
+            grade = {**prior, **static_grade("alarms", baseline, source(section_path.read_text(encoding="utf-8")))}
+            success = old["status"] == "completed" and all((
+                prior.get("declarations_pass"), prior.get("obtained_source_through_mcp"), prior.get("model_built"),
+                prior.get("model_saved"), prior.get("compile_pass"),
+                grade["scope"] == "pass", grade["static_behavior"] == "pass"))
+            grade["success"] = success
+            value = {"case_id": case["case_id"], "attempt_id": summary_path.parent.name,
+                "fingerprint": plan["fingerprint"], "prior_rubric": prior.get("rubric"),
+                "prior_success": old["success"], "rubric": ALARM_RUBRIC, "success": success,
+                "summary_sha256": digest(summary_path.read_bytes()), "section_sha256": digest(section_path.read_bytes()),
+                "grader_sha256": digest(Path(__file__).with_name("alarms.py").read_bytes()),
+                "validation": grade, "method": "Saved-section static regrade; original build/save/declaration evidence retained. No API or CE calls."}
+            path = output / case["case_id"] / (summary_path.parent.name + ".json")
+            if path.exists() and read_json(path) != value:
+                raise ValueError("Regrade already exists with different evidence; use a new rubric version")
+            if not path.exists():
+                write_json(path, value)
+    return output
 
 
 def regrade_inspection(results: Path, run_id: str, task: str = "inspect") -> Path:
@@ -14,6 +53,8 @@ def regrade_inspection(results: Path, run_id: str, task: str = "inspect") -> Pat
         raise ValueError("Invalid run ID")
     run = results / run_id
     plan = read_json(run / "plan.json")
+    if task == "alarms":
+        return regrade_alarms(run, plan)
     if task not in {"inspect", "io_mapping"}:
         raise ValueError("Unsupported answer regrade task")
     grader = inspect_grade
@@ -63,13 +104,18 @@ def regraded_row(summary_path: Path, rubric: str) -> dict:
     if Path(rubric).name != rubric or rubric in {".", ".."}:
         raise ValueError("Invalid rubric")
     row = read_json(summary_path)
-    expected_task = "io_mapping" if rubric.startswith("demo-io-mapping-") else "inspect"
+    expected_task = ("io_mapping" if rubric.startswith("demo-io-mapping-") else
+                     "alarms" if rubric.startswith("feeder-alarms-") else "inspect")
     if row["task"] != expected_task:
         return row
     run = summary_path.parents[2]
     path = run / "regrades" / rubric / row["case_id"] / (summary_path.parent.name + ".json")
+    if expected_task == "alarms" and not path.exists():
+        return row  # No saved section was available to regrade.
     grade = read_json(path)
-    if grade["summary_sha256"] != digest(summary_path.read_bytes()) or grade["response_sha256"] != digest((summary_path.parent / "final-response.txt").read_bytes()):
+    evidence, name = (("section_sha256", "saved-section.xml") if expected_task == "alarms"
+                      else ("response_sha256", "final-response.txt"))
+    if grade["summary_sha256"] != digest(summary_path.read_bytes()) or grade[evidence] != digest((summary_path.parent / name).read_bytes()):
         raise ValueError("Regrade source evidence changed")
     row = copy.deepcopy(row)
     row.update(success=grade["success"], validation=grade["validation"], scoring_view=rubric)

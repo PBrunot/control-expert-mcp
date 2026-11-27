@@ -130,7 +130,7 @@ def archive_run(results: Path, run_id: str, destination: Path, *, allow_incomple
                 "cold_start", "provider", "requested_model", "returned_models", "model_identity",
                 "startup_seconds", "discovery_seconds", "setup_seconds", "reset_seconds", "workflow_seconds",
                 "total_seconds", "tool_calls", "tool_errors", "repair_cycles", "api_retries", "transport_retries",
-                "model_requests", "usage", "success", "durable_completed", "provider_failure_code",
+                "model_requests", "usage", "cost_usd", "success", "durable_completed", "provider_failure_code",
                 "variant", "language") if key in row}
             safe["cpu"] = row.get("ce_status", {}).get("project", {}).get("cpu")
             safe["attempt_id"] = attempt.name
@@ -193,7 +193,10 @@ def archive_run(results: Path, run_id: str, destination: Path, *, allow_incomple
              if live else "Sampled one-second OPC DA counter behavior on PLC Simulator; no scan-level or physical-hardware proof."
              if simulator else "Native IEC in-MAST output traces on M580 Simulator; no physical-hardware validation."
              if iec else "Static recognized-subset acceptance; PLC runtime behavior remains unverified."),
-            "API client/model experiment, distinct from ChatGPT UI.",
+            ("Claude Code CLI agent loop (subscription login, built-in tools disabled, server instructions as "
+             "replacement system prompt); distinct from interactive Claude Code defaults."
+             if config.get("provider", {}).get("name") == "claude-code"
+             else "API client/model experiment, distinct from ChatGPT UI."),
             "Dirty source fingerprints identify uncommitted code; do not label them a clean revision."]}
     if live:
         outcome = read_json(run / "outcome.json")

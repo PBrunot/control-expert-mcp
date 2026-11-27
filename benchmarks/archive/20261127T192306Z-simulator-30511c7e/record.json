@@ -1,0 +1,557 @@
+{
+  "archive_version": 1,
+  "run_id": "20261127T192306Z-simulator-30511c7e",
+  "fingerprint": "a1d9931cbc599d6152f56ff69b40aaeb6c03a4e915899ccb63392ffe6c58c96c",
+  "complete": true,
+  "unfinished_cases": [],
+  "scheduled_cases": 1,
+  "model": {
+    "id": "claude-haiku-4-5-20251001",
+    "identity": "pinned"
+  },
+  "provider": "claude-code",
+  "cpu": {
+    "part_number": "BME P58 3040",
+    "version": "03.20"
+  },
+  "ce_version": "16.4",
+  "machine_sha256": "a41fca9484390d13b1ac9c53a119a7880bcbee96ebcb9a9c40ef26e7f2e738e7",
+  "harness": {
+    "revision": "8432871bba754e95819570a1addd000608242dce",
+    "dirty": true,
+    "dirty_fingerprint": "95d3763b93ddc577302741efd245ec97a5bf5a52e54aff0d7a01ba26f1d7aad7"
+  },
+  "dependencies": {
+    "control-expert-mcp": "0.9.0",
+    "mcp": "2.3.0",
+    "openai": "2.54.0",
+    "pywin32": "312",
+    "claude-code-cli": "2.1.332 (Claude Code)"
+  },
+  "servers": {
+    "SIMULATOR": {
+      "source": {
+        "revision": "8432871bba754e95819570a1addd000608242dce",
+        "dirty": true,
+        "dirty_fingerprint": "95d3763b93ddc577302741efd245ec97a5bf5a52e54aff0d7a01ba26f1d7aad7"
+      },
+      "runtime_package_sha256": "262455b73a97528d10c28d6b94f610dfcea38efa6c4c3845dbb7494539654e3e",
+      "dependencies": {
+        "control-expert-mcp": "0.9.4",
+        "mcp": "2.3.0"
+      },
+      "documentation_available": false,
+      "corpus_sha256": null,
+      "corpus_files": 0,
+      "environment_sha256": "52e7c23ed88f76351ab101f653f9a98538ee09a91da8f394a166caeda29b28c6"
+    }
+  },
+  "fixture_sha256": "5243304e7c0289eb56b63359b4c2c8fd406ec39612dd513293abda3cb2e45538",
+  "demo_inputs": {},
+  "rubric_version": "simulator-counter-1",
+  "prompt_sha256": {
+    "simulator_counter": "d94a9b1e0ccc3800956965755465ca983903e970d254b64a672a49f78aae8ed6"
+  },
+  "orientation_sha256": "b7fe35e78ec9d1a3049e0943f30ef150bf4a0558b898b96d532409d3f1688fe3",
+  "demo_orientation_sha256": "ab95fe37b465a65ab6601fa6cefd5b034aa67191c8d928c0bd6bb0f01b184e5c",
+  "contexts": "b22febcd5d6e90564c87d82655b46e96db92b58ef07c6056fc60bd27ecaf3582",
+  "provider_retry_policy": {
+    "error": "APIConnectionError",
+    "max_retries": 2,
+    "backoff_seconds": [
+      1.0,
+      2.0
+    ],
+    "sdk_retries": 0,
+    "mcp_retries": 0
+  },
+  "seed": 0,
+  "schedule": [
+    {
+      "case_id": "simulator-counter-000",
+      "task": "simulator_counter",
+      "repeat": 0,
+      "condition": "SIMULATOR"
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "simulator-counter-000",
+      "task": "simulator_counter",
+      "repeat": 0,
+      "condition": "SIMULATOR",
+      "fingerprint": "a1d9931cbc599d6152f56ff69b40aaeb6c03a4e915899ccb63392ffe6c58c96c",
+      "status": "completed",
+      "cold_start": true,
+      "provider": "claude-code",
+      "requested_model": "claude-haiku-4-5-20251001",
+      "returned_models": [
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001"
+      ],
+      "model_identity": "pinned",
+      "startup_seconds": 1.098264200030826,
+      "discovery_seconds": 0.0155863999389112,
+      "workflow_seconds": 150.46403020003345,
+      "total_seconds": 160.5,
+      "tool_calls": 38,
+      "tool_errors": 0,
+      "repair_cycles": 0,
+      "api_retries": 0,
+      "transport_retries": 0,
+      "model_requests": 35,
+      "usage": {
+        "requests": 35,
+        "tokens": {
+          "input_tokens": 809726,
+          "output_tokens": 10340,
+          "total_tokens": 820066,
+          "cached_input_tokens": 770964,
+          "reasoning_tokens": 5049
+        },
+        "known_partial_tokens": {
+          "input_tokens": 809726,
+          "output_tokens": 10340,
+          "total_tokens": 820066,
+          "cached_input_tokens": 770964,
+          "reasoning_tokens": 5049
+        }
+      },
+      "cost_usd": 0.20603840000000007,
+      "success": false,
+      "durable_completed": true,
+      "cpu": null,
+      "attempt_id": "attempt-001",
+      "interaction_metrics": {
+        "model_request_seconds": {
+          "n": 35,
+          "known_n": 35,
+          "unknown_n": 0,
+          "median": 1.353428200003691,
+          "p95": 9.091805499978364
+        },
+        "mcp_round_trip_seconds": {
+          "get_status": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.010039699962362647,
+            "p95": 0.010039699962362647
+          },
+          "get_live_access_setup": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.002047399990260601,
+            "p95": 0.002047399990260601
+          },
+          "open_project": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 14.13860810000915,
+            "p95": 14.13860810000915
+          },
+          "get_project_structure": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.12053149996791035,
+            "p95": 0.12053149996791035
+          },
+          "list_variables": {
+            "n": 2,
+            "known_n": 2,
+            "unknown_n": 0,
+            "median": 0.22248554998077452,
+            "p95": 0.2298933999845758
+          },
+          "create_variable": {
+            "n": 4,
+            "known_n": 4,
+            "unknown_n": 0,
+            "median": 0.012537650007288903,
+            "p95": 0.06410499999765307
+          },
+          "get_language_reference": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.00250260008033365,
+            "p95": 0.00250260008033365
+          },
+          "write_st_logic": {
+            "n": 2,
+            "known_n": 2,
+            "unknown_n": 0,
+            "median": 0.17641245003324002,
+            "p95": 0.21448310010600835
+          },
+          "build_project": {
+            "n": 2,
+            "known_n": 2,
+            "unknown_n": 0,
+            "median": 2.4270216500153765,
+            "p95": 3.4507623999379575
+          },
+          "save_project": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 2.316240399959497,
+            "p95": 2.316240399959497
+          },
+          "start_simulator": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 1.7183868000283837,
+            "p95": 1.7183868000283837
+          },
+          "plc_setup_connection": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.0033552999375388026,
+            "p95": 0.0033552999375388026
+          },
+          "plc_connect": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 1.1231268000556156,
+            "p95": 1.1231268000556156
+          },
+          "plc_transfer": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 7.154692100011744,
+            "p95": 7.154692100011744
+          },
+          "plc_command": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.31679020007140934,
+            "p95": 0.31679020007140934
+          },
+          "plc_state": {
+            "n": 2,
+            "known_n": 2,
+            "unknown_n": 0,
+            "median": 0.0032358000171370804,
+            "p95": 0.003536500036716461
+          },
+          "opc_connect": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.3474711999297142,
+            "p95": 0.3474711999297142
+          },
+          "opc_browse": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.009681299910880625,
+            "p95": 0.009681299910880625
+          },
+          "opc_read_tags": {
+            "n": 12,
+            "known_n": 12,
+            "unknown_n": 0,
+            "median": 0.043608700041659176,
+            "p95": 0.051166199962608516
+          },
+          "read_section": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.11030609998852015,
+            "p95": 0.11030609998852015
+          }
+        }
+      },
+      "validation": {
+        "rubric": "simulator-counter-1",
+        "runtime_behavior": "unverified",
+        "compile_pass": true,
+        "success": false
+      },
+      "artifact_sha256": {
+        "project.stu": "ede87fd7cf5b13393dab71e683aaba2fae5889334209af0e0986f691fbd7617d"
+      }
+    }
+  ],
+  "conditions": {
+    "SIMULATOR": {
+      "overall": {
+        "cases": 1,
+        "completion": {
+          "pass": 1,
+          "n": 1,
+          "verified_n": 1,
+          "rate_all": 1.0
+        },
+        "accepted": {
+          "pass": 0,
+          "n": 1,
+          "verified_n": 1,
+          "rate_all": 0.0
+        },
+        "build": {
+          "pass": 1,
+          "n": 1,
+          "verified_n": 1,
+          "rate_all": 1.0
+        },
+        "static_behavior": {
+          "pass": 0,
+          "n": 1,
+          "verified_n": 0,
+          "rate_all": 0.0
+        },
+        "runtime_behavior": {
+          "pass": 0,
+          "n": 1,
+          "verified_n": 0,
+          "rate_all": 0.0
+        },
+        "all_attempts": {
+          "workflow_seconds": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 150.46403020003345,
+            "p95": 150.46403020003345
+          },
+          "input_tokens": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 809726,
+            "p95": 809726
+          },
+          "output_tokens": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 10340,
+            "p95": 10340
+          },
+          "total_tokens": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 820066,
+            "p95": 820066
+          }
+        },
+        "accepted_attempts": {
+          "workflow_seconds": {
+            "n": 0,
+            "known_n": 0,
+            "unknown_n": 0,
+            "median": null,
+            "p95": null
+          },
+          "input_tokens": {
+            "n": 0,
+            "known_n": 0,
+            "unknown_n": 0,
+            "median": null,
+            "p95": null
+          },
+          "output_tokens": {
+            "n": 0,
+            "known_n": 0,
+            "unknown_n": 0,
+            "median": null,
+            "p95": null
+          },
+          "total_tokens": {
+            "n": 0,
+            "known_n": 0,
+            "unknown_n": 0,
+            "median": null,
+            "p95": null
+          }
+        },
+        "known_partial_tokens": {
+          "input_tokens": 809726,
+          "output_tokens": 10340,
+          "total_tokens": 820066
+        },
+        "tool_errors": 0,
+        "api_retries": 0,
+        "repair_cycles": 0,
+        "statuses": {
+          "completed": 1
+        }
+      },
+      "tasks": {
+        "simulator_counter": {
+          "cases": 1,
+          "completion": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "accepted": {
+            "pass": 0,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 0.0
+          },
+          "build": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "static_behavior": {
+            "pass": 0,
+            "n": 1,
+            "verified_n": 0,
+            "rate_all": 0.0
+          },
+          "runtime_behavior": {
+            "pass": 0,
+            "n": 1,
+            "verified_n": 0,
+            "rate_all": 0.0
+          },
+          "all_attempts": {
+            "workflow_seconds": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 150.46403020003345,
+              "p95": 150.46403020003345
+            },
+            "input_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 809726,
+              "p95": 809726
+            },
+            "output_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 10340,
+              "p95": 10340
+            },
+            "total_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 820066,
+              "p95": 820066
+            }
+          },
+          "accepted_attempts": {
+            "workflow_seconds": {
+              "n": 0,
+              "known_n": 0,
+              "unknown_n": 0,
+              "median": null,
+              "p95": null
+            },
+            "input_tokens": {
+              "n": 0,
+              "known_n": 0,
+              "unknown_n": 0,
+              "median": null,
+              "p95": null
+            },
+            "output_tokens": {
+              "n": 0,
+              "known_n": 0,
+              "unknown_n": 0,
+              "median": null,
+              "p95": null
+            },
+            "total_tokens": {
+              "n": 0,
+              "known_n": 0,
+              "unknown_n": 0,
+              "median": null,
+              "p95": null
+            }
+          },
+          "known_partial_tokens": {
+            "input_tokens": 809726,
+            "output_tokens": 10340,
+            "total_tokens": 820066
+          },
+          "tool_errors": 0,
+          "api_retries": 0,
+          "repair_cycles": 0,
+          "statuses": {
+            "completed": 1
+          }
+        }
+      }
+    }
+  },
+  "paired_differences": {},
+  "suite": "simulator-counter",
+  "limitations": [
+    "Small repetition counts are exploratory, not statistically strong comparisons.",
+    "Sampled one-second OPC DA counter behavior on PLC Simulator; no scan-level or physical-hardware proof.",
+    "Claude Code CLI agent loop (subscription login, built-in tools disabled, server instructions as replacement system prompt); distinct from interactive Claude Code defaults.",
+    "Dirty source fingerprints identify uncommitted code; do not label them a clean revision."
+  ],
+  "runtime_environment": {
+    "protocol": "opc-da",
+    "cleanup_verified": true,
+    "alias_sha256": "8159ae854dcc8fa1cd166ea94ecddf9c2b35ede2fec71651524856a06d3ca023"
+  },
+  "observation_policy": {
+    "duration_seconds": 8.0,
+    "poll_seconds": 0.1,
+    "max_sample_gap": 0.35,
+    "min_increments": 6,
+    "interval_tolerance": 0.35,
+    "mean_period_tolerance": 0.15
+  },
+  "inspection_regrades": [],
+  "regraded_conditions": {}
+}

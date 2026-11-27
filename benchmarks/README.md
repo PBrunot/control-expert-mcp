@@ -21,6 +21,51 @@ system prompt or orchestration. A ChatGPT subscription does not supply API acces
 or an API key. Only `run` and `resume` can send paid requests; tests, `doctor`,
 `prepare`, `validate`, `compare`, and `run --dry-run` never call a provider.
 
+## Claude Code CLI provider
+
+`"provider": {"name": "claude-code"}` drives the Claude Code CLI (`claude -p`)
+as the agent loop instead of a Responses API. It uses the CLI's own login
+(a Claude subscription works; no API key is read or forwarded). Each case runs
+one `claude -p` session in a fresh temporary directory outside the repository with:
+
+- built-in tools disabled (`--tools ""`), no user/project settings, no slash
+  commands, no session persistence and `--permission-mode dontAsk`;
+- the same server instructions + orientation that other providers receive, as a
+  replacement system prompt (not Claude Code's default coding prompt);
+- one relay MCP server (`control_expert_mcp.benchmark.claude_bridge`) exposing
+  exactly the benchmark-filtered tool schemas. Every call returns over a
+  token-authenticated loopback socket to the harness's own MCP session, so
+  dispatch policy, `mcp_call` evidence, tool limits and independent grading are
+  identical to the API providers.
+
+Only `id`, `identity` and optional `reasoning_effort` (passed as `--effort`)
+are accepted under `model`. Usage comes from the CLI's cumulative per-model
+usage (input includes cache reads/writes); `cost_usd` is the CLI's list-price
+estimate, also reported for subscription logins. The CLI version is part of the
+campaign fingerprint. Claude Code auto-updates its shared install, which would
+abort a campaign midway, so pin a frozen copy for the campaign:
+
+```powershell
+# Copy the current native binary, e.g. to benchmarks\.local\claude-cli\<version>\claude.exe
+$env:CE_BENCH_CLAUDE_EXE = "E:\GitHub\control-expert-mcp\benchmarks\.local\claude-cli\2.1.332\claude.exe"
+ce-bench run --config benchmarks/.local/claude-haiku.json --condition A B --repeats 1 --seed 1729
+ce-bench simulator run --config benchmarks/.local/simulator-claude-haiku.json --alias Dev_Alias_2 --allow-live --confirm-ofs-running --allow-closed-loop --allow-simulator-replacement --repeats 1
+```
+
+[claude-code.example.json](claude-code.example.json) uses the pinned
+`claude-haiku-4-5-20251001` snapshot (a low-cost model). The first full Claude
+Code suite (2026-11-27, CLI 2.1.332, Haiku 4.5) is archived as
+`20261127T185620Z-558a4028` (offline, 8/14 original, 12/14 with `feeder-3` +
+`feeder-alarms-2`) and `20261127T192306Z-simulator-30511c7e` (simulator, 0/1:
+the model edited and rebuilt after download without transferring again, so the
+running application was stale and the counter judge had nothing to attribute;
+the model still claimed success). Remaining offline failures are real: both
+repair arms replaced the broken operand with the constant `0` instead of
+`Measured_temp`. The earlier attempt `20261127T183256Z-d960f39f` stopped after
+11 cases when the CLI auto-updated (2.1.289 → 2.1.332) and is archived as partial.
+List-price cost (`cost_usd`): $1.01 for the 14 offline cases and $0.21 for the
+simulator case.
+
 ## Full M580 demo inspection cases
 
 Configure both `demo_project` (a disposable source STU) and `io_mapping_reference`

@@ -1,0 +1,5338 @@
+{
+  "archive_version": 1,
+  "run_id": "20261127T185620Z-558a4028",
+  "fingerprint": "885b342368808facad30c77687ee14d0a64fa0394330240ade794292908c87c8",
+  "complete": true,
+  "unfinished_cases": [],
+  "scheduled_cases": 14,
+  "model": {
+    "id": "claude-haiku-4-5-20251001",
+    "identity": "pinned"
+  },
+  "provider": "claude-code",
+  "cpu": {
+    "part_number": "BMX P34 2020",
+    "version": "02.70"
+  },
+  "ce_version": "16.4",
+  "machine_sha256": "a41fca9484390d13b1ac9c53a119a7880bcbee96ebcb9a9c40ef26e7f2e738e7",
+  "harness": {
+    "revision": "8432871bba754e95819570a1addd000608242dce",
+    "dirty": true,
+    "dirty_fingerprint": "95d3763b93ddc577302741efd245ec97a5bf5a52e54aff0d7a01ba26f1d7aad7"
+  },
+  "dependencies": {
+    "control-expert-mcp": "0.9.0",
+    "mcp": "2.3.0",
+    "openai": "2.54.0",
+    "pywin32": "312",
+    "claude-code-cli": "2.1.332 (Claude Code)"
+  },
+  "servers": {
+    "A": {
+      "source": {
+        "revision": "8432871bba754e95819570a1addd000608242dce",
+        "dirty": true,
+        "dirty_fingerprint": "95d3763b93ddc577302741efd245ec97a5bf5a52e54aff0d7a01ba26f1d7aad7"
+      },
+      "runtime_package_sha256": "262455b73a97528d10c28d6b94f610dfcea38efa6c4c3845dbb7494539654e3e",
+      "dependencies": {
+        "control-expert-mcp": "0.9.0",
+        "mcp": "2.3.0"
+      },
+      "documentation_available": false,
+      "corpus_sha256": "a1ec0bc44081b4ae58812c29cee112de3c0ca46d45854e6909a5b7cef7c1f1af",
+      "corpus_files": 47545,
+      "environment_sha256": "4b3617da3922e528bf6e4a67caaa2814a9fca25d95a68d55db250f9213c0a5f1"
+    },
+    "B": {
+      "source": {
+        "revision": "8432871bba754e95819570a1addd000608242dce",
+        "dirty": true,
+        "dirty_fingerprint": "95d3763b93ddc577302741efd245ec97a5bf5a52e54aff0d7a01ba26f1d7aad7"
+      },
+      "runtime_package_sha256": "262455b73a97528d10c28d6b94f610dfcea38efa6c4c3845dbb7494539654e3e",
+      "dependencies": {
+        "control-expert-mcp": "0.9.0",
+        "mcp": "2.3.0"
+      },
+      "documentation_available": true,
+      "corpus_sha256": "a1ec0bc44081b4ae58812c29cee112de3c0ca46d45854e6909a5b7cef7c1f1af",
+      "corpus_files": 47545,
+      "environment_sha256": "4b3617da3922e528bf6e4a67caaa2814a9fca25d95a68d55db250f9213c0a5f1"
+    }
+  },
+  "fixture_sha256": "88f39fb5d52df4dfacbb9e6a6bae0939cff6381932830aec3990ce8241c46a7f",
+  "demo_inputs": {
+    "demo_project": "5243304e7c0289eb56b63359b4c2c8fd406ec39612dd513293abda3cb2e45538",
+    "io_mapping_reference": "ae70a0f647ac3d404ed66eb014a0f876806b067ef38f0b07953a5a8233218888"
+  },
+  "rubric_version": "feeder-2",
+  "prompt_sha256": {
+    "inspect": "db3e5efeb3c953697360a4ed7719ff23efd68e48e26bfeb270ecc22ac0e0477b",
+    "threshold": "2e0f696bd5b268a0d516bd60cecaa03d527c607c632ae5f4ee829f19dab0f25f",
+    "temperature": "ec3522af780feed05f7812ae58b58477b7be45efe14189e71afe5477c0a25d54",
+    "repair": "6e237c54b8f1935f6eba50933df23ff7fc28173bd0a7bb0d30b343fd7af44704",
+    "alarms": "04a0911f671b3fae1ba368a5daea9d625ea66f6fa958b85128ed5e8deffde17a",
+    "weighing": "ba565b369fa632d82ae0d2a79611e3793ec9f08c317fb216aac39aafb09eea1f",
+    "io_mapping": "d848ece470125e0119814a0960b7243b59ad50ac9fa18c5ac7ff7aa7c71491cb"
+  },
+  "orientation_sha256": "0c5113862cdcd53bff0177aa4a8aae6682225b0234c2acc8bc846274b0437f46",
+  "demo_orientation_sha256": "ab95fe37b465a65ab6601fa6cefd5b034aa67191c8d928c0bd6bb0f01b184e5c",
+  "contexts": {
+    "A": {
+      "inspect": "5d756beb3626299ab95bff1b628168b3c61b721265c550664c90266443011dec",
+      "threshold": "35e54abaae4ddc935f4e40d40dbcdfe4a719ae1033b2f716f2a6c47f13042a75",
+      "temperature": "35e54abaae4ddc935f4e40d40dbcdfe4a719ae1033b2f716f2a6c47f13042a75",
+      "repair": "35e54abaae4ddc935f4e40d40dbcdfe4a719ae1033b2f716f2a6c47f13042a75",
+      "alarms": "35e54abaae4ddc935f4e40d40dbcdfe4a719ae1033b2f716f2a6c47f13042a75",
+      "weighing": "c45285bc755d19efc3df0a16b5ea681ea20b5ad01723d864b0c46359cab0b9a9",
+      "io_mapping": "c45285bc755d19efc3df0a16b5ea681ea20b5ad01723d864b0c46359cab0b9a9"
+    },
+    "B": {
+      "inspect": "66336c538b16de53a7f56fcfb8c8a947632a553df9554e77ee36a481ccfc0e2d",
+      "threshold": "1464c2ead866939b6e376422ab5b377661573ee5d4ea7260e6ad5123c915e580",
+      "temperature": "1464c2ead866939b6e376422ab5b377661573ee5d4ea7260e6ad5123c915e580",
+      "repair": "1464c2ead866939b6e376422ab5b377661573ee5d4ea7260e6ad5123c915e580",
+      "alarms": "1464c2ead866939b6e376422ab5b377661573ee5d4ea7260e6ad5123c915e580",
+      "weighing": "ef7ce0b664633f9aa22b3ef07488d938d018f3b4019a5e744c10fdcf5a2fcec3",
+      "io_mapping": "ef7ce0b664633f9aa22b3ef07488d938d018f3b4019a5e744c10fdcf5a2fcec3"
+    }
+  },
+  "provider_retry_policy": {
+    "error": "APIConnectionError",
+    "max_retries": 2,
+    "backoff_seconds": [
+      1.0,
+      2.0
+    ],
+    "sdk_retries": 0,
+    "mcp_retries": 0
+  },
+  "seed": 1729,
+  "schedule": [
+    {
+      "task": "threshold",
+      "repeat": 0,
+      "condition": "B",
+      "case_id": "threshold-000-B"
+    },
+    {
+      "task": "threshold",
+      "repeat": 0,
+      "condition": "A",
+      "case_id": "threshold-000-A"
+    },
+    {
+      "task": "temperature",
+      "repeat": 0,
+      "condition": "A",
+      "case_id": "temperature-000-A"
+    },
+    {
+      "task": "temperature",
+      "repeat": 0,
+      "condition": "B",
+      "case_id": "temperature-000-B"
+    },
+    {
+      "task": "io_mapping",
+      "repeat": 0,
+      "condition": "A",
+      "case_id": "io_mapping-000-A"
+    },
+    {
+      "task": "io_mapping",
+      "repeat": 0,
+      "condition": "B",
+      "case_id": "io_mapping-000-B"
+    },
+    {
+      "task": "alarms",
+      "repeat": 0,
+      "condition": "A",
+      "case_id": "alarms-000-A"
+    },
+    {
+      "task": "alarms",
+      "repeat": 0,
+      "condition": "B",
+      "case_id": "alarms-000-B"
+    },
+    {
+      "task": "repair",
+      "repeat": 0,
+      "condition": "B",
+      "case_id": "repair-000-B"
+    },
+    {
+      "task": "repair",
+      "repeat": 0,
+      "condition": "A",
+      "case_id": "repair-000-A"
+    },
+    {
+      "task": "inspect",
+      "repeat": 0,
+      "condition": "B",
+      "case_id": "inspect-000-B"
+    },
+    {
+      "task": "inspect",
+      "repeat": 0,
+      "condition": "A",
+      "case_id": "inspect-000-A"
+    },
+    {
+      "task": "weighing",
+      "repeat": 0,
+      "condition": "A",
+      "case_id": "weighing-000-A"
+    },
+    {
+      "task": "weighing",
+      "repeat": 0,
+      "condition": "B",
+      "case_id": "weighing-000-B"
+    }
+  ],
+  "cases": [
+    {
+      "case_id": "threshold-000-B",
+      "task": "threshold",
+      "repeat": 0,
+      "condition": "B",
+      "fingerprint": "885b342368808facad30c77687ee14d0a64fa0394330240ade794292908c87c8",
+      "status": "completed",
+      "failure_reason": null,
+      "cold_start": true,
+      "provider": "claude-code",
+      "requested_model": "claude-haiku-4-5-20251001",
+      "returned_models": [
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001"
+      ],
+      "model_identity": "pinned",
+      "startup_seconds": 1.0157894999720156,
+      "discovery_seconds": 0.011387899983674288,
+      "setup_seconds": 12.874546300037764,
+      "reset_seconds": 11.843935400014743,
+      "workflow_seconds": 28.594349000020884,
+      "total_seconds": 72.87259499996435,
+      "tool_calls": 6,
+      "tool_errors": 0,
+      "repair_cycles": 0,
+      "api_retries": 0,
+      "transport_retries": 0,
+      "model_requests": 6,
+      "usage": {
+        "requests": 6,
+        "tokens": {
+          "input_tokens": 46688,
+          "output_tokens": 1786,
+          "total_tokens": 48474,
+          "cached_input_tokens": 36786,
+          "reasoning_tokens": 641
+        },
+        "known_partial_tokens": {
+          "input_tokens": 46688,
+          "output_tokens": 1786,
+          "total_tokens": 48474,
+          "cached_input_tokens": 36786,
+          "reasoning_tokens": 641
+        }
+      },
+      "cost_usd": 0.0323626,
+      "success": true,
+      "durable_completed": true,
+      "cpu": {
+        "family": "Micro Basic",
+        "part_number": "BMX P34 2020",
+        "version": "02.70"
+      },
+      "attempt_id": "attempt-b90197e952e54244af1020a568fa26c4",
+      "interaction_metrics": {
+        "model_request_seconds": {
+          "n": 6,
+          "known_n": 6,
+          "unknown_n": 0,
+          "median": 0.9792248999583535,
+          "p95": 7.362368499976583
+        },
+        "mcp_round_trip_seconds": {
+          "get_status": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.009616700001060963,
+            "p95": 0.009616700001060963
+          },
+          "get_project_structure": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.05238449992612004,
+            "p95": 0.05238449992612004
+          },
+          "read_section": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.06121519999578595,
+            "p95": 0.06121519999578595
+          },
+          "write_st_logic": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.20202440000139177,
+            "p95": 0.20202440000139177
+          },
+          "build_project": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 1.0695358999073505,
+            "p95": 1.0695358999073505
+          },
+          "save_project": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.85177670000121,
+            "p95": 0.85177670000121
+          }
+        }
+      },
+      "validation": {
+        "scope": "pass",
+        "static_behavior": "pass",
+        "runtime_behavior": "unverified",
+        "compile_pass": true,
+        "declarations_pass": true,
+        "model_built": true,
+        "model_saved": true,
+        "success": true,
+        "obtained_source_through_mcp": true,
+        "limitation": "Static recognized-subset checks; PLC runtime behavior unverified",
+        "evaluator_seconds": 23.671864999923855,
+        "build": {
+          "build_state": "built_ok",
+          "error_present": false,
+          "diagnostics_available": true,
+          "diagnostics_summary": {
+            "process_status": "succeeded",
+            "errors": 0,
+            "warnings": 0
+          },
+          "capture": {
+            "freshness": "changed",
+            "attribution": "unverified",
+            "scope": "snapshot",
+            "source_tab": "Build"
+          }
+        }
+      },
+      "artifact_sha256": {
+        "project.stu": "13157b5bf9b80c86bc1734575489775a6f96f6d67e3e0a975f1d9bceff0180fd",
+        "saved-section.xml": "9bf0ee6d720e16542972a07cfaa5bcbc0955a144f0326368bccb8351e19da218",
+        "saved-variables.xml": "a783cca146dbe2c742a215d413696388c94d77253a44d47e2ccdb3aadf478ced"
+      }
+    },
+    {
+      "case_id": "threshold-000-A",
+      "task": "threshold",
+      "repeat": 0,
+      "condition": "A",
+      "fingerprint": "885b342368808facad30c77687ee14d0a64fa0394330240ade794292908c87c8",
+      "status": "completed",
+      "failure_reason": null,
+      "cold_start": true,
+      "provider": "claude-code",
+      "requested_model": "claude-haiku-4-5-20251001",
+      "returned_models": [
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001"
+      ],
+      "model_identity": "pinned",
+      "startup_seconds": 1.0948696000268683,
+      "discovery_seconds": 0.012080300017260015,
+      "setup_seconds": 12.907644799910486,
+      "reset_seconds": 11.79789039993193,
+      "workflow_seconds": 31.861743599991314,
+      "total_seconds": 74.78675599989947,
+      "tool_calls": 6,
+      "tool_errors": 0,
+      "repair_cycles": 0,
+      "api_retries": 0,
+      "transport_retries": 0,
+      "model_requests": 6,
+      "usage": {
+        "requests": 6,
+        "tokens": {
+          "input_tokens": 44009,
+          "output_tokens": 2269,
+          "total_tokens": 46278,
+          "cached_input_tokens": 30342,
+          "reasoning_tokens": 1240
+        },
+        "known_partial_tokens": {
+          "input_tokens": 44009,
+          "output_tokens": 2269,
+          "total_tokens": 46278,
+          "cached_input_tokens": 30342,
+          "reasoning_tokens": 1240
+        }
+      },
+      "cost_usd": 0.03769320000000001,
+      "success": true,
+      "durable_completed": true,
+      "cpu": {
+        "family": "Micro Basic",
+        "part_number": "BMX P34 2020",
+        "version": "02.70"
+      },
+      "attempt_id": "attempt-edd6f7e7ab7948efa2f78fb5c72d82df",
+      "interaction_metrics": {
+        "model_request_seconds": {
+          "n": 6,
+          "known_n": 6,
+          "unknown_n": 0,
+          "median": 1.1649884999496862,
+          "p95": 9.377573000034317
+        },
+        "mcp_round_trip_seconds": {
+          "get_status": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.009884899947792292,
+            "p95": 0.009884899947792292
+          },
+          "get_project_structure": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.05039400001987815,
+            "p95": 0.05039400001987815
+          },
+          "read_section": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.06310220004525036,
+            "p95": 0.06310220004525036
+          },
+          "write_st_logic": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.20991630002390593,
+            "p95": 0.20991630002390593
+          },
+          "build_project": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.986966299940832,
+            "p95": 0.986966299940832
+          },
+          "save_project": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.8672416000626981,
+            "p95": 0.8672416000626981
+          }
+        }
+      },
+      "validation": {
+        "scope": "pass",
+        "static_behavior": "pass",
+        "runtime_behavior": "unverified",
+        "compile_pass": true,
+        "declarations_pass": true,
+        "model_built": true,
+        "model_saved": true,
+        "success": true,
+        "obtained_source_through_mcp": true,
+        "limitation": "Static recognized-subset checks; PLC runtime behavior unverified",
+        "evaluator_seconds": 22.591728699975647,
+        "build": {
+          "build_state": "built_ok",
+          "error_present": false,
+          "diagnostics_available": true,
+          "diagnostics_summary": {
+            "process_status": "succeeded",
+            "errors": 0,
+            "warnings": 0
+          },
+          "capture": {
+            "freshness": "changed",
+            "attribution": "unverified",
+            "scope": "snapshot",
+            "source_tab": "Build"
+          }
+        }
+      },
+      "artifact_sha256": {
+        "project.stu": "9b70c44a558b3a263eff01686899449111f5fb971b95ce8fc859a0ba6c09c1e2",
+        "saved-section.xml": "32f3344c3fa9e5a1e3d65b2cfc16fa31d73be78a1787bca360bd14c793a209d9",
+        "saved-variables.xml": "a11590417566ac37cf54240ab8563af9b7698462d101e9e47fd57f1433aecf41"
+      }
+    },
+    {
+      "case_id": "temperature-000-A",
+      "task": "temperature",
+      "repeat": 0,
+      "condition": "A",
+      "fingerprint": "885b342368808facad30c77687ee14d0a64fa0394330240ade794292908c87c8",
+      "status": "completed",
+      "failure_reason": null,
+      "cold_start": true,
+      "provider": "claude-code",
+      "requested_model": "claude-haiku-4-5-20251001",
+      "returned_models": [
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001"
+      ],
+      "model_identity": "pinned",
+      "startup_seconds": 1.2200205000117421,
+      "discovery_seconds": 0.012535199988633394,
+      "setup_seconds": 13.06410550000146,
+      "reset_seconds": 11.82816710008774,
+      "workflow_seconds": 26.222108499961905,
+      "total_seconds": 66.98696929996368,
+      "tool_calls": 6,
+      "tool_errors": 0,
+      "repair_cycles": 0,
+      "api_retries": 0,
+      "transport_retries": 0,
+      "model_requests": 6,
+      "usage": {
+        "requests": 6,
+        "tokens": {
+          "input_tokens": 41400,
+          "output_tokens": 1528,
+          "total_tokens": 42928,
+          "cached_input_tokens": 28543,
+          "reasoning_tokens": 493
+        },
+        "known_partial_tokens": {
+          "input_tokens": 41400,
+          "output_tokens": 1528,
+          "total_tokens": 42928,
+          "cached_input_tokens": 28543,
+          "reasoning_tokens": 493
+        }
+      },
+      "cost_usd": 0.032203300000000004,
+      "success": true,
+      "durable_completed": true,
+      "cpu": {
+        "family": "Micro Basic",
+        "part_number": "BMX P34 2020",
+        "version": "02.70"
+      },
+      "attempt_id": "attempt-d93fe9d136a840a28a8c702ee7bf865c",
+      "interaction_metrics": {
+        "model_request_seconds": {
+          "n": 6,
+          "known_n": 6,
+          "unknown_n": 0,
+          "median": 1.08746454998618,
+          "p95": 6.670142799965106
+        },
+        "mcp_round_trip_seconds": {
+          "get_status": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.008279899950139225,
+            "p95": 0.008279899950139225
+          },
+          "get_project_structure": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.052071599988266826,
+            "p95": 0.052071599988266826
+          },
+          "read_section": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.06549389997962862,
+            "p95": 0.06549389997962862
+          },
+          "write_st_logic": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.2090744999004528,
+            "p95": 0.2090744999004528
+          },
+          "build_project": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.9862055999692529,
+            "p95": 0.9862055999692529
+          },
+          "save_project": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.8831202000146732,
+            "p95": 0.8831202000146732
+          }
+        }
+      },
+      "validation": {
+        "rubric": "feeder-temperature-2",
+        "scope": "pass",
+        "static_behavior": "pass",
+        "runtime_behavior": "unverified",
+        "compile_pass": true,
+        "declarations_pass": true,
+        "model_built": true,
+        "model_saved": true,
+        "success": true,
+        "obtained_source_through_mcp": true,
+        "limitation": "Static recognized-subset checks; PLC runtime behavior unverified",
+        "evaluator_seconds": 20.27380780002568,
+        "build": {
+          "build_state": "built_ok",
+          "error_present": false,
+          "diagnostics_available": true,
+          "diagnostics_summary": {
+            "process_status": "succeeded",
+            "errors": 0,
+            "warnings": 0
+          },
+          "capture": {
+            "freshness": "changed",
+            "attribution": "unverified",
+            "scope": "snapshot",
+            "source_tab": "Build"
+          }
+        }
+      },
+      "artifact_sha256": {
+        "project.stu": "cf05477ac2f8a9c5b8a85df2f44e1c4d4668fe417047452f23a7a7e15dfef2b7",
+        "saved-section.xml": "6acb6f48efb8416820dd7d4bb7570d7e5bb3d32db69777d4343aa788255acd29",
+        "saved-variables.xml": "edede0f57522ea4982a8f72bf66e9ecadfd0999cfa8d73a941d0e13b467c1420"
+      }
+    },
+    {
+      "case_id": "temperature-000-B",
+      "task": "temperature",
+      "repeat": 0,
+      "condition": "B",
+      "fingerprint": "885b342368808facad30c77687ee14d0a64fa0394330240ade794292908c87c8",
+      "status": "completed",
+      "failure_reason": null,
+      "cold_start": true,
+      "provider": "claude-code",
+      "requested_model": "claude-haiku-4-5-20251001",
+      "returned_models": [
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001"
+      ],
+      "model_identity": "pinned",
+      "startup_seconds": 1.0921199000440538,
+      "discovery_seconds": 0.011604800005443394,
+      "setup_seconds": 12.992204000009224,
+      "reset_seconds": 11.885282200062647,
+      "workflow_seconds": 28.95216560002882,
+      "total_seconds": 71.83212819998153,
+      "tool_calls": 6,
+      "tool_errors": 0,
+      "repair_cycles": 0,
+      "api_retries": 0,
+      "transport_retries": 0,
+      "model_requests": 6,
+      "usage": {
+        "requests": 6,
+        "tokens": {
+          "input_tokens": 46450,
+          "output_tokens": 1858,
+          "total_tokens": 48308,
+          "cached_input_tokens": 36610,
+          "reasoning_tokens": 788
+        },
+        "known_partial_tokens": {
+          "input_tokens": 46450,
+          "output_tokens": 1858,
+          "total_tokens": 48308,
+          "cached_input_tokens": 36610,
+          "reasoning_tokens": 788
+        }
+      },
+      "cost_usd": 0.032581,
+      "success": true,
+      "durable_completed": true,
+      "cpu": {
+        "family": "Micro Basic",
+        "part_number": "BMX P34 2020",
+        "version": "02.70"
+      },
+      "attempt_id": "attempt-a52a4f99fef341ba98920ac16a8f08ba",
+      "interaction_metrics": {
+        "model_request_seconds": {
+          "n": 6,
+          "known_n": 6,
+          "unknown_n": 0,
+          "median": 1.792769949999638,
+          "p95": 7.242536899982952
+        },
+        "mcp_round_trip_seconds": {
+          "get_status": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.008614199934527278,
+            "p95": 0.008614199934527278
+          },
+          "get_project_structure": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.05078799999319017,
+            "p95": 0.05078799999319017
+          },
+          "read_section": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.0733299000421539,
+            "p95": 0.0733299000421539
+          },
+          "write_st_logic": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.2184219000628218,
+            "p95": 0.2184219000628218
+          },
+          "build_project": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.9661906000692397,
+            "p95": 0.9661906000692397
+          },
+          "save_project": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.8715389999561012,
+            "p95": 0.8715389999561012
+          }
+        }
+      },
+      "validation": {
+        "rubric": "feeder-temperature-2",
+        "scope": "pass",
+        "static_behavior": "pass",
+        "runtime_behavior": "unverified",
+        "compile_pass": true,
+        "declarations_pass": true,
+        "model_built": true,
+        "model_saved": true,
+        "success": true,
+        "obtained_source_through_mcp": true,
+        "limitation": "Static recognized-subset checks; PLC runtime behavior unverified",
+        "evaluator_seconds": 22.34974410000723,
+        "build": {
+          "build_state": "built_ok",
+          "error_present": false,
+          "diagnostics_available": true,
+          "diagnostics_summary": {
+            "process_status": "succeeded",
+            "errors": 0,
+            "warnings": 0
+          },
+          "capture": {
+            "freshness": "changed",
+            "attribution": "unverified",
+            "scope": "snapshot",
+            "source_tab": "Build"
+          }
+        }
+      },
+      "artifact_sha256": {
+        "project.stu": "b2b52503ce9413efff5a8aad5e486c887485d2ff5a6e45bd875075d9e877ba1b",
+        "saved-section.xml": "e5b1c7bbc0324f5c0380e9605ee7ac31c657cc577dd12a2e55f362f2ca5ea109",
+        "saved-variables.xml": "ba52dbbe71b62bee6c3bb5592de1a973e898ff43c0fd9c50df7e3fd685f688f5"
+      }
+    },
+    {
+      "case_id": "io_mapping-000-A",
+      "task": "io_mapping",
+      "repeat": 0,
+      "condition": "A",
+      "fingerprint": "885b342368808facad30c77687ee14d0a64fa0394330240ade794292908c87c8",
+      "status": "completed",
+      "failure_reason": null,
+      "cold_start": true,
+      "provider": "claude-code",
+      "requested_model": "claude-haiku-4-5-20251001",
+      "returned_models": [
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001"
+      ],
+      "model_identity": "pinned",
+      "startup_seconds": 1.1143372000660747,
+      "discovery_seconds": 0.011765699950046837,
+      "setup_seconds": 14.464561400003731,
+      "reset_seconds": 13.333922599907964,
+      "workflow_seconds": 97.78541759995278,
+      "total_seconds": 119.75257239991333,
+      "tool_calls": 14,
+      "tool_errors": 0,
+      "repair_cycles": 0,
+      "api_retries": 0,
+      "transport_retries": 0,
+      "model_requests": 8,
+      "usage": {
+        "requests": 8,
+        "tokens": {
+          "input_tokens": 193505,
+          "output_tokens": 9731,
+          "total_tokens": 203236,
+          "cached_input_tokens": 142497,
+          "reasoning_tokens": 2456
+        },
+        "known_partial_tokens": {
+          "input_tokens": 193505,
+          "output_tokens": 9731,
+          "total_tokens": 203236,
+          "cached_input_tokens": 142497,
+          "reasoning_tokens": 2456
+        }
+      },
+      "cost_usd": 0.16106169999999997,
+      "success": true,
+      "durable_completed": true,
+      "cpu": {
+        "family": "M580",
+        "part_number": "BME P58 3040",
+        "version": "03.20"
+      },
+      "attempt_id": "attempt-7c3d7a34c183405bb114cf966c7a1dba",
+      "interaction_metrics": {
+        "model_request_seconds": {
+          "n": 8,
+          "known_n": 8,
+          "unknown_n": 0,
+          "median": 3.955299049965106,
+          "p95": 8.802325300057419
+        },
+        "mcp_round_trip_seconds": {
+          "get_status": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.01290319999679923,
+            "p95": 0.01290319999679923
+          },
+          "get_project_structure": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.13060689996927977,
+            "p95": 0.13060689996927977
+          },
+          "get_hardware": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.12775089999195188,
+            "p95": 0.12775089999195188
+          },
+          "list_variables": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 1.0019935000455007,
+            "p95": 1.0019935000455007
+          },
+          "list_data_types": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.059827900025993586,
+            "p95": 0.059827900025993586
+          },
+          "export_xml": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.3340350999496877,
+            "p95": 0.3340350999496877
+          },
+          "read_section": {
+            "n": 8,
+            "known_n": 8,
+            "unknown_n": 0,
+            "median": 0.07511564996093512,
+            "p95": 0.16358310007490218
+          }
+        }
+      },
+      "validation": {
+        "rubric": "demo-io-mapping-6",
+        "answer_pass": true,
+        "scope": "pass",
+        "static_behavior": null,
+        "runtime_behavior": "unverified",
+        "compile_pass": null,
+        "success": true,
+        "obtained_source_through_mcp": true,
+        "checks": {
+          "physical:ami0410_0_7": true,
+          "physical:analog_input_0": true,
+          "physical:analog_input_1": true,
+          "physical:analog_input_2": true,
+          "physical:analog_input_3": true,
+          "physical:ddi3202k_0_5": true,
+          "physical:ddo1602_0_6": true,
+          "physical:l0": true,
+          "physical:l1": true,
+          "physical:l2": true,
+          "physical:machine_running": true,
+          "memory:current_position": true,
+          "memory:recipe": true,
+          "unmapped:start": true,
+          "unmapped:stop": true,
+          "unmapped:bp0": true,
+          "unmapped:bp1": true,
+          "unmapped:switch0": true,
+          "unmapped:measured_temp": true,
+          "unmapped:valve_a_open": true,
+          "unmapped:valve_a_closed": true,
+          "unmapped:valve_b_open": true,
+          "unmapped:valve_b_closed": true,
+          "unmapped:conveying_screw": true,
+          "unmapped:forming": true,
+          "unmapped:belt_running": true,
+          "unmapped:material_picked_off": true,
+          "robot_unmapped": true,
+          "no_false_physical_mappings": true
+        },
+        "limitation": "Deterministic reference subset; unrecognized representations remain missing. No semantic or exhaustive device-leaf verification.",
+        "evaluator_seconds": 0.06794300000183284
+      },
+      "artifact_sha256": {
+        "project.stu": "5243304e7c0289eb56b63359b4c2c8fd406ec39612dd513293abda3cb2e45538"
+      }
+    },
+    {
+      "case_id": "io_mapping-000-B",
+      "task": "io_mapping",
+      "repeat": 0,
+      "condition": "B",
+      "fingerprint": "885b342368808facad30c77687ee14d0a64fa0394330240ade794292908c87c8",
+      "status": "completed",
+      "failure_reason": null,
+      "cold_start": true,
+      "provider": "claude-code",
+      "requested_model": "claude-haiku-4-5-20251001",
+      "returned_models": [
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001"
+      ],
+      "model_identity": "pinned",
+      "startup_seconds": 1.050913400016725,
+      "discovery_seconds": 0.011237600003369153,
+      "setup_seconds": 13.860499000060372,
+      "reset_seconds": 12.793959100032225,
+      "workflow_seconds": 128.08830780000426,
+      "total_seconds": 149.386894700001,
+      "tool_calls": 15,
+      "tool_errors": 0,
+      "repair_cycles": 0,
+      "api_retries": 0,
+      "transport_retries": 0,
+      "model_requests": 7,
+      "usage": {
+        "requests": 7,
+        "tokens": {
+          "input_tokens": 209411,
+          "output_tokens": 12887,
+          "total_tokens": 222298,
+          "cached_input_tokens": 157898,
+          "reasoning_tokens": 5325
+        },
+        "known_partial_tokens": {
+          "input_tokens": 209411,
+          "output_tokens": 12887,
+          "total_tokens": 222298,
+          "cached_input_tokens": 157898,
+          "reasoning_tokens": 5325
+        }
+      },
+      "cost_usd": 0.1831938,
+      "success": true,
+      "durable_completed": true,
+      "cpu": {
+        "family": "M580",
+        "part_number": "BME P58 3040",
+        "version": "03.20"
+      },
+      "attempt_id": "attempt-c229ca13e3654bc09e440eafa22383db",
+      "interaction_metrics": {
+        "model_request_seconds": {
+          "n": 7,
+          "known_n": 7,
+          "unknown_n": 0,
+          "median": 7.813928699935786,
+          "p95": 22.01569449994713
+        },
+        "mcp_round_trip_seconds": {
+          "get_status": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.008473200025036931,
+            "p95": 0.008473200025036931
+          },
+          "get_hardware": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.10316019994206727,
+            "p95": 0.10316019994206727
+          },
+          "get_project_structure": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.1008258000947535,
+            "p95": 0.1008258000947535
+          },
+          "list_variables": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.8044950000476092,
+            "p95": 0.8044950000476092
+          },
+          "list_data_types": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.06020179996266961,
+            "p95": 0.06020179996266961
+          },
+          "export_xml": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.19341029995121062,
+            "p95": 0.19341029995121062
+          },
+          "read_section": {
+            "n": 9,
+            "known_n": 9,
+            "unknown_n": 0,
+            "median": 0.07012379996012896,
+            "p95": 0.1463657000567764
+          }
+        }
+      },
+      "validation": {
+        "rubric": "demo-io-mapping-6",
+        "answer_pass": true,
+        "scope": "pass",
+        "static_behavior": null,
+        "runtime_behavior": "unverified",
+        "compile_pass": null,
+        "success": true,
+        "obtained_source_through_mcp": true,
+        "checks": {
+          "physical:ami0410_0_7": true,
+          "physical:analog_input_0": true,
+          "physical:analog_input_1": true,
+          "physical:analog_input_2": true,
+          "physical:analog_input_3": true,
+          "physical:ddi3202k_0_5": true,
+          "physical:ddo1602_0_6": true,
+          "physical:l0": true,
+          "physical:l1": true,
+          "physical:l2": true,
+          "physical:machine_running": true,
+          "memory:current_position": true,
+          "memory:recipe": true,
+          "unmapped:start": true,
+          "unmapped:stop": true,
+          "unmapped:bp0": true,
+          "unmapped:bp1": true,
+          "unmapped:switch0": true,
+          "unmapped:measured_temp": true,
+          "unmapped:valve_a_open": true,
+          "unmapped:valve_a_closed": true,
+          "unmapped:valve_b_open": true,
+          "unmapped:valve_b_closed": true,
+          "unmapped:conveying_screw": true,
+          "unmapped:forming": true,
+          "unmapped:belt_running": true,
+          "unmapped:material_picked_off": true,
+          "robot_unmapped": true,
+          "no_false_physical_mappings": true
+        },
+        "limitation": "Deterministic reference subset; unrecognized representations remain missing. No semantic or exhaustive device-leaf verification.",
+        "evaluator_seconds": 0.054823200101964176
+      },
+      "artifact_sha256": {
+        "project.stu": "5243304e7c0289eb56b63359b4c2c8fd406ec39612dd513293abda3cb2e45538"
+      }
+    },
+    {
+      "case_id": "alarms-000-A",
+      "task": "alarms",
+      "repeat": 0,
+      "condition": "A",
+      "fingerprint": "885b342368808facad30c77687ee14d0a64fa0394330240ade794292908c87c8",
+      "status": "completed",
+      "failure_reason": null,
+      "cold_start": true,
+      "provider": "claude-code",
+      "requested_model": "claude-haiku-4-5-20251001",
+      "returned_models": [
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001"
+      ],
+      "model_identity": "pinned",
+      "startup_seconds": 1.0168748000869527,
+      "discovery_seconds": 0.011358499992638826,
+      "setup_seconds": 12.930856400053017,
+      "reset_seconds": 11.899858300108463,
+      "workflow_seconds": 40.66143179999199,
+      "total_seconds": 81.0938966999529,
+      "tool_calls": 8,
+      "tool_errors": 0,
+      "repair_cycles": 0,
+      "api_retries": 0,
+      "transport_retries": 0,
+      "model_requests": 7,
+      "usage": {
+        "requests": 7,
+        "tokens": {
+          "input_tokens": 62146,
+          "output_tokens": 3047,
+          "total_tokens": 65193,
+          "cached_input_tokens": 48555,
+          "reasoning_tokens": 1125
+        },
+        "known_partial_tokens": {
+          "input_tokens": 62146,
+          "output_tokens": 3047,
+          "total_tokens": 65193,
+          "cached_input_tokens": 48555,
+          "reasoning_tokens": 1125
+        }
+      },
+      "cost_usd": 0.047214500000000006,
+      "success": false,
+      "durable_completed": true,
+      "cpu": {
+        "family": "Micro Basic",
+        "part_number": "BMX P34 2020",
+        "version": "02.70"
+      },
+      "attempt_id": "attempt-14a9f3f8c4384e719c10e9aa0e106a65",
+      "interaction_metrics": {
+        "model_request_seconds": {
+          "n": 7,
+          "known_n": 7,
+          "unknown_n": 0,
+          "median": 1.2244059999939054,
+          "p95": 8.195525699993595
+        },
+        "mcp_round_trip_seconds": {
+          "get_status": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.0098794000223279,
+            "p95": 0.0098794000223279
+          },
+          "get_project_structure": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.052338700043037534,
+            "p95": 0.052338700043037534
+          },
+          "read_section": {
+            "n": 2,
+            "known_n": 2,
+            "unknown_n": 0,
+            "median": 0.0658915500389412,
+            "p95": 0.06742410000879318
+          },
+          "list_variables": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.08587130007799715,
+            "p95": 0.08587130007799715
+          },
+          "write_st_logic": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.2733035999117419,
+            "p95": 0.2733035999117419
+          },
+          "build_project": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 1.0262113999342546,
+            "p95": 1.0262113999342546
+          },
+          "save_project": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.9232486999826506,
+            "p95": 0.9232486999826506
+          }
+        }
+      },
+      "validation": {
+        "rubric": "feeder-alarms-1",
+        "scope": "unverified",
+        "static_behavior": "unverified",
+        "runtime_behavior": "unverified",
+        "compile_pass": true,
+        "declarations_pass": true,
+        "model_built": true,
+        "model_saved": true,
+        "success": false,
+        "obtained_source_through_mcp": true,
+        "limitation": "Static recognized-subset checks; PLC runtime behavior unverified",
+        "evaluator_seconds": 20.142957699950784,
+        "build": {
+          "build_state": "built_ok",
+          "error_present": false,
+          "diagnostics_available": true,
+          "diagnostics_summary": {
+            "process_status": "succeeded",
+            "errors": 0,
+            "warnings": 0
+          },
+          "capture": {
+            "freshness": "changed",
+            "attribution": "unverified",
+            "scope": "snapshot",
+            "source_tab": "Build"
+          }
+        }
+      },
+      "artifact_sha256": {
+        "project.stu": "af32b282bb973316e596a5ddb4676700df6a2e20ac76d73cadead4a78457826d",
+        "saved-section.xml": "4445d896e242f0909975042ae01a1fcb8f0eef1b0938445aaa3ec79cecda9152",
+        "saved-variables.xml": "edd6ddb813a3925a8e1b54b2d6bd20b8181af4ad4f333b871bd27442820ddc8e"
+      }
+    },
+    {
+      "case_id": "alarms-000-B",
+      "task": "alarms",
+      "repeat": 0,
+      "condition": "B",
+      "fingerprint": "885b342368808facad30c77687ee14d0a64fa0394330240ade794292908c87c8",
+      "status": "completed",
+      "failure_reason": null,
+      "cold_start": true,
+      "provider": "claude-code",
+      "requested_model": "claude-haiku-4-5-20251001",
+      "returned_models": [
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001"
+      ],
+      "model_identity": "pinned",
+      "startup_seconds": 1.1067711000796407,
+      "discovery_seconds": 0.01259199995547533,
+      "setup_seconds": 12.886774800019339,
+      "reset_seconds": 11.764558600028977,
+      "workflow_seconds": 53.52888870006427,
+      "total_seconds": 93.97705600003246,
+      "tool_calls": 9,
+      "tool_errors": 0,
+      "repair_cycles": 0,
+      "api_retries": 0,
+      "transport_retries": 0,
+      "model_requests": 9,
+      "usage": {
+        "requests": 9,
+        "tokens": {
+          "input_tokens": 92020,
+          "output_tokens": 4319,
+          "total_tokens": 96339,
+          "cached_input_tokens": 76309,
+          "reasoning_tokens": 2457
+        },
+        "known_partial_tokens": {
+          "input_tokens": 92020,
+          "output_tokens": 4319,
+          "total_tokens": 96339,
+          "cached_input_tokens": 76309,
+          "reasoning_tokens": 2457
+        }
+      },
+      "cost_usd": 0.0605739,
+      "success": false,
+      "durable_completed": true,
+      "cpu": {
+        "family": "Micro Basic",
+        "part_number": "BMX P34 2020",
+        "version": "02.70"
+      },
+      "attempt_id": "attempt-1aed5154e0ea4e76b8d0643c237b20ef",
+      "interaction_metrics": {
+        "model_request_seconds": {
+          "n": 9,
+          "known_n": 9,
+          "unknown_n": 0,
+          "median": 1.17698820005171,
+          "p95": 12.086707400041632
+        },
+        "mcp_round_trip_seconds": {
+          "get_status": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.012826699996367097,
+            "p95": 0.012826699996367097
+          },
+          "get_project_structure": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.0625504000345245,
+            "p95": 0.0625504000345245
+          },
+          "read_section": {
+            "n": 2,
+            "known_n": 2,
+            "unknown_n": 0,
+            "median": 0.06181645003380254,
+            "p95": 0.06566490000113845
+          },
+          "list_variables": {
+            "n": 2,
+            "known_n": 2,
+            "unknown_n": 0,
+            "median": 0.05472534999717027,
+            "p95": 0.07793689996469766
+          },
+          "write_st_logic": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.21923729998525232,
+            "p95": 0.21923729998525232
+          },
+          "build_project": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 1.2787417999934405,
+            "p95": 1.2787417999934405
+          },
+          "save_project": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.854136599926278,
+            "p95": 0.854136599926278
+          }
+        }
+      },
+      "validation": {
+        "rubric": "feeder-alarms-1",
+        "scope": "unverified",
+        "static_behavior": "unverified",
+        "runtime_behavior": "unverified",
+        "compile_pass": true,
+        "declarations_pass": true,
+        "model_built": true,
+        "model_saved": true,
+        "success": false,
+        "obtained_source_through_mcp": true,
+        "limitation": "Static recognized-subset checks; PLC runtime behavior unverified",
+        "evaluator_seconds": 20.2182486000238,
+        "build": {
+          "build_state": "built_ok",
+          "error_present": false,
+          "diagnostics_available": true,
+          "diagnostics_summary": {
+            "process_status": "succeeded",
+            "errors": 0,
+            "warnings": 0
+          },
+          "capture": {
+            "freshness": "changed",
+            "attribution": "unverified",
+            "scope": "snapshot",
+            "source_tab": "Build"
+          }
+        }
+      },
+      "artifact_sha256": {
+        "project.stu": "225f8492f573040d923f7d7e5847b3a4d9db15d39040ba35c4238d9cdca434d0",
+        "saved-section.xml": "0a1c2d8df6f055af6d4bb50893873c1bd2c1e89966b2b6d1704c5f872f186b5e",
+        "saved-variables.xml": "fb51b412c25dce34dfaf390147e07a0a810be1351bdb7b7c32462ffd8f5b7c38"
+      }
+    },
+    {
+      "case_id": "repair-000-B",
+      "task": "repair",
+      "repeat": 0,
+      "condition": "B",
+      "fingerprint": "885b342368808facad30c77687ee14d0a64fa0394330240ade794292908c87c8",
+      "status": "completed",
+      "failure_reason": null,
+      "cold_start": true,
+      "provider": "claude-code",
+      "requested_model": "claude-haiku-4-5-20251001",
+      "returned_models": [
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001"
+      ],
+      "model_identity": "pinned",
+      "startup_seconds": 1.1070738999405876,
+      "discovery_seconds": 0.011587399989366531,
+      "setup_seconds": 12.774275100091472,
+      "reset_seconds": 11.652326399926096,
+      "workflow_seconds": 84.23748780007008,
+      "total_seconds": 124.91089910001028,
+      "tool_calls": 9,
+      "tool_errors": 0,
+      "repair_cycles": 2,
+      "api_retries": 0,
+      "transport_retries": 0,
+      "model_requests": 9,
+      "usage": {
+        "requests": 9,
+        "tokens": {
+          "input_tokens": 107821,
+          "output_tokens": 7112,
+          "total_tokens": 114933,
+          "cached_input_tokens": 90783,
+          "reasoning_tokens": 5288
+        },
+        "known_partial_tokens": {
+          "input_tokens": 107821,
+          "output_tokens": 7112,
+          "total_tokens": 114933,
+          "cached_input_tokens": 90783,
+          "reasoning_tokens": 5288
+        }
+      },
+      "cost_usd": 0.0786403,
+      "success": false,
+      "durable_completed": true,
+      "cpu": {
+        "family": "Micro Basic",
+        "part_number": "BMX P34 2020",
+        "version": "02.70"
+      },
+      "attempt_id": "attempt-8de0cd1526a049a6baccfa275a599f01",
+      "interaction_metrics": {
+        "model_request_seconds": {
+          "n": 9,
+          "known_n": 9,
+          "unknown_n": 0,
+          "median": 1.2541459000203758,
+          "p95": 28.71652090002317
+        },
+        "mcp_round_trip_seconds": {
+          "get_status": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.009787100018002093,
+            "p95": 0.009787100018002093
+          },
+          "get_project_structure": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.052498299977742136,
+            "p95": 0.052498299977742136
+          },
+          "read_section": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.06636559998150915,
+            "p95": 0.06636559998150915
+          },
+          "build_project": {
+            "n": 3,
+            "known_n": 3,
+            "unknown_n": 0,
+            "median": 0.17680700006894767,
+            "p95": 1.3323639000300318
+          },
+          "write_st_logic": {
+            "n": 2,
+            "known_n": 2,
+            "unknown_n": 0,
+            "median": 0.15340379998087883,
+            "p95": 0.16301170003134757
+          },
+          "save_project": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.8002345999702811,
+            "p95": 0.8002345999702811
+          }
+        }
+      },
+      "validation": {
+        "scope": "unverified",
+        "static_behavior": "unverified",
+        "runtime_behavior": "unverified",
+        "compile_pass": true,
+        "declarations_pass": true,
+        "model_built": true,
+        "model_saved": true,
+        "success": false,
+        "obtained_source_through_mcp": true,
+        "limitation": "Static recognized-subset checks; PLC runtime behavior unverified",
+        "evaluator_seconds": 20.57480140007101,
+        "build": {
+          "build_state": "built_ok",
+          "error_present": false,
+          "diagnostics_available": true,
+          "diagnostics_summary": {
+            "process_status": "succeeded",
+            "errors": 0,
+            "warnings": 0
+          },
+          "capture": {
+            "freshness": "changed",
+            "attribution": "unverified",
+            "scope": "snapshot",
+            "source_tab": "Build"
+          }
+        }
+      },
+      "artifact_sha256": {
+        "project.stu": "8adc83144ff910c5e096341eb3293f8157d4b502e0e65f1b66e4ab912ad9f255",
+        "saved-section.xml": "c0147096f6d440ede95594f25afd83c8426ed1a8e00a5da26b5a56b266810028",
+        "saved-variables.xml": "fecdb2e66d0d50d7355dd4a51dab2036c4a006e10d2fa1ec434ad9c48534b548"
+      }
+    },
+    {
+      "case_id": "repair-000-A",
+      "task": "repair",
+      "repeat": 0,
+      "condition": "A",
+      "fingerprint": "885b342368808facad30c77687ee14d0a64fa0394330240ade794292908c87c8",
+      "status": "completed",
+      "failure_reason": null,
+      "cold_start": true,
+      "provider": "claude-code",
+      "requested_model": "claude-haiku-4-5-20251001",
+      "returned_models": [
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001"
+      ],
+      "model_identity": "pinned",
+      "startup_seconds": 1.1055227000033483,
+      "discovery_seconds": 0.012152299983426929,
+      "setup_seconds": 12.729923599981703,
+      "reset_seconds": 11.609251699992456,
+      "workflow_seconds": 154.87764229997993,
+      "total_seconds": 196.79048899991903,
+      "tool_calls": 21,
+      "tool_errors": 0,
+      "repair_cycles": 7,
+      "api_retries": 0,
+      "transport_retries": 0,
+      "model_requests": 21,
+      "usage": {
+        "requests": 21,
+        "tokens": {
+          "input_tokens": 388549,
+          "output_tokens": 13185,
+          "total_tokens": 401734,
+          "cached_input_tokens": 353727,
+          "reasoning_tokens": 8335
+        },
+        "known_partial_tokens": {
+          "input_tokens": 388549,
+          "output_tokens": 13185,
+          "total_tokens": 401734,
+          "cached_input_tokens": 353727,
+          "reasoning_tokens": 8335
+        }
+      },
+      "cost_usd": 0.16682270000000002,
+      "success": false,
+      "durable_completed": true,
+      "cpu": {
+        "family": "Micro Basic",
+        "part_number": "BMX P34 2020",
+        "version": "02.70"
+      },
+      "attempt_id": "attempt-07ed6ead56064af0a04f593aee3dc9ee",
+      "interaction_metrics": {
+        "model_request_seconds": {
+          "n": 21,
+          "known_n": 21,
+          "unknown_n": 0,
+          "median": 1.6492467999923974,
+          "p95": 13.672970499959774
+        },
+        "mcp_round_trip_seconds": {
+          "get_status": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.00863769999705255,
+            "p95": 0.00863769999705255
+          },
+          "get_project_structure": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.05026769998949021,
+            "p95": 0.05026769998949021
+          },
+          "read_section": {
+            "n": 2,
+            "known_n": 2,
+            "unknown_n": 0,
+            "median": 0.05477394995978102,
+            "p95": 0.056712099933065474
+          },
+          "build_project": {
+            "n": 8,
+            "known_n": 8,
+            "unknown_n": 0,
+            "median": 0.09055354999145493,
+            "p95": 1.3385852000210434
+          },
+          "write_st_logic": {
+            "n": 7,
+            "known_n": 7,
+            "unknown_n": 0,
+            "median": 0.14416489994619042,
+            "p95": 0.17546009994111955
+          },
+          "get_language_reference": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.001944800023920834,
+            "p95": 0.001944800023920834
+          },
+          "save_project": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.8014535000547767,
+            "p95": 0.8014535000547767
+          }
+        }
+      },
+      "validation": {
+        "scope": "unverified",
+        "static_behavior": "unverified",
+        "runtime_behavior": "unverified",
+        "compile_pass": true,
+        "declarations_pass": true,
+        "model_built": true,
+        "model_saved": true,
+        "success": false,
+        "obtained_source_through_mcp": true,
+        "limitation": "Static recognized-subset checks; PLC runtime behavior unverified",
+        "evaluator_seconds": 21.762496499926783,
+        "build": {
+          "build_state": "built_ok",
+          "error_present": false,
+          "diagnostics_available": true,
+          "diagnostics_summary": {
+            "process_status": "succeeded",
+            "errors": 0,
+            "warnings": 0
+          },
+          "capture": {
+            "freshness": "changed",
+            "attribution": "unverified",
+            "scope": "snapshot",
+            "source_tab": "Build"
+          }
+        }
+      },
+      "artifact_sha256": {
+        "project.stu": "537fa2039e28712be6664aa65e92ce10fcb4481fb965704f27424ef2a5e16886",
+        "saved-section.xml": "9e58f973c538c395c22a6720998e03192b0fa4d1787e577fd048cd640ba9c4b0",
+        "saved-variables.xml": "886f3afb043bd6b4b867c25d43a10b9fb72c96e0b8e2c9403f18aeddeb749124"
+      }
+    },
+    {
+      "case_id": "inspect-000-B",
+      "task": "inspect",
+      "repeat": 0,
+      "condition": "B",
+      "fingerprint": "885b342368808facad30c77687ee14d0a64fa0394330240ade794292908c87c8",
+      "status": "completed",
+      "failure_reason": null,
+      "cold_start": true,
+      "provider": "claude-code",
+      "requested_model": "claude-haiku-4-5-20251001",
+      "returned_models": [
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001"
+      ],
+      "model_identity": "pinned",
+      "startup_seconds": 1.4034990000072867,
+      "discovery_seconds": 0.012440699967555702,
+      "setup_seconds": 16.502674699993804,
+      "reset_seconds": 15.083698500064202,
+      "workflow_seconds": 21.368805999984033,
+      "total_seconds": 69.37408219999634,
+      "tool_calls": 4,
+      "tool_errors": 0,
+      "repair_cycles": 0,
+      "api_retries": 0,
+      "transport_retries": 0,
+      "model_requests": 3,
+      "usage": {
+        "requests": 3,
+        "tokens": {
+          "input_tokens": 16385,
+          "output_tokens": 1351,
+          "total_tokens": 17736,
+          "cached_input_tokens": 4624,
+          "reasoning_tokens": 935
+        },
+        "known_partial_tokens": {
+          "input_tokens": 16385,
+          "output_tokens": 1351,
+          "total_tokens": 17736,
+          "cached_input_tokens": 4624,
+          "reasoning_tokens": 935
+        }
+      },
+      "cost_usd": 0.026883400000000002,
+      "success": false,
+      "durable_completed": true,
+      "cpu": {
+        "family": "Micro Basic",
+        "part_number": "BMX P34 2020",
+        "version": "02.70"
+      },
+      "attempt_id": "attempt-80903dec51c2415396e17048d880ee3e",
+      "interaction_metrics": {
+        "model_request_seconds": {
+          "n": 3,
+          "known_n": 3,
+          "unknown_n": 0,
+          "median": 8.317225900013,
+          "p95": 8.527380399988033
+        },
+        "mcp_round_trip_seconds": {
+          "get_status": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.013264600071124732,
+            "p95": 0.013264600071124732
+          },
+          "get_project_structure": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.061990899965167046,
+            "p95": 0.061990899965167046
+          },
+          "read_section": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.07942759990692139,
+            "p95": 0.07942759990692139
+          },
+          "list_variables": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.09340050001628697,
+            "p95": 0.09340050001628697
+          }
+        }
+      },
+      "validation": {
+        "rubric": "feeder-2",
+        "answer_pass": false,
+        "scope": "pass",
+        "static_behavior": null,
+        "runtime_behavior": "unverified",
+        "compile_pass": null,
+        "success": false,
+        "obtained_source_through_mcp": true,
+        "limitation": "Static recognized-subset checks; PLC runtime behavior unverified",
+        "evaluator_seconds": 23.663379200035706
+      },
+      "artifact_sha256": {
+        "project.stu": "60282f9313dadbfb109bfc3a63a21a6b0f6da8c7d8a6e99b6b536c5b60407ad1",
+        "saved-section.xml": "cfa53583c445f2ba60aeefee4cdf37878c8b0d50a7fd27d3f1da2fe5ca43e778",
+        "saved-variables.xml": "dc534b6d702741f33b2f5047dbfda60ba7650a1dbf9c2261f3e10a2e879295d6"
+      }
+    },
+    {
+      "case_id": "inspect-000-A",
+      "task": "inspect",
+      "repeat": 0,
+      "condition": "A",
+      "fingerprint": "885b342368808facad30c77687ee14d0a64fa0394330240ade794292908c87c8",
+      "status": "completed",
+      "failure_reason": null,
+      "cold_start": true,
+      "provider": "claude-code",
+      "requested_model": "claude-haiku-4-5-20251001",
+      "returned_models": [
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001"
+      ],
+      "model_identity": "pinned",
+      "startup_seconds": 1.3404027000069618,
+      "discovery_seconds": 0.012737600016407669,
+      "setup_seconds": 14.955489100073464,
+      "reset_seconds": 13.599339799955487,
+      "workflow_seconds": 19.667896899976768,
+      "total_seconds": 65.80039360001683,
+      "tool_calls": 5,
+      "tool_errors": 0,
+      "repair_cycles": 0,
+      "api_retries": 0,
+      "transport_retries": 0,
+      "model_requests": 3,
+      "usage": {
+        "requests": 3,
+        "tokens": {
+          "input_tokens": 14822,
+          "output_tokens": 1250,
+          "total_tokens": 16072,
+          "cached_input_tokens": 4170,
+          "reasoning_tokens": 733
+        },
+        "known_partial_tokens": {
+          "input_tokens": 14822,
+          "output_tokens": 1250,
+          "total_tokens": 16072,
+          "cached_input_tokens": 4170,
+          "reasoning_tokens": 733
+        }
+      },
+      "cost_usd": 0.024816,
+      "success": false,
+      "durable_completed": true,
+      "cpu": {
+        "family": "Micro Basic",
+        "part_number": "BMX P34 2020",
+        "version": "02.70"
+      },
+      "attempt_id": "attempt-832d0efd72aa4c0ebc2adab8c40d72fd",
+      "interaction_metrics": {
+        "model_request_seconds": {
+          "n": 3,
+          "known_n": 3,
+          "unknown_n": 0,
+          "median": 5.492636899929494,
+          "p95": 8.315529800020158
+        },
+        "mcp_round_trip_seconds": {
+          "get_status": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.010476800031028688,
+            "p95": 0.010476800031028688
+          },
+          "get_project_structure": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.06224480003584176,
+            "p95": 0.06224480003584176
+          },
+          "list_variables": {
+            "n": 2,
+            "known_n": 2,
+            "unknown_n": 0,
+            "median": 0.058050849998835474,
+            "p95": 0.08230060001369566
+          },
+          "read_section": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.06654080003499985,
+            "p95": 0.06654080003499985
+          }
+        }
+      },
+      "validation": {
+        "rubric": "feeder-2",
+        "answer_pass": false,
+        "scope": "pass",
+        "static_behavior": null,
+        "runtime_behavior": "unverified",
+        "compile_pass": null,
+        "success": false,
+        "obtained_source_through_mcp": true,
+        "limitation": "Static recognized-subset checks; PLC runtime behavior unverified",
+        "evaluator_seconds": 23.602610099944286
+      },
+      "artifact_sha256": {
+        "project.stu": "60282f9313dadbfb109bfc3a63a21a6b0f6da8c7d8a6e99b6b536c5b60407ad1",
+        "saved-section.xml": "2a6cee1536dc963b2f72ca1df2d0740cee59f8360d94e4c0038b1f35923a7130",
+        "saved-variables.xml": "8410f2319d53cb411c5ec228278b970c222161e8f80624ba062a14c78779dfce"
+      }
+    },
+    {
+      "case_id": "weighing-000-A",
+      "task": "weighing",
+      "repeat": 0,
+      "condition": "A",
+      "fingerprint": "885b342368808facad30c77687ee14d0a64fa0394330240ade794292908c87c8",
+      "status": "completed",
+      "failure_reason": null,
+      "cold_start": true,
+      "provider": "claude-code",
+      "requested_model": "claude-haiku-4-5-20251001",
+      "returned_models": [
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001"
+      ],
+      "model_identity": "pinned",
+      "startup_seconds": 1.1121352999471128,
+      "discovery_seconds": 0.011387200094759464,
+      "setup_seconds": 13.814664699952118,
+      "reset_seconds": 12.687362600001507,
+      "workflow_seconds": 39.5384571000468,
+      "total_seconds": 61.00177289999556,
+      "tool_calls": 8,
+      "tool_errors": 0,
+      "repair_cycles": 0,
+      "api_retries": 0,
+      "transport_retries": 0,
+      "model_requests": 4,
+      "usage": {
+        "requests": 4,
+        "tokens": {
+          "input_tokens": 45235,
+          "output_tokens": 3489,
+          "total_tokens": 48724,
+          "cached_input_tokens": 22697,
+          "reasoning_tokens": 1317
+        },
+        "known_partial_tokens": {
+          "input_tokens": 45235,
+          "output_tokens": 3489,
+          "total_tokens": 48724,
+          "cached_input_tokens": 22697,
+          "reasoning_tokens": 1317
+        }
+      },
+      "cost_usd": 0.06153170000000001,
+      "success": true,
+      "durable_completed": true,
+      "cpu": {
+        "family": "M580",
+        "part_number": "BME P58 3040",
+        "version": "03.20"
+      },
+      "attempt_id": "attempt-4af02a6b1d8e474d91e36cb57d947d45",
+      "interaction_metrics": {
+        "model_request_seconds": {
+          "n": 4,
+          "known_n": 4,
+          "unknown_n": 0,
+          "median": 4.73460264998721,
+          "p95": 9.918680200004019
+        },
+        "mcp_round_trip_seconds": {
+          "get_status": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.008563300012610853,
+            "p95": 0.008563300012610853
+          },
+          "get_project_structure": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.11112899996805936,
+            "p95": 0.11112899996805936
+          },
+          "read_section": {
+            "n": 4,
+            "known_n": 4,
+            "unknown_n": 0,
+            "median": 0.08198519999859855,
+            "p95": 0.14752230001613498
+          },
+          "list_variables": {
+            "n": 2,
+            "known_n": 2,
+            "unknown_n": 0,
+            "median": 0.2735856000217609,
+            "p95": 0.2824312000302598
+          }
+        }
+      },
+      "validation": {
+        "rubric": "demo-weighing-1",
+        "answer_pass": true,
+        "scope": "pass",
+        "static_behavior": null,
+        "runtime_behavior": "unverified",
+        "compile_pass": null,
+        "success": true,
+        "obtained_source_through_mcp": true,
+        "checks": {
+          "Weighing_Material_A": true,
+          "Weighing_Material_B": true
+        },
+        "limitation": "Identifier presence only; explanation semantics are not automatically verified",
+        "evaluator_seconds": 0.00729390000924468
+      },
+      "artifact_sha256": {
+        "project.stu": "5243304e7c0289eb56b63359b4c2c8fd406ec39612dd513293abda3cb2e45538"
+      }
+    },
+    {
+      "case_id": "weighing-000-B",
+      "task": "weighing",
+      "repeat": 0,
+      "condition": "B",
+      "fingerprint": "885b342368808facad30c77687ee14d0a64fa0394330240ade794292908c87c8",
+      "status": "completed",
+      "failure_reason": null,
+      "cold_start": true,
+      "provider": "claude-code",
+      "requested_model": "claude-haiku-4-5-20251001",
+      "returned_models": [
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001",
+        "claude-haiku-4-5-20251001"
+      ],
+      "model_identity": "pinned",
+      "startup_seconds": 1.1220082000363618,
+      "discovery_seconds": 0.011745700030587614,
+      "setup_seconds": 14.745749299996532,
+      "reset_seconds": 13.607134499936365,
+      "workflow_seconds": 44.17387759999838,
+      "total_seconds": 66.38898269995116,
+      "tool_calls": 9,
+      "tool_errors": 0,
+      "repair_cycles": 0,
+      "api_retries": 0,
+      "transport_retries": 0,
+      "model_requests": 4,
+      "usage": {
+        "requests": 4,
+        "tokens": {
+          "input_tokens": 52081,
+          "output_tokens": 3843,
+          "total_tokens": 55924,
+          "cached_input_tokens": 26791,
+          "reasoning_tokens": 1422
+        },
+        "known_partial_tokens": {
+          "input_tokens": 52081,
+          "output_tokens": 3843,
+          "total_tokens": 55924,
+          "cached_input_tokens": 26791,
+          "reasoning_tokens": 1422
+        }
+      },
+      "cost_usd": 0.06851109999999999,
+      "success": true,
+      "durable_completed": true,
+      "cpu": {
+        "family": "M580",
+        "part_number": "BME P58 3040",
+        "version": "03.20"
+      },
+      "attempt_id": "attempt-db95d87c8fe3446a8bd8843e4ccb45f9",
+      "interaction_metrics": {
+        "model_request_seconds": {
+          "n": 4,
+          "known_n": 4,
+          "unknown_n": 0,
+          "median": 4.548026800039224,
+          "p95": 11.5765561000444
+        },
+        "mcp_round_trip_seconds": {
+          "get_status": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.01233729999512434,
+            "p95": 0.01233729999512434
+          },
+          "get_project_structure": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.15276040008757263,
+            "p95": 0.15276040008757263
+          },
+          "get_hardware": {
+            "n": 1,
+            "known_n": 1,
+            "unknown_n": 0,
+            "median": 0.1318075000308454,
+            "p95": 0.1318075000308454
+          },
+          "read_section": {
+            "n": 4,
+            "known_n": 4,
+            "unknown_n": 0,
+            "median": 0.08337585005210713,
+            "p95": 0.13168949994724244
+          },
+          "list_variables": {
+            "n": 2,
+            "known_n": 2,
+            "unknown_n": 0,
+            "median": 0.2429291500011459,
+            "p95": 0.2503455999540165
+          }
+        }
+      },
+      "validation": {
+        "rubric": "demo-weighing-1",
+        "answer_pass": true,
+        "scope": "pass",
+        "static_behavior": null,
+        "runtime_behavior": "unverified",
+        "compile_pass": null,
+        "success": true,
+        "obtained_source_through_mcp": true,
+        "checks": {
+          "Weighing_Material_A": true,
+          "Weighing_Material_B": true
+        },
+        "limitation": "Identifier presence only; explanation semantics are not automatically verified",
+        "evaluator_seconds": 0.004332699929364026
+      },
+      "artifact_sha256": {
+        "project.stu": "5243304e7c0289eb56b63359b4c2c8fd406ec39612dd513293abda3cb2e45538"
+      }
+    }
+  ],
+  "conditions": {
+    "A": {
+      "overall": {
+        "cases": 7,
+        "completion": {
+          "pass": 7,
+          "n": 7,
+          "verified_n": 7,
+          "rate_all": 1.0
+        },
+        "accepted": {
+          "pass": 4,
+          "n": 7,
+          "verified_n": 7,
+          "rate_all": 0.5714285714285714
+        },
+        "build": {
+          "pass": 4,
+          "n": 4,
+          "verified_n": 4,
+          "rate_all": 1.0
+        },
+        "static_behavior": {
+          "pass": 2,
+          "n": 4,
+          "verified_n": 2,
+          "rate_all": 0.5
+        },
+        "runtime_behavior": {
+          "pass": 0,
+          "n": 4,
+          "verified_n": 0,
+          "rate_all": 0.0
+        },
+        "all_attempts": {
+          "workflow_seconds": {
+            "n": 7,
+            "known_n": 7,
+            "unknown_n": 0,
+            "median": 39.5384571000468,
+            "p95": 154.87764229997993
+          },
+          "input_tokens": {
+            "n": 7,
+            "known_n": 7,
+            "unknown_n": 0,
+            "median": 45235,
+            "p95": 388549
+          },
+          "output_tokens": {
+            "n": 7,
+            "known_n": 7,
+            "unknown_n": 0,
+            "median": 3047,
+            "p95": 13185
+          },
+          "total_tokens": {
+            "n": 7,
+            "known_n": 7,
+            "unknown_n": 0,
+            "median": 48724,
+            "p95": 401734
+          }
+        },
+        "accepted_attempts": {
+          "workflow_seconds": {
+            "n": 4,
+            "known_n": 4,
+            "unknown_n": 0,
+            "median": 35.700100350019056,
+            "p95": 97.78541759995278
+          },
+          "input_tokens": {
+            "n": 4,
+            "known_n": 4,
+            "unknown_n": 0,
+            "median": 44622.0,
+            "p95": 193505
+          },
+          "output_tokens": {
+            "n": 4,
+            "known_n": 4,
+            "unknown_n": 0,
+            "median": 2879.0,
+            "p95": 9731
+          },
+          "total_tokens": {
+            "n": 4,
+            "known_n": 4,
+            "unknown_n": 0,
+            "median": 47501.0,
+            "p95": 203236
+          }
+        },
+        "known_partial_tokens": {
+          "input_tokens": 789666,
+          "output_tokens": 34499,
+          "total_tokens": 824165
+        },
+        "tool_errors": 0,
+        "api_retries": 0,
+        "repair_cycles": 7,
+        "statuses": {
+          "completed": 7
+        }
+      },
+      "tasks": {
+        "alarms": {
+          "cases": 1,
+          "completion": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "accepted": {
+            "pass": 0,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 0.0
+          },
+          "build": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "static_behavior": {
+            "pass": 0,
+            "n": 1,
+            "verified_n": 0,
+            "rate_all": 0.0
+          },
+          "runtime_behavior": {
+            "pass": 0,
+            "n": 1,
+            "verified_n": 0,
+            "rate_all": 0.0
+          },
+          "all_attempts": {
+            "workflow_seconds": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 40.66143179999199,
+              "p95": 40.66143179999199
+            },
+            "input_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 62146,
+              "p95": 62146
+            },
+            "output_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 3047,
+              "p95": 3047
+            },
+            "total_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 65193,
+              "p95": 65193
+            }
+          },
+          "accepted_attempts": {
+            "workflow_seconds": {
+              "n": 0,
+              "known_n": 0,
+              "unknown_n": 0,
+              "median": null,
+              "p95": null
+            },
+            "input_tokens": {
+              "n": 0,
+              "known_n": 0,
+              "unknown_n": 0,
+              "median": null,
+              "p95": null
+            },
+            "output_tokens": {
+              "n": 0,
+              "known_n": 0,
+              "unknown_n": 0,
+              "median": null,
+              "p95": null
+            },
+            "total_tokens": {
+              "n": 0,
+              "known_n": 0,
+              "unknown_n": 0,
+              "median": null,
+              "p95": null
+            }
+          },
+          "known_partial_tokens": {
+            "input_tokens": 62146,
+            "output_tokens": 3047,
+            "total_tokens": 65193
+          },
+          "tool_errors": 0,
+          "api_retries": 0,
+          "repair_cycles": 0,
+          "statuses": {
+            "completed": 1
+          }
+        },
+        "inspect": {
+          "cases": 1,
+          "completion": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "accepted": {
+            "pass": 0,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 0.0
+          },
+          "build": {
+            "pass": 0,
+            "n": 0,
+            "verified_n": 0,
+            "rate_all": null
+          },
+          "static_behavior": {
+            "pass": 0,
+            "n": 0,
+            "verified_n": 0,
+            "rate_all": null
+          },
+          "runtime_behavior": {
+            "pass": 0,
+            "n": 0,
+            "verified_n": 0,
+            "rate_all": null
+          },
+          "all_attempts": {
+            "workflow_seconds": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 19.667896899976768,
+              "p95": 19.667896899976768
+            },
+            "input_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 14822,
+              "p95": 14822
+            },
+            "output_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 1250,
+              "p95": 1250
+            },
+            "total_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 16072,
+              "p95": 16072
+            }
+          },
+          "accepted_attempts": {
+            "workflow_seconds": {
+              "n": 0,
+              "known_n": 0,
+              "unknown_n": 0,
+              "median": null,
+              "p95": null
+            },
+            "input_tokens": {
+              "n": 0,
+              "known_n": 0,
+              "unknown_n": 0,
+              "median": null,
+              "p95": null
+            },
+            "output_tokens": {
+              "n": 0,
+              "known_n": 0,
+              "unknown_n": 0,
+              "median": null,
+              "p95": null
+            },
+            "total_tokens": {
+              "n": 0,
+              "known_n": 0,
+              "unknown_n": 0,
+              "median": null,
+              "p95": null
+            }
+          },
+          "known_partial_tokens": {
+            "input_tokens": 14822,
+            "output_tokens": 1250,
+            "total_tokens": 16072
+          },
+          "tool_errors": 0,
+          "api_retries": 0,
+          "repair_cycles": 0,
+          "statuses": {
+            "completed": 1
+          }
+        },
+        "io_mapping": {
+          "cases": 1,
+          "completion": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "accepted": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "build": {
+            "pass": 0,
+            "n": 0,
+            "verified_n": 0,
+            "rate_all": null
+          },
+          "static_behavior": {
+            "pass": 0,
+            "n": 0,
+            "verified_n": 0,
+            "rate_all": null
+          },
+          "runtime_behavior": {
+            "pass": 0,
+            "n": 0,
+            "verified_n": 0,
+            "rate_all": null
+          },
+          "all_attempts": {
+            "workflow_seconds": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 97.78541759995278,
+              "p95": 97.78541759995278
+            },
+            "input_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 193505,
+              "p95": 193505
+            },
+            "output_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 9731,
+              "p95": 9731
+            },
+            "total_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 203236,
+              "p95": 203236
+            }
+          },
+          "accepted_attempts": {
+            "workflow_seconds": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 97.78541759995278,
+              "p95": 97.78541759995278
+            },
+            "input_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 193505,
+              "p95": 193505
+            },
+            "output_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 9731,
+              "p95": 9731
+            },
+            "total_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 203236,
+              "p95": 203236
+            }
+          },
+          "known_partial_tokens": {
+            "input_tokens": 193505,
+            "output_tokens": 9731,
+            "total_tokens": 203236
+          },
+          "tool_errors": 0,
+          "api_retries": 0,
+          "repair_cycles": 0,
+          "statuses": {
+            "completed": 1
+          }
+        },
+        "repair": {
+          "cases": 1,
+          "completion": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "accepted": {
+            "pass": 0,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 0.0
+          },
+          "build": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "static_behavior": {
+            "pass": 0,
+            "n": 1,
+            "verified_n": 0,
+            "rate_all": 0.0
+          },
+          "runtime_behavior": {
+            "pass": 0,
+            "n": 1,
+            "verified_n": 0,
+            "rate_all": 0.0
+          },
+          "all_attempts": {
+            "workflow_seconds": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 154.87764229997993,
+              "p95": 154.87764229997993
+            },
+            "input_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 388549,
+              "p95": 388549
+            },
+            "output_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 13185,
+              "p95": 13185
+            },
+            "total_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 401734,
+              "p95": 401734
+            }
+          },
+          "accepted_attempts": {
+            "workflow_seconds": {
+              "n": 0,
+              "known_n": 0,
+              "unknown_n": 0,
+              "median": null,
+              "p95": null
+            },
+            "input_tokens": {
+              "n": 0,
+              "known_n": 0,
+              "unknown_n": 0,
+              "median": null,
+              "p95": null
+            },
+            "output_tokens": {
+              "n": 0,
+              "known_n": 0,
+              "unknown_n": 0,
+              "median": null,
+              "p95": null
+            },
+            "total_tokens": {
+              "n": 0,
+              "known_n": 0,
+              "unknown_n": 0,
+              "median": null,
+              "p95": null
+            }
+          },
+          "known_partial_tokens": {
+            "input_tokens": 388549,
+            "output_tokens": 13185,
+            "total_tokens": 401734
+          },
+          "tool_errors": 0,
+          "api_retries": 0,
+          "repair_cycles": 7,
+          "statuses": {
+            "completed": 1
+          }
+        },
+        "temperature": {
+          "cases": 1,
+          "completion": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "accepted": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "build": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "static_behavior": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "runtime_behavior": {
+            "pass": 0,
+            "n": 1,
+            "verified_n": 0,
+            "rate_all": 0.0
+          },
+          "all_attempts": {
+            "workflow_seconds": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 26.222108499961905,
+              "p95": 26.222108499961905
+            },
+            "input_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 41400,
+              "p95": 41400
+            },
+            "output_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 1528,
+              "p95": 1528
+            },
+            "total_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 42928,
+              "p95": 42928
+            }
+          },
+          "accepted_attempts": {
+            "workflow_seconds": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 26.222108499961905,
+              "p95": 26.222108499961905
+            },
+            "input_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 41400,
+              "p95": 41400
+            },
+            "output_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 1528,
+              "p95": 1528
+            },
+            "total_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 42928,
+              "p95": 42928
+            }
+          },
+          "known_partial_tokens": {
+            "input_tokens": 41400,
+            "output_tokens": 1528,
+            "total_tokens": 42928
+          },
+          "tool_errors": 0,
+          "api_retries": 0,
+          "repair_cycles": 0,
+          "statuses": {
+            "completed": 1
+          }
+        },
+        "threshold": {
+          "cases": 1,
+          "completion": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "accepted": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "build": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "static_behavior": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "runtime_behavior": {
+            "pass": 0,
+            "n": 1,
+            "verified_n": 0,
+            "rate_all": 0.0
+          },
+          "all_attempts": {
+            "workflow_seconds": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 31.861743599991314,
+              "p95": 31.861743599991314
+            },
+            "input_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 44009,
+              "p95": 44009
+            },
+            "output_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 2269,
+              "p95": 2269
+            },
+            "total_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 46278,
+              "p95": 46278
+            }
+          },
+          "accepted_attempts": {
+            "workflow_seconds": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 31.861743599991314,
+              "p95": 31.861743599991314
+            },
+            "input_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 44009,
+              "p95": 44009
+            },
+            "output_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 2269,
+              "p95": 2269
+            },
+            "total_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 46278,
+              "p95": 46278
+            }
+          },
+          "known_partial_tokens": {
+            "input_tokens": 44009,
+            "output_tokens": 2269,
+            "total_tokens": 46278
+          },
+          "tool_errors": 0,
+          "api_retries": 0,
+          "repair_cycles": 0,
+          "statuses": {
+            "completed": 1
+          }
+        },
+        "weighing": {
+          "cases": 1,
+          "completion": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "accepted": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "build": {
+            "pass": 0,
+            "n": 0,
+            "verified_n": 0,
+            "rate_all": null
+          },
+          "static_behavior": {
+            "pass": 0,
+            "n": 0,
+            "verified_n": 0,
+            "rate_all": null
+          },
+          "runtime_behavior": {
+            "pass": 0,
+            "n": 0,
+            "verified_n": 0,
+            "rate_all": null
+          },
+          "all_attempts": {
+            "workflow_seconds": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 39.5384571000468,
+              "p95": 39.5384571000468
+            },
+            "input_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 45235,
+              "p95": 45235
+            },
+            "output_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 3489,
+              "p95": 3489
+            },
+            "total_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 48724,
+              "p95": 48724
+            }
+          },
+          "accepted_attempts": {
+            "workflow_seconds": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 39.5384571000468,
+              "p95": 39.5384571000468
+            },
+            "input_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 45235,
+              "p95": 45235
+            },
+            "output_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 3489,
+              "p95": 3489
+            },
+            "total_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 48724,
+              "p95": 48724
+            }
+          },
+          "known_partial_tokens": {
+            "input_tokens": 45235,
+            "output_tokens": 3489,
+            "total_tokens": 48724
+          },
+          "tool_errors": 0,
+          "api_retries": 0,
+          "repair_cycles": 0,
+          "statuses": {
+            "completed": 1
+          }
+        }
+      }
+    },
+    "B": {
+      "overall": {
+        "cases": 7,
+        "completion": {
+          "pass": 7,
+          "n": 7,
+          "verified_n": 7,
+          "rate_all": 1.0
+        },
+        "accepted": {
+          "pass": 4,
+          "n": 7,
+          "verified_n": 7,
+          "rate_all": 0.5714285714285714
+        },
+        "build": {
+          "pass": 4,
+          "n": 4,
+          "verified_n": 4,
+          "rate_all": 1.0
+        },
+        "static_behavior": {
+          "pass": 2,
+          "n": 4,
+          "verified_n": 2,
+          "rate_all": 0.5
+        },
+        "runtime_behavior": {
+          "pass": 0,
+          "n": 4,
+          "verified_n": 0,
+          "rate_all": 0.0
+        },
+        "all_attempts": {
+          "workflow_seconds": {
+            "n": 7,
+            "known_n": 7,
+            "unknown_n": 0,
+            "median": 44.17387759999838,
+            "p95": 128.08830780000426
+          },
+          "input_tokens": {
+            "n": 7,
+            "known_n": 7,
+            "unknown_n": 0,
+            "median": 52081,
+            "p95": 209411
+          },
+          "output_tokens": {
+            "n": 7,
+            "known_n": 7,
+            "unknown_n": 0,
+            "median": 3843,
+            "p95": 12887
+          },
+          "total_tokens": {
+            "n": 7,
+            "known_n": 7,
+            "unknown_n": 0,
+            "median": 55924,
+            "p95": 222298
+          }
+        },
+        "accepted_attempts": {
+          "workflow_seconds": {
+            "n": 4,
+            "known_n": 4,
+            "unknown_n": 0,
+            "median": 36.5630216000136,
+            "p95": 128.08830780000426
+          },
+          "input_tokens": {
+            "n": 4,
+            "known_n": 4,
+            "unknown_n": 0,
+            "median": 49384.5,
+            "p95": 209411
+          },
+          "output_tokens": {
+            "n": 4,
+            "known_n": 4,
+            "unknown_n": 0,
+            "median": 2850.5,
+            "p95": 12887
+          },
+          "total_tokens": {
+            "n": 4,
+            "known_n": 4,
+            "unknown_n": 0,
+            "median": 52199.0,
+            "p95": 222298
+          }
+        },
+        "known_partial_tokens": {
+          "input_tokens": 570856,
+          "output_tokens": 33156,
+          "total_tokens": 604012
+        },
+        "tool_errors": 0,
+        "api_retries": 0,
+        "repair_cycles": 2,
+        "statuses": {
+          "completed": 7
+        }
+      },
+      "tasks": {
+        "alarms": {
+          "cases": 1,
+          "completion": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "accepted": {
+            "pass": 0,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 0.0
+          },
+          "build": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "static_behavior": {
+            "pass": 0,
+            "n": 1,
+            "verified_n": 0,
+            "rate_all": 0.0
+          },
+          "runtime_behavior": {
+            "pass": 0,
+            "n": 1,
+            "verified_n": 0,
+            "rate_all": 0.0
+          },
+          "all_attempts": {
+            "workflow_seconds": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 53.52888870006427,
+              "p95": 53.52888870006427
+            },
+            "input_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 92020,
+              "p95": 92020
+            },
+            "output_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 4319,
+              "p95": 4319
+            },
+            "total_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 96339,
+              "p95": 96339
+            }
+          },
+          "accepted_attempts": {
+            "workflow_seconds": {
+              "n": 0,
+              "known_n": 0,
+              "unknown_n": 0,
+              "median": null,
+              "p95": null
+            },
+            "input_tokens": {
+              "n": 0,
+              "known_n": 0,
+              "unknown_n": 0,
+              "median": null,
+              "p95": null
+            },
+            "output_tokens": {
+              "n": 0,
+              "known_n": 0,
+              "unknown_n": 0,
+              "median": null,
+              "p95": null
+            },
+            "total_tokens": {
+              "n": 0,
+              "known_n": 0,
+              "unknown_n": 0,
+              "median": null,
+              "p95": null
+            }
+          },
+          "known_partial_tokens": {
+            "input_tokens": 92020,
+            "output_tokens": 4319,
+            "total_tokens": 96339
+          },
+          "tool_errors": 0,
+          "api_retries": 0,
+          "repair_cycles": 0,
+          "statuses": {
+            "completed": 1
+          }
+        },
+        "inspect": {
+          "cases": 1,
+          "completion": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "accepted": {
+            "pass": 0,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 0.0
+          },
+          "build": {
+            "pass": 0,
+            "n": 0,
+            "verified_n": 0,
+            "rate_all": null
+          },
+          "static_behavior": {
+            "pass": 0,
+            "n": 0,
+            "verified_n": 0,
+            "rate_all": null
+          },
+          "runtime_behavior": {
+            "pass": 0,
+            "n": 0,
+            "verified_n": 0,
+            "rate_all": null
+          },
+          "all_attempts": {
+            "workflow_seconds": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 21.368805999984033,
+              "p95": 21.368805999984033
+            },
+            "input_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 16385,
+              "p95": 16385
+            },
+            "output_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 1351,
+              "p95": 1351
+            },
+            "total_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 17736,
+              "p95": 17736
+            }
+          },
+          "accepted_attempts": {
+            "workflow_seconds": {
+              "n": 0,
+              "known_n": 0,
+              "unknown_n": 0,
+              "median": null,
+              "p95": null
+            },
+            "input_tokens": {
+              "n": 0,
+              "known_n": 0,
+              "unknown_n": 0,
+              "median": null,
+              "p95": null
+            },
+            "output_tokens": {
+              "n": 0,
+              "known_n": 0,
+              "unknown_n": 0,
+              "median": null,
+              "p95": null
+            },
+            "total_tokens": {
+              "n": 0,
+              "known_n": 0,
+              "unknown_n": 0,
+              "median": null,
+              "p95": null
+            }
+          },
+          "known_partial_tokens": {
+            "input_tokens": 16385,
+            "output_tokens": 1351,
+            "total_tokens": 17736
+          },
+          "tool_errors": 0,
+          "api_retries": 0,
+          "repair_cycles": 0,
+          "statuses": {
+            "completed": 1
+          }
+        },
+        "io_mapping": {
+          "cases": 1,
+          "completion": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "accepted": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "build": {
+            "pass": 0,
+            "n": 0,
+            "verified_n": 0,
+            "rate_all": null
+          },
+          "static_behavior": {
+            "pass": 0,
+            "n": 0,
+            "verified_n": 0,
+            "rate_all": null
+          },
+          "runtime_behavior": {
+            "pass": 0,
+            "n": 0,
+            "verified_n": 0,
+            "rate_all": null
+          },
+          "all_attempts": {
+            "workflow_seconds": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 128.08830780000426,
+              "p95": 128.08830780000426
+            },
+            "input_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 209411,
+              "p95": 209411
+            },
+            "output_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 12887,
+              "p95": 12887
+            },
+            "total_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 222298,
+              "p95": 222298
+            }
+          },
+          "accepted_attempts": {
+            "workflow_seconds": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 128.08830780000426,
+              "p95": 128.08830780000426
+            },
+            "input_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 209411,
+              "p95": 209411
+            },
+            "output_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 12887,
+              "p95": 12887
+            },
+            "total_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 222298,
+              "p95": 222298
+            }
+          },
+          "known_partial_tokens": {
+            "input_tokens": 209411,
+            "output_tokens": 12887,
+            "total_tokens": 222298
+          },
+          "tool_errors": 0,
+          "api_retries": 0,
+          "repair_cycles": 0,
+          "statuses": {
+            "completed": 1
+          }
+        },
+        "repair": {
+          "cases": 1,
+          "completion": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "accepted": {
+            "pass": 0,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 0.0
+          },
+          "build": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "static_behavior": {
+            "pass": 0,
+            "n": 1,
+            "verified_n": 0,
+            "rate_all": 0.0
+          },
+          "runtime_behavior": {
+            "pass": 0,
+            "n": 1,
+            "verified_n": 0,
+            "rate_all": 0.0
+          },
+          "all_attempts": {
+            "workflow_seconds": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 84.23748780007008,
+              "p95": 84.23748780007008
+            },
+            "input_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 107821,
+              "p95": 107821
+            },
+            "output_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 7112,
+              "p95": 7112
+            },
+            "total_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 114933,
+              "p95": 114933
+            }
+          },
+          "accepted_attempts": {
+            "workflow_seconds": {
+              "n": 0,
+              "known_n": 0,
+              "unknown_n": 0,
+              "median": null,
+              "p95": null
+            },
+            "input_tokens": {
+              "n": 0,
+              "known_n": 0,
+              "unknown_n": 0,
+              "median": null,
+              "p95": null
+            },
+            "output_tokens": {
+              "n": 0,
+              "known_n": 0,
+              "unknown_n": 0,
+              "median": null,
+              "p95": null
+            },
+            "total_tokens": {
+              "n": 0,
+              "known_n": 0,
+              "unknown_n": 0,
+              "median": null,
+              "p95": null
+            }
+          },
+          "known_partial_tokens": {
+            "input_tokens": 107821,
+            "output_tokens": 7112,
+            "total_tokens": 114933
+          },
+          "tool_errors": 0,
+          "api_retries": 0,
+          "repair_cycles": 2,
+          "statuses": {
+            "completed": 1
+          }
+        },
+        "temperature": {
+          "cases": 1,
+          "completion": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "accepted": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "build": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "static_behavior": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "runtime_behavior": {
+            "pass": 0,
+            "n": 1,
+            "verified_n": 0,
+            "rate_all": 0.0
+          },
+          "all_attempts": {
+            "workflow_seconds": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 28.95216560002882,
+              "p95": 28.95216560002882
+            },
+            "input_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 46450,
+              "p95": 46450
+            },
+            "output_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 1858,
+              "p95": 1858
+            },
+            "total_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 48308,
+              "p95": 48308
+            }
+          },
+          "accepted_attempts": {
+            "workflow_seconds": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 28.95216560002882,
+              "p95": 28.95216560002882
+            },
+            "input_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 46450,
+              "p95": 46450
+            },
+            "output_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 1858,
+              "p95": 1858
+            },
+            "total_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 48308,
+              "p95": 48308
+            }
+          },
+          "known_partial_tokens": {
+            "input_tokens": 46450,
+            "output_tokens": 1858,
+            "total_tokens": 48308
+          },
+          "tool_errors": 0,
+          "api_retries": 0,
+          "repair_cycles": 0,
+          "statuses": {
+            "completed": 1
+          }
+        },
+        "threshold": {
+          "cases": 1,
+          "completion": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "accepted": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "build": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "static_behavior": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "runtime_behavior": {
+            "pass": 0,
+            "n": 1,
+            "verified_n": 0,
+            "rate_all": 0.0
+          },
+          "all_attempts": {
+            "workflow_seconds": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 28.594349000020884,
+              "p95": 28.594349000020884
+            },
+            "input_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 46688,
+              "p95": 46688
+            },
+            "output_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 1786,
+              "p95": 1786
+            },
+            "total_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 48474,
+              "p95": 48474
+            }
+          },
+          "accepted_attempts": {
+            "workflow_seconds": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 28.594349000020884,
+              "p95": 28.594349000020884
+            },
+            "input_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 46688,
+              "p95": 46688
+            },
+            "output_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 1786,
+              "p95": 1786
+            },
+            "total_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 48474,
+              "p95": 48474
+            }
+          },
+          "known_partial_tokens": {
+            "input_tokens": 46688,
+            "output_tokens": 1786,
+            "total_tokens": 48474
+          },
+          "tool_errors": 0,
+          "api_retries": 0,
+          "repair_cycles": 0,
+          "statuses": {
+            "completed": 1
+          }
+        },
+        "weighing": {
+          "cases": 1,
+          "completion": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "accepted": {
+            "pass": 1,
+            "n": 1,
+            "verified_n": 1,
+            "rate_all": 1.0
+          },
+          "build": {
+            "pass": 0,
+            "n": 0,
+            "verified_n": 0,
+            "rate_all": null
+          },
+          "static_behavior": {
+            "pass": 0,
+            "n": 0,
+            "verified_n": 0,
+            "rate_all": null
+          },
+          "runtime_behavior": {
+            "pass": 0,
+            "n": 0,
+            "verified_n": 0,
+            "rate_all": null
+          },
+          "all_attempts": {
+            "workflow_seconds": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 44.17387759999838,
+              "p95": 44.17387759999838
+            },
+            "input_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 52081,
+              "p95": 52081
+            },
+            "output_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 3843,
+              "p95": 3843
+            },
+            "total_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 55924,
+              "p95": 55924
+            }
+          },
+          "accepted_attempts": {
+            "workflow_seconds": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 44.17387759999838,
+              "p95": 44.17387759999838
+            },
+            "input_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 52081,
+              "p95": 52081
+            },
+            "output_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 3843,
+              "p95": 3843
+            },
+            "total_tokens": {
+              "n": 1,
+              "known_n": 1,
+              "unknown_n": 0,
+              "median": 55924,
+              "p95": 55924
+            }
+          },
+          "known_partial_tokens": {
+            "input_tokens": 52081,
+            "output_tokens": 3843,
+            "total_tokens": 55924
+          },
+          "tool_errors": 0,
+          "api_retries": 0,
+          "repair_cycles": 0,
+          "statuses": {
+            "completed": 1
+          }
+        }
+      }
+    }
+  },
+  "paired_differences": {
+    "threshold:workflow_seconds:B_minus_A": {
+      "n": 1,
+      "known_n": 1,
+      "unknown_n": 0,
+      "median": -3.26739459997043,
+      "p95": -3.26739459997043
+    },
+    "threshold:total_tokens:B_minus_A": {
+      "n": 1,
+      "known_n": 1,
+      "unknown_n": 0,
+      "median": 2196,
+      "p95": 2196
+    },
+    "temperature:workflow_seconds:B_minus_A": {
+      "n": 1,
+      "known_n": 1,
+      "unknown_n": 0,
+      "median": 2.730057100066915,
+      "p95": 2.730057100066915
+    },
+    "temperature:total_tokens:B_minus_A": {
+      "n": 1,
+      "known_n": 1,
+      "unknown_n": 0,
+      "median": 5380,
+      "p95": 5380
+    },
+    "io_mapping:workflow_seconds:B_minus_A": {
+      "n": 1,
+      "known_n": 1,
+      "unknown_n": 0,
+      "median": 30.30289020005148,
+      "p95": 30.30289020005148
+    },
+    "io_mapping:total_tokens:B_minus_A": {
+      "n": 1,
+      "known_n": 1,
+      "unknown_n": 0,
+      "median": 19062,
+      "p95": 19062
+    },
+    "alarms:workflow_seconds:B_minus_A": {
+      "n": 1,
+      "known_n": 1,
+      "unknown_n": 0,
+      "median": 12.867456900072284,
+      "p95": 12.867456900072284
+    },
+    "alarms:total_tokens:B_minus_A": {
+      "n": 1,
+      "known_n": 1,
+      "unknown_n": 0,
+      "median": 31146,
+      "p95": 31146
+    },
+    "repair:workflow_seconds:B_minus_A": {
+      "n": 1,
+      "known_n": 1,
+      "unknown_n": 0,
+      "median": -70.64015449990984,
+      "p95": -70.64015449990984
+    },
+    "repair:total_tokens:B_minus_A": {
+      "n": 1,
+      "known_n": 1,
+      "unknown_n": 0,
+      "median": -286801,
+      "p95": -286801
+    },
+    "inspect:workflow_seconds:B_minus_A": {
+      "n": 1,
+      "known_n": 1,
+      "unknown_n": 0,
+      "median": 1.7009091000072658,
+      "p95": 1.7009091000072658
+    },
+    "inspect:total_tokens:B_minus_A": {
+      "n": 1,
+      "known_n": 1,
+      "unknown_n": 0,
+      "median": 1664,
+      "p95": 1664
+    },
+    "weighing:workflow_seconds:B_minus_A": {
+      "n": 1,
+      "known_n": 1,
+      "unknown_n": 0,
+      "median": 4.635420499951579,
+      "p95": 4.635420499951579
+    },
+    "weighing:total_tokens:B_minus_A": {
+      "n": 1,
+      "known_n": 1,
+      "unknown_n": 0,
+      "median": 7200,
+      "p95": 7200
+    }
+  },
+  "suite": "offline-feeder-demo",
+  "limitations": [
+    "Small repetition counts are exploratory, not statistically strong comparisons.",
+    "Static recognized-subset acceptance; PLC runtime behavior remains unverified.",
+    "Claude Code CLI agent loop (subscription login, built-in tools disabled, server instructions as replacement system prompt); distinct from interactive Claude Code defaults.",
+    "Dirty source fingerprints identify uncommitted code; do not label them a clean revision."
+  ],
+  "inspection_regrades": [
+    {
+      "case_id": "io_mapping-000-A",
+      "attempt_id": "attempt-7c3d7a34c183405bb114cf966c7a1dba",
+      "fingerprint": "885b342368808facad30c77687ee14d0a64fa0394330240ade794292908c87c8",
+      "prior_rubric": "demo-io-mapping-6",
+      "prior_success": true,
+      "rubric": "demo-io-mapping-6",
+      "success": true,
+      "summary_sha256": "ba384219bc90a3cf1d643c1aba98766139f9570bf5d961df03769cf00081fdac",
+      "response_sha256": "64f1e9d5cdf6e521fa96c4f02ed5f4194a95168a496c3625a0eb4b5386eebe29",
+      "validation": {
+        "rubric": "demo-io-mapping-6",
+        "checks": {
+          "physical:ami0410_0_7": true,
+          "physical:analog_input_0": true,
+          "physical:analog_input_1": true,
+          "physical:analog_input_2": true,
+          "physical:analog_input_3": true,
+          "physical:ddi3202k_0_5": true,
+          "physical:ddo1602_0_6": true,
+          "physical:l0": true,
+          "physical:l1": true,
+          "physical:l2": true,
+          "physical:machine_running": true,
+          "memory:current_position": true,
+          "memory:recipe": true,
+          "unmapped:start": true,
+          "unmapped:stop": true,
+          "unmapped:bp0": true,
+          "unmapped:bp1": true,
+          "unmapped:switch0": true,
+          "unmapped:measured_temp": true,
+          "unmapped:valve_a_open": true,
+          "unmapped:valve_a_closed": true,
+          "unmapped:valve_b_open": true,
+          "unmapped:valve_b_closed": true,
+          "unmapped:conveying_screw": true,
+          "unmapped:forming": true,
+          "unmapped:belt_running": true,
+          "unmapped:material_picked_off": true,
+          "robot_unmapped": true,
+          "no_false_physical_mappings": true
+        },
+        "facts": {
+          "physical:ami0410_0_7": {
+            "status": "matched",
+            "reason": "Signal, address/DDT, module and channel established together",
+            "evidence_sha256": [
+              "ef2a5cf21e02184c45a4fbdf96208c4e94eab7b17f4ebe3173f8d4c11511ce18"
+            ]
+          },
+          "physical:analog_input_0": {
+            "status": "matched",
+            "reason": "Signal, address/DDT, module and channel established together",
+            "evidence_sha256": [
+              "f85ec08d77e1a5ec806fdf250554d4951e78f8eccdbcef5954f5ed9aa3bc9a2f"
+            ]
+          },
+          "physical:analog_input_1": {
+            "status": "matched",
+            "reason": "Signal, address/DDT, module and channel established together",
+            "evidence_sha256": [
+              "f352a5afd0577450848f808499e3f9d067e3f600e5e6cc654dfab42e6f0cf1a7"
+            ]
+          },
+          "physical:analog_input_2": {
+            "status": "matched",
+            "reason": "Signal, address/DDT, module and channel established together",
+            "evidence_sha256": [
+              "71c7325e8b16d717b3c437f833e990a4b9d14bba12d4034b90dc3a57dac67fbe"
+            ]
+          },
+          "physical:analog_input_3": {
+            "status": "matched",
+            "reason": "Signal, address/DDT, module and channel established together",
+            "evidence_sha256": [
+              "caf2a6499144cd665e6fe37ca8d353c1604871e9fe272c91d3658d54e87c594a"
+            ]
+          },
+          "physical:ddi3202k_0_5": {
+            "status": "matched",
+            "reason": "Signal, address/DDT, module and channel established together",
+            "evidence_sha256": [
+              "d03a21515ed9a5fa685ac11473ea9be35e35c6d30174f4b8aa1170759b1212a3"
+            ]
+          },
+          "physical:ddo1602_0_6": {
+            "status": "matched",
+            "reason": "Signal, address/DDT, module and channel established together",
+            "evidence_sha256": [
+              "412fd9c741baa987f0c3ffe543d99e8e577e6f87a7019956e336f88a34380697"
+            ]
+          },
+          "physical:l0": {
+            "status": "matched",
+            "reason": "Signal, address/DDT, module and channel established together",
+            "evidence_sha256": [
+              "50d27f421b461afdc8e57a0e09efe5dbd6ee95f3f0fb527641a36bfb45f77bd7"
+            ]
+          },
+          "physical:l1": {
+            "status": "matched",
+            "reason": "Signal, address/DDT, module and channel established together",
+            "evidence_sha256": [
+              "51602a8de1f7531e522bdb8bccdb0f0eeee2dc19247f25755ac1198bf9bbf7d3"
+            ]
+          },
+          "physical:l2": {
+            "status": "matched",
+            "reason": "Signal, address/DDT, module and channel established together",
+            "evidence_sha256": [
+              "2a1123ea6ac214c4dc165b16615d3584d583255435357c4c4dfbce36615a3420"
+            ]
+          },
+          "physical:machine_running": {
+            "status": "matched",
+            "reason": "Signal, address/DDT, module and channel established together",
+            "evidence_sha256": [
+              "722c94e786eace4101abc11bdb24755fc9c58be698f34b0a5f8467ad81edabef"
+            ]
+          },
+          "memory:current_position": {
+            "status": "matched",
+            "reason": "Require explicit internal-memory location and classification",
+            "evidence_sha256": [
+              "515f6ddecb917e313d7bc308b93e56fc445eb0511788b7a983d10341f9bb24a6",
+              "8fec8e59367c5046f59e4446749be8eebf10d4cf73d8098437877a1e3eeb9ce7"
+            ]
+          },
+          "memory:recipe": {
+            "status": "matched",
+            "reason": "Require explicit internal-memory location and classification",
+            "evidence_sha256": [
+              "271328c4f4f9a4d21be8c408b363890e13fdac4448ebab1ecfe61305b0b03649"
+            ]
+          },
+          "unmapped:start": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "66e9fb15bceb2703a8213bc01f16ec634b311a27f29d01eee0ba10ebe8e72bac"
+            ]
+          },
+          "unmapped:stop": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "71892686a1d672f243c92382917c58e5137e9a4caae5e069be384f7cb29ab77f"
+            ]
+          },
+          "unmapped:bp0": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "55823def08be46e2836054ce0360e085c720ec804f9358c1683bcdc739627d20"
+            ]
+          },
+          "unmapped:bp1": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "b3918993bccad63a940f14896833909e996c1eb5aa11a60479bf47b6d51a9ab4"
+            ]
+          },
+          "unmapped:switch0": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "34f3f696a7005cf0dd05baa33a8eab6770de64be8db813fb8619801105944369"
+            ]
+          },
+          "unmapped:measured_temp": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "f60d1f73551591f42c3add8c37094d501279510d4063243f6ccd5d037e181081"
+            ]
+          },
+          "unmapped:valve_a_open": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "171c383d3e06846d863c8d3d63e04ba58b2cad764dac3b0c270be0d7be55e53e"
+            ]
+          },
+          "unmapped:valve_a_closed": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "e181be97544249e790e59ca03403f417b3d9d0aaf31645f640174ca679583525"
+            ]
+          },
+          "unmapped:valve_b_open": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "1ea56dbf6155247b5cac00dedc8d20dbbbef7450ff899f42be08eafaee689d18"
+            ]
+          },
+          "unmapped:valve_b_closed": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "a4d80b33fdfc5af93139f3109616dfb047fc708769348f39f2b82195a0495d99"
+            ]
+          },
+          "unmapped:conveying_screw": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "26b18740f305af6680c7a86dba5bf221c19b992645f63a11af1dc35e3303fb1f"
+            ]
+          },
+          "unmapped:forming": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "b117e4b9981e1eb562f746ca541419445cd18222f0576c9afb660fa974e260dc"
+            ]
+          },
+          "unmapped:belt_running": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "b5b33e2400fec29a8287efd983973d8f64a0ef88cfc05f9338864925a4d03208"
+            ]
+          },
+          "unmapped:material_picked_off": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "9955a1d26bddf4c77fb44c35451b227a7b994a87814458ac220ab3ce54066777"
+            ]
+          },
+          "robot_unmapped": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "60ae8413f6656b0759948ae1e5baf572e155891fbc21f8b4410cc95d2f6dc1af"
+            ]
+          },
+          "no_false_physical_mappings": {
+            "status": "matched",
+            "reason": "Reference-unmapped signals must not acquire hardware assignments",
+            "evidence_sha256": []
+          }
+        },
+        "coverage": {
+          "matched": 29,
+          "required": 29,
+          "fraction": 1.0
+        },
+        "missing": [],
+        "incorrect": [],
+        "answer_pass": true,
+        "limitation": "Deterministic reference subset; unrecognized representations remain missing. No semantic or exhaustive device-leaf verification.",
+        "scope": "pass",
+        "compile_pass": null,
+        "runtime_behavior": "unverified",
+        "static_behavior": null,
+        "obtained_source_through_mcp": true,
+        "success": true
+      },
+      "method": "Answer-only deterministic regrade; original saved-artifact scope/read evidence retained. No API or CE calls.",
+      "reference_sha256": "ae70a0f647ac3d404ed66eb014a0f876806b067ef38f0b07953a5a8233218888",
+      "grader_sha256": "f7700630351f82c7d7037a55630cc168f4448061be09b7c48f510d686da91200",
+      "grader_dependencies": {
+        "demo.py": "f7700630351f82c7d7037a55630cc168f4448061be09b7c48f510d686da91200",
+        "mapping_grade.py": "2b310604903aef5535a9420cbf9f9f7a6fc162c5dc8573cdd7596b6e679d1b2b"
+      }
+    },
+    {
+      "case_id": "io_mapping-000-B",
+      "attempt_id": "attempt-c229ca13e3654bc09e440eafa22383db",
+      "fingerprint": "885b342368808facad30c77687ee14d0a64fa0394330240ade794292908c87c8",
+      "prior_rubric": "demo-io-mapping-6",
+      "prior_success": true,
+      "rubric": "demo-io-mapping-6",
+      "success": true,
+      "summary_sha256": "a8b064bff052323520113f5d426fff5523bf797d0b0c41fa70de8edd33fc110a",
+      "response_sha256": "63598063e7d552b0237aba63c5e00c7fd940fdb25180d453a8b3325bbc9d490c",
+      "validation": {
+        "rubric": "demo-io-mapping-6",
+        "checks": {
+          "physical:ami0410_0_7": true,
+          "physical:analog_input_0": true,
+          "physical:analog_input_1": true,
+          "physical:analog_input_2": true,
+          "physical:analog_input_3": true,
+          "physical:ddi3202k_0_5": true,
+          "physical:ddo1602_0_6": true,
+          "physical:l0": true,
+          "physical:l1": true,
+          "physical:l2": true,
+          "physical:machine_running": true,
+          "memory:current_position": true,
+          "memory:recipe": true,
+          "unmapped:start": true,
+          "unmapped:stop": true,
+          "unmapped:bp0": true,
+          "unmapped:bp1": true,
+          "unmapped:switch0": true,
+          "unmapped:measured_temp": true,
+          "unmapped:valve_a_open": true,
+          "unmapped:valve_a_closed": true,
+          "unmapped:valve_b_open": true,
+          "unmapped:valve_b_closed": true,
+          "unmapped:conveying_screw": true,
+          "unmapped:forming": true,
+          "unmapped:belt_running": true,
+          "unmapped:material_picked_off": true,
+          "robot_unmapped": true,
+          "no_false_physical_mappings": true
+        },
+        "facts": {
+          "physical:ami0410_0_7": {
+            "status": "matched",
+            "reason": "Signal, address/DDT, module and channel established together",
+            "evidence_sha256": [
+              "ef2a5cf21e02184c45a4fbdf96208c4e94eab7b17f4ebe3173f8d4c11511ce18"
+            ]
+          },
+          "physical:analog_input_0": {
+            "status": "matched",
+            "reason": "Signal, address/DDT, module and channel established together",
+            "evidence_sha256": [
+              "f85ec08d77e1a5ec806fdf250554d4951e78f8eccdbcef5954f5ed9aa3bc9a2f"
+            ]
+          },
+          "physical:analog_input_1": {
+            "status": "matched",
+            "reason": "Signal, address/DDT, module and channel established together",
+            "evidence_sha256": [
+              "f352a5afd0577450848f808499e3f9d067e3f600e5e6cc654dfab42e6f0cf1a7"
+            ]
+          },
+          "physical:analog_input_2": {
+            "status": "matched",
+            "reason": "Signal, address/DDT, module and channel established together",
+            "evidence_sha256": [
+              "71c7325e8b16d717b3c437f833e990a4b9d14bba12d4034b90dc3a57dac67fbe"
+            ]
+          },
+          "physical:analog_input_3": {
+            "status": "matched",
+            "reason": "Signal, address/DDT, module and channel established together",
+            "evidence_sha256": [
+              "caf2a6499144cd665e6fe37ca8d353c1604871e9fe272c91d3658d54e87c594a"
+            ]
+          },
+          "physical:ddi3202k_0_5": {
+            "status": "matched",
+            "reason": "Signal, address/DDT, module and channel established together",
+            "evidence_sha256": [
+              "d03a21515ed9a5fa685ac11473ea9be35e35c6d30174f4b8aa1170759b1212a3"
+            ]
+          },
+          "physical:ddo1602_0_6": {
+            "status": "matched",
+            "reason": "Signal, address/DDT, module and channel established together",
+            "evidence_sha256": [
+              "412fd9c741baa987f0c3ffe543d99e8e577e6f87a7019956e336f88a34380697"
+            ]
+          },
+          "physical:l0": {
+            "status": "matched",
+            "reason": "Signal, address/DDT, module and channel established together",
+            "evidence_sha256": [
+              "202aed2129f895d99fa78bbbbe7e105f5554eb69e37e65ec19f57fe4faa3ea5e"
+            ]
+          },
+          "physical:l1": {
+            "status": "matched",
+            "reason": "Signal, address/DDT, module and channel established together",
+            "evidence_sha256": [
+              "fc6a33169e6d9dcf7f4fab5a38261d76244012a20d7acb18139630c50ec671a6"
+            ]
+          },
+          "physical:l2": {
+            "status": "matched",
+            "reason": "Signal, address/DDT, module and channel established together",
+            "evidence_sha256": [
+              "367b9f1ad405d546f47186557ab64fc3d17d46c89adcae2be650537e49e114ec"
+            ]
+          },
+          "physical:machine_running": {
+            "status": "matched",
+            "reason": "Signal, address/DDT, module and channel established together",
+            "evidence_sha256": [
+              "50899d82947f0e371379a94499e146d491f1805ca0577a98c5c2c64b59df02b0"
+            ]
+          },
+          "memory:current_position": {
+            "status": "matched",
+            "reason": "Require explicit internal-memory location and classification",
+            "evidence_sha256": [
+              "48e994fa65ba5f8960a1a3c9b53c889355e5b58c1da285786f5292f55066b65e"
+            ]
+          },
+          "memory:recipe": {
+            "status": "matched",
+            "reason": "Require explicit internal-memory location and classification",
+            "evidence_sha256": [
+              "90ba2696cc5507f2d6f86562cd242152f55b35a01e340e1a585be339be66c712"
+            ]
+          },
+          "unmapped:start": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "66e9fb15bceb2703a8213bc01f16ec634b311a27f29d01eee0ba10ebe8e72bac"
+            ]
+          },
+          "unmapped:stop": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "71892686a1d672f243c92382917c58e5137e9a4caae5e069be384f7cb29ab77f"
+            ]
+          },
+          "unmapped:bp0": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "a9ec434a49302c690b233380c31f2718be43dd60c05fd66bf73b22d96a6f1533"
+            ]
+          },
+          "unmapped:bp1": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "159d69da1dc91f847ca86c7f1606abcc797971d8cb5da997d6f4ed8238710b44"
+            ]
+          },
+          "unmapped:switch0": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "28e51a92934a1cb7eefa5a33473266ff631b266e338a9839090abf7f8e439bca"
+            ]
+          },
+          "unmapped:measured_temp": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "c45d0c334f94ad00ac88eddb8c86352837741c73536c26daa88804cbb08f846b"
+            ]
+          },
+          "unmapped:valve_a_open": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "75a49904dd7b6979a3bf74537118347a650d13ee40b1d755b799d83e02067947"
+            ]
+          },
+          "unmapped:valve_a_closed": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "05e10556e1309dbc08e8bc43bbd4ccf6eaf7eab648422683c6d0de9ca3534fdf"
+            ]
+          },
+          "unmapped:valve_b_open": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "8e4a5e36005771e72f75e61978f400d741006037a9c32d878bca55cd2d5ec687"
+            ]
+          },
+          "unmapped:valve_b_closed": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "492ff1def558a71f2cf2faf95995d1a9cceb617c55cdc8ad36be8249cfccaf95"
+            ]
+          },
+          "unmapped:conveying_screw": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "358f520b5905711ba0716745e517ba88cadb41e967ad941aa0d2d517616d7a47"
+            ]
+          },
+          "unmapped:forming": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "3f219fb94278fd274e030b3a2d863c56067f08b35b945d359f9dfa41bd311db2"
+            ]
+          },
+          "unmapped:belt_running": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "06b4cf73b450aa50980aad94bf3e43e2891891905de077be4ce8d1fa072d69ab"
+            ]
+          },
+          "unmapped:material_picked_off": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "9955a1d26bddf4c77fb44c35451b227a7b994a87814458ac220ab3ce54066777"
+            ]
+          },
+          "robot_unmapped": {
+            "status": "matched",
+            "reason": "Require explicit unmapped classification without hardware assignment",
+            "evidence_sha256": [
+              "07125b29e4a0131dedc430db0c55186327d26dc0b4662bfa1253fc33f0864c80"
+            ]
+          },
+          "no_false_physical_mappings": {
+            "status": "matched",
+            "reason": "Reference-unmapped signals must not acquire hardware assignments",
+            "evidence_sha256": []
+          }
+        },
+        "coverage": {
+          "matched": 29,
+          "required": 29,
+          "fraction": 1.0
+        },
+        "missing": [],
+        "incorrect": [],
+        "answer_pass": true,
+        "limitation": "Deterministic reference subset; unrecognized representations remain missing. No semantic or exhaustive device-leaf verification.",
+        "scope": "pass",
+        "compile_pass": null,
+        "runtime_behavior": "unverified",
+        "static_behavior": null,
+        "obtained_source_through_mcp": true,
+        "success": true
+      },
+      "method": "Answer-only deterministic regrade; original saved-artifact scope/read evidence retained. No API or CE calls.",
+      "reference_sha256": "ae70a0f647ac3d404ed66eb014a0f876806b067ef38f0b07953a5a8233218888",
+      "grader_sha256": "f7700630351f82c7d7037a55630cc168f4448061be09b7c48f510d686da91200",
+      "grader_dependencies": {
+        "demo.py": "f7700630351f82c7d7037a55630cc168f4448061be09b7c48f510d686da91200",
+        "mapping_grade.py": "2b310604903aef5535a9420cbf9f9f7a6fc162c5dc8573cdd7596b6e679d1b2b"
+      }
+    },
+    {
+      "case_id": "inspect-000-A",
+      "attempt_id": "attempt-832d0efd72aa4c0ebc2adab8c40d72fd",
+      "fingerprint": "885b342368808facad30c77687ee14d0a64fa0394330240ade794292908c87c8",
+      "prior_rubric": "feeder-2",
+      "prior_success": false,
+      "rubric": "feeder-3",
+      "success": true,
+      "summary_sha256": "982df8ec9295701ba66b39b71687cba821f8fd562b5ad87900c25eac87b28658",
+      "response_sha256": "0b2b00c3721b465435d56597a8fc9dd55c27bbc5799c35edf2941c18aead79eb",
+      "validation": {
+        "rubric": "feeder-3",
+        "checks": {
+          "location": true,
+          "initialization_event": true,
+          "initialization_expression": true,
+          "decrement_event": true,
+          "full": true,
+          "empty": true,
+          "temperature": true
+        },
+        "answer_pass": true,
+        "scope": "pass",
+        "compile_pass": null,
+        "runtime_behavior": "unverified",
+        "static_behavior": null,
+        "obtained_source_through_mcp": true,
+        "success": true
+      },
+      "method": "Answer-only deterministic regrade; original saved-artifact scope/read evidence retained. No API or CE calls."
+    },
+    {
+      "case_id": "inspect-000-B",
+      "attempt_id": "attempt-80903dec51c2415396e17048d880ee3e",
+      "fingerprint": "885b342368808facad30c77687ee14d0a64fa0394330240ade794292908c87c8",
+      "prior_rubric": "feeder-2",
+      "prior_success": false,
+      "rubric": "feeder-3",
+      "success": true,
+      "summary_sha256": "5e4764273e5b59ce7cd637c34647ebc18c7f48c660a1d8dbccbe47719c81fa4e",
+      "response_sha256": "f1961bb46dd8ca87a5e3e4b8f1261f08e05c8f3f46003c371a3ffadace2b06b8",
+      "validation": {
+        "rubric": "feeder-3",
+        "checks": {
+          "location": true,
+          "initialization_event": true,
+          "initialization_expression": true,
+          "decrement_event": true,
+          "full": true,
+          "empty": true,
+          "temperature": true
+        },
+        "answer_pass": true,
+        "scope": "pass",
+        "compile_pass": null,
+        "runtime_behavior": "unverified",
+        "static_behavior": null,
+        "obtained_source_through_mcp": true,
+        "success": true
+      },
+      "method": "Answer-only deterministic regrade; original saved-artifact scope/read evidence retained. No API or CE calls."
+    },
+    {
+      "case_id": "alarms-000-A",
+      "attempt_id": "attempt-14a9f3f8c4384e719c10e9aa0e106a65",
+      "fingerprint": "885b342368808facad30c77687ee14d0a64fa0394330240ade794292908c87c8",
+      "prior_rubric": "feeder-alarms-1",
+      "prior_success": false,
+      "rubric": "feeder-alarms-2",
+      "success": true,
+      "summary_sha256": "a3c9db34c607cabb565fceb7c7c8c27444d266c696e4c8dd69a9e1b7fcb13091",
+      "section_sha256": "4445d896e242f0909975042ae01a1fcb8f0eef1b0938445aaa3ec79cecda9152",
+      "grader_sha256": "b08335db8c50c1f1073056d18d01ba1a8684a373eeaad24878d90cc72dc46731",
+      "validation": {
+        "rubric": "feeder-alarms-2",
+        "scope": "pass",
+        "static_behavior": "pass",
+        "runtime_behavior": "unverified",
+        "method": "restricted ST interpreter + exhaustive INT comparison partitions; no PLC execution",
+        "build": {
+          "build_state": "built_ok",
+          "output": "Analyzing...\nProject settings disabled : \tMaintain output links on disabled EF (EN=0)\n{Feeder : [MAST]}\t: \t0 error(s), 0 warning(s)\nGenerating...\nLinking...\nProcess succeeded  : 0 Error(s) , 0 Warning(s)",
+          "diagnostics_output": "Analyzing...\nProject settings disabled : \tMaintain output links on disabled EF (EN=0)\n{Feeder : [MAST]}\t: \t0 error(s), 0 warning(s)\nGenerating...\nLinking...\nProcess succeeded  : 0 Error(s) , 0 Warning(s)",
+          "diagnostics": [],
+          "diagnostics_summary": {
+            "process_status": "succeeded",
+            "errors": 0,
+            "warnings": 0,
+            "message": "Process succeeded  : 0 Error(s) , 0 Warning(s)"
+          },
+          "diagnostics_available": true,
+          "diagnostics_capture": {
+            "operation": "build",
+            "source_tab": "Build",
+            "freshness": "changed",
+            "scope": "snapshot",
+            "attribution": "unverified",
+            "read_errors": [],
+            "note": "Observed output changes do not prove operation attribution. An empty diagnostics list does not establish a clean build; check build_state, error, availability and freshness."
+          }
+        },
+        "compile_pass": true,
+        "declarations_pass": true,
+        "model_built": true,
+        "model_saved": true,
+        "success": true,
+        "obtained_source_through_mcp": true,
+        "evaluator_seconds": 20.142957699950784,
+        "limitation": "Static recognized-subset checks; PLC runtime behavior unverified",
+        "partition_cases": 112,
+        "int_domain": [
+          -32768,
+          32767
+        ]
+      },
+      "method": "Saved-section static regrade; original build/save/declaration evidence retained. No API or CE calls."
+    },
+    {
+      "case_id": "alarms-000-B",
+      "attempt_id": "attempt-1aed5154e0ea4e76b8d0643c237b20ef",
+      "fingerprint": "885b342368808facad30c77687ee14d0a64fa0394330240ade794292908c87c8",
+      "prior_rubric": "feeder-alarms-1",
+      "prior_success": false,
+      "rubric": "feeder-alarms-2",
+      "success": true,
+      "summary_sha256": "f18f7e48ec78e5dbf30b23d63553c4dda32d768036f2bed7d001b93f98f92196",
+      "section_sha256": "0a1c2d8df6f055af6d4bb50893873c1bd2c1e89966b2b6d1704c5f872f186b5e",
+      "grader_sha256": "b08335db8c50c1f1073056d18d01ba1a8684a373eeaad24878d90cc72dc46731",
+      "validation": {
+        "rubric": "feeder-alarms-2",
+        "scope": "pass",
+        "static_behavior": "pass",
+        "runtime_behavior": "unverified",
+        "method": "restricted ST interpreter + exhaustive INT comparison partitions; no PLC execution",
+        "build": {
+          "build_state": "built_ok",
+          "output": "Analyzing...\nProject settings disabled : \tMaintain output links on disabled EF (EN=0)\n{Feeder : [MAST]}\t: \t0 error(s), 0 warning(s)\nGenerating...\nLinking...\nProcess succeeded  : 0 Error(s) , 0 Warning(s)",
+          "diagnostics_output": "Analyzing...\nProject settings disabled : \tMaintain output links on disabled EF (EN=0)\n{Feeder : [MAST]}\t: \t0 error(s), 0 warning(s)\nGenerating...\nLinking...\nProcess succeeded  : 0 Error(s) , 0 Warning(s)",
+          "diagnostics": [],
+          "diagnostics_summary": {
+            "process_status": "succeeded",
+            "errors": 0,
+            "warnings": 0,
+            "message": "Process succeeded  : 0 Error(s) , 0 Warning(s)"
+          },
+          "diagnostics_available": true,
+          "diagnostics_capture": {
+            "operation": "build",
+            "source_tab": "Build",
+            "freshness": "changed",
+            "scope": "snapshot",
+            "attribution": "unverified",
+            "read_errors": [],
+            "note": "Observed output changes do not prove operation attribution. An empty diagnostics list does not establish a clean build; check build_state, error, availability and freshness."
+          }
+        },
+        "compile_pass": true,
+        "declarations_pass": true,
+        "model_built": true,
+        "model_saved": true,
+        "success": true,
+        "obtained_source_through_mcp": true,
+        "evaluator_seconds": 20.2182486000238,
+        "limitation": "Static recognized-subset checks; PLC runtime behavior unverified",
+        "partition_cases": 112,
+        "int_domain": [
+          -32768,
+          32767
+        ]
+      },
+      "method": "Saved-section static regrade; original build/save/declaration evidence retained. No API or CE calls."
+    }
+  ],
+  "regraded_conditions": {
+    "demo-io-mapping-6": {
+      "A": {
+        "cases": 7,
+        "completion": {
+          "pass": 7,
+          "n": 7,
+          "verified_n": 7,
+          "rate_all": 1.0
+        },
+        "accepted": {
+          "pass": 4,
+          "n": 7,
+          "verified_n": 7,
+          "rate_all": 0.5714285714285714
+        },
+        "build": {
+          "pass": 4,
+          "n": 4,
+          "verified_n": 4,
+          "rate_all": 1.0
+        },
+        "static_behavior": {
+          "pass": 2,
+          "n": 4,
+          "verified_n": 2,
+          "rate_all": 0.5
+        },
+        "runtime_behavior": {
+          "pass": 0,
+          "n": 4,
+          "verified_n": 0,
+          "rate_all": 0.0
+        },
+        "all_attempts": {
+          "workflow_seconds": {
+            "n": 7,
+            "known_n": 7,
+            "unknown_n": 0,
+            "median": 39.5384571000468,
+            "p95": 154.87764229997993
+          },
+          "input_tokens": {
+            "n": 7,
+            "known_n": 7,
+            "unknown_n": 0,
+            "median": 45235,
+            "p95": 388549
+          },
+          "output_tokens": {
+            "n": 7,
+            "known_n": 7,
+            "unknown_n": 0,
+            "median": 3047,
+            "p95": 13185
+          },
+          "total_tokens": {
+            "n": 7,
+            "known_n": 7,
+            "unknown_n": 0,
+            "median": 48724,
+            "p95": 401734
+          }
+        },
+        "accepted_attempts": {
+          "workflow_seconds": {
+            "n": 4,
+            "known_n": 4,
+            "unknown_n": 0,
+            "median": 35.700100350019056,
+            "p95": 97.78541759995278
+          },
+          "input_tokens": {
+            "n": 4,
+            "known_n": 4,
+            "unknown_n": 0,
+            "median": 44622.0,
+            "p95": 193505
+          },
+          "output_tokens": {
+            "n": 4,
+            "known_n": 4,
+            "unknown_n": 0,
+            "median": 2879.0,
+            "p95": 9731
+          },
+          "total_tokens": {
+            "n": 4,
+            "known_n": 4,
+            "unknown_n": 0,
+            "median": 47501.0,
+            "p95": 203236
+          }
+        },
+        "known_partial_tokens": {
+          "input_tokens": 789666,
+          "output_tokens": 34499,
+          "total_tokens": 824165
+        },
+        "tool_errors": 0,
+        "api_retries": 0,
+        "repair_cycles": 7,
+        "statuses": {
+          "completed": 7
+        }
+      },
+      "B": {
+        "cases": 7,
+        "completion": {
+          "pass": 7,
+          "n": 7,
+          "verified_n": 7,
+          "rate_all": 1.0
+        },
+        "accepted": {
+          "pass": 4,
+          "n": 7,
+          "verified_n": 7,
+          "rate_all": 0.5714285714285714
+        },
+        "build": {
+          "pass": 4,
+          "n": 4,
+          "verified_n": 4,
+          "rate_all": 1.0
+        },
+        "static_behavior": {
+          "pass": 2,
+          "n": 4,
+          "verified_n": 2,
+          "rate_all": 0.5
+        },
+        "runtime_behavior": {
+          "pass": 0,
+          "n": 4,
+          "verified_n": 0,
+          "rate_all": 0.0
+        },
+        "all_attempts": {
+          "workflow_seconds": {
+            "n": 7,
+            "known_n": 7,
+            "unknown_n": 0,
+            "median": 44.17387759999838,
+            "p95": 128.08830780000426
+          },
+          "input_tokens": {
+            "n": 7,
+            "known_n": 7,
+            "unknown_n": 0,
+            "median": 52081,
+            "p95": 209411
+          },
+          "output_tokens": {
+            "n": 7,
+            "known_n": 7,
+            "unknown_n": 0,
+            "median": 3843,
+            "p95": 12887
+          },
+          "total_tokens": {
+            "n": 7,
+            "known_n": 7,
+            "unknown_n": 0,
+            "median": 55924,
+            "p95": 222298
+          }
+        },
+        "accepted_attempts": {
+          "workflow_seconds": {
+            "n": 4,
+            "known_n": 4,
+            "unknown_n": 0,
+            "median": 36.5630216000136,
+            "p95": 128.08830780000426
+          },
+          "input_tokens": {
+            "n": 4,
+            "known_n": 4,
+            "unknown_n": 0,
+            "median": 49384.5,
+            "p95": 209411
+          },
+          "output_tokens": {
+            "n": 4,
+            "known_n": 4,
+            "unknown_n": 0,
+            "median": 2850.5,
+            "p95": 12887
+          },
+          "total_tokens": {
+            "n": 4,
+            "known_n": 4,
+            "unknown_n": 0,
+            "median": 52199.0,
+            "p95": 222298
+          }
+        },
+        "known_partial_tokens": {
+          "input_tokens": 570856,
+          "output_tokens": 33156,
+          "total_tokens": 604012
+        },
+        "tool_errors": 0,
+        "api_retries": 0,
+        "repair_cycles": 2,
+        "statuses": {
+          "completed": 7
+        }
+      }
+    },
+    "feeder-3": {
+      "A": {
+        "cases": 7,
+        "completion": {
+          "pass": 7,
+          "n": 7,
+          "verified_n": 7,
+          "rate_all": 1.0
+        },
+        "accepted": {
+          "pass": 5,
+          "n": 7,
+          "verified_n": 7,
+          "rate_all": 0.7142857142857143
+        },
+        "build": {
+          "pass": 4,
+          "n": 4,
+          "verified_n": 4,
+          "rate_all": 1.0
+        },
+        "static_behavior": {
+          "pass": 2,
+          "n": 4,
+          "verified_n": 2,
+          "rate_all": 0.5
+        },
+        "runtime_behavior": {
+          "pass": 0,
+          "n": 4,
+          "verified_n": 0,
+          "rate_all": 0.0
+        },
+        "all_attempts": {
+          "workflow_seconds": {
+            "n": 7,
+            "known_n": 7,
+            "unknown_n": 0,
+            "median": 39.5384571000468,
+            "p95": 154.87764229997993
+          },
+          "input_tokens": {
+            "n": 7,
+            "known_n": 7,
+            "unknown_n": 0,
+            "median": 45235,
+            "p95": 388549
+          },
+          "output_tokens": {
+            "n": 7,
+            "known_n": 7,
+            "unknown_n": 0,
+            "median": 3047,
+            "p95": 13185
+          },
+          "total_tokens": {
+            "n": 7,
+            "known_n": 7,
+            "unknown_n": 0,
+            "median": 48724,
+            "p95": 401734
+          }
+        },
+        "accepted_attempts": {
+          "workflow_seconds": {
+            "n": 5,
+            "known_n": 5,
+            "unknown_n": 0,
+            "median": 31.861743599991314,
+            "p95": 97.78541759995278
+          },
+          "input_tokens": {
+            "n": 5,
+            "known_n": 5,
+            "unknown_n": 0,
+            "median": 44009,
+            "p95": 193505
+          },
+          "output_tokens": {
+            "n": 5,
+            "known_n": 5,
+            "unknown_n": 0,
+            "median": 2269,
+            "p95": 9731
+          },
+          "total_tokens": {
+            "n": 5,
+            "known_n": 5,
+            "unknown_n": 0,
+            "median": 46278,
+            "p95": 203236
+          }
+        },
+        "known_partial_tokens": {
+          "input_tokens": 789666,
+          "output_tokens": 34499,
+          "total_tokens": 824165
+        },
+        "tool_errors": 0,
+        "api_retries": 0,
+        "repair_cycles": 7,
+        "statuses": {
+          "completed": 7
+        }
+      },
+      "B": {
+        "cases": 7,
+        "completion": {
+          "pass": 7,
+          "n": 7,
+          "verified_n": 7,
+          "rate_all": 1.0
+        },
+        "accepted": {
+          "pass": 5,
+          "n": 7,
+          "verified_n": 7,
+          "rate_all": 0.7142857142857143
+        },
+        "build": {
+          "pass": 4,
+          "n": 4,
+          "verified_n": 4,
+          "rate_all": 1.0
+        },
+        "static_behavior": {
+          "pass": 2,
+          "n": 4,
+          "verified_n": 2,
+          "rate_all": 0.5
+        },
+        "runtime_behavior": {
+          "pass": 0,
+          "n": 4,
+          "verified_n": 0,
+          "rate_all": 0.0
+        },
+        "all_attempts": {
+          "workflow_seconds": {
+            "n": 7,
+            "known_n": 7,
+            "unknown_n": 0,
+            "median": 44.17387759999838,
+            "p95": 128.08830780000426
+          },
+          "input_tokens": {
+            "n": 7,
+            "known_n": 7,
+            "unknown_n": 0,
+            "median": 52081,
+            "p95": 209411
+          },
+          "output_tokens": {
+            "n": 7,
+            "known_n": 7,
+            "unknown_n": 0,
+            "median": 3843,
+            "p95": 12887
+          },
+          "total_tokens": {
+            "n": 7,
+            "known_n": 7,
+            "unknown_n": 0,
+            "median": 55924,
+            "p95": 222298
+          }
+        },
+        "accepted_attempts": {
+          "workflow_seconds": {
+            "n": 5,
+            "known_n": 5,
+            "unknown_n": 0,
+            "median": 28.95216560002882,
+            "p95": 128.08830780000426
+          },
+          "input_tokens": {
+            "n": 5,
+            "known_n": 5,
+            "unknown_n": 0,
+            "median": 46688,
+            "p95": 209411
+          },
+          "output_tokens": {
+            "n": 5,
+            "known_n": 5,
+            "unknown_n": 0,
+            "median": 1858,
+            "p95": 12887
+          },
+          "total_tokens": {
+            "n": 5,
+            "known_n": 5,
+            "unknown_n": 0,
+            "median": 48474,
+            "p95": 222298
+          }
+        },
+        "known_partial_tokens": {
+          "input_tokens": 570856,
+          "output_tokens": 33156,
+          "total_tokens": 604012
+        },
+        "tool_errors": 0,
+        "api_retries": 0,
+        "repair_cycles": 2,
+        "statuses": {
+          "completed": 7
+        }
+      }
+    },
+    "feeder-alarms-2": {
+      "A": {
+        "cases": 7,
+        "completion": {
+          "pass": 7,
+          "n": 7,
+          "verified_n": 7,
+          "rate_all": 1.0
+        },
+        "accepted": {
+          "pass": 5,
+          "n": 7,
+          "verified_n": 7,
+          "rate_all": 0.7142857142857143
+        },
+        "build": {
+          "pass": 4,
+          "n": 4,
+          "verified_n": 4,
+          "rate_all": 1.0
+        },
+        "static_behavior": {
+          "pass": 3,
+          "n": 4,
+          "verified_n": 3,
+          "rate_all": 0.75
+        },
+        "runtime_behavior": {
+          "pass": 0,
+          "n": 4,
+          "verified_n": 0,
+          "rate_all": 0.0
+        },
+        "all_attempts": {
+          "workflow_seconds": {
+            "n": 7,
+            "known_n": 7,
+            "unknown_n": 0,
+            "median": 39.5384571000468,
+            "p95": 154.87764229997993
+          },
+          "input_tokens": {
+            "n": 7,
+            "known_n": 7,
+            "unknown_n": 0,
+            "median": 45235,
+            "p95": 388549
+          },
+          "output_tokens": {
+            "n": 7,
+            "known_n": 7,
+            "unknown_n": 0,
+            "median": 3047,
+            "p95": 13185
+          },
+          "total_tokens": {
+            "n": 7,
+            "known_n": 7,
+            "unknown_n": 0,
+            "median": 48724,
+            "p95": 401734
+          }
+        },
+        "accepted_attempts": {
+          "workflow_seconds": {
+            "n": 5,
+            "known_n": 5,
+            "unknown_n": 0,
+            "median": 39.5384571000468,
+            "p95": 97.78541759995278
+          },
+          "input_tokens": {
+            "n": 5,
+            "known_n": 5,
+            "unknown_n": 0,
+            "median": 45235,
+            "p95": 193505
+          },
+          "output_tokens": {
+            "n": 5,
+            "known_n": 5,
+            "unknown_n": 0,
+            "median": 3047,
+            "p95": 9731
+          },
+          "total_tokens": {
+            "n": 5,
+            "known_n": 5,
+            "unknown_n": 0,
+            "median": 48724,
+            "p95": 203236
+          }
+        },
+        "known_partial_tokens": {
+          "input_tokens": 789666,
+          "output_tokens": 34499,
+          "total_tokens": 824165
+        },
+        "tool_errors": 0,
+        "api_retries": 0,
+        "repair_cycles": 7,
+        "statuses": {
+          "completed": 7
+        }
+      },
+      "B": {
+        "cases": 7,
+        "completion": {
+          "pass": 7,
+          "n": 7,
+          "verified_n": 7,
+          "rate_all": 1.0
+        },
+        "accepted": {
+          "pass": 5,
+          "n": 7,
+          "verified_n": 7,
+          "rate_all": 0.7142857142857143
+        },
+        "build": {
+          "pass": 4,
+          "n": 4,
+          "verified_n": 4,
+          "rate_all": 1.0
+        },
+        "static_behavior": {
+          "pass": 3,
+          "n": 4,
+          "verified_n": 3,
+          "rate_all": 0.75
+        },
+        "runtime_behavior": {
+          "pass": 0,
+          "n": 4,
+          "verified_n": 0,
+          "rate_all": 0.0
+        },
+        "all_attempts": {
+          "workflow_seconds": {
+            "n": 7,
+            "known_n": 7,
+            "unknown_n": 0,
+            "median": 44.17387759999838,
+            "p95": 128.08830780000426
+          },
+          "input_tokens": {
+            "n": 7,
+            "known_n": 7,
+            "unknown_n": 0,
+            "median": 52081,
+            "p95": 209411
+          },
+          "output_tokens": {
+            "n": 7,
+            "known_n": 7,
+            "unknown_n": 0,
+            "median": 3843,
+            "p95": 12887
+          },
+          "total_tokens": {
+            "n": 7,
+            "known_n": 7,
+            "unknown_n": 0,
+            "median": 55924,
+            "p95": 222298
+          }
+        },
+        "accepted_attempts": {
+          "workflow_seconds": {
+            "n": 5,
+            "known_n": 5,
+            "unknown_n": 0,
+            "median": 44.17387759999838,
+            "p95": 128.08830780000426
+          },
+          "input_tokens": {
+            "n": 5,
+            "known_n": 5,
+            "unknown_n": 0,
+            "median": 52081,
+            "p95": 209411
+          },
+          "output_tokens": {
+            "n": 5,
+            "known_n": 5,
+            "unknown_n": 0,
+            "median": 3843,
+            "p95": 12887
+          },
+          "total_tokens": {
+            "n": 5,
+            "known_n": 5,
+            "unknown_n": 0,
+            "median": 55924,
+            "p95": 222298
+          }
+        },
+        "known_partial_tokens": {
+          "input_tokens": 570856,
+          "output_tokens": 33156,
+          "total_tokens": 604012
+        },
+        "tool_errors": 0,
+        "api_retries": 0,
+        "repair_cycles": 2,
+        "statuses": {
+          "completed": 7
+        }
+      }
+    }
+  }
+}

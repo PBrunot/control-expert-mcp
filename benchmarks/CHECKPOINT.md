@@ -25,8 +25,21 @@ All eight saved I/O answers across four campaigns were regraded with rubric 6.
 Both DeepSeek campaigns and GPT-5.5 match 29/29 in each condition; GPT-6 Luna
 remains at 23/29 (A) and 22/29 (B). Latest DeepSeek is 15/15 including the
 independently verified simulator counter. Originals and earlier scoring remain
-immutable; rubric-specific archive snapshots are selected once per run by the
-overview, avoiding duplicated attempts.
+immutable. Each rubric family has its own archive snapshot; the overview takes
+case evidence from one snapshot per run and applies the newest regrade of every
+family (`feeder-`, `feeder-alarms-`, `demo-io-mapping-`) from all snapshots.
+Fields that a newer archiver only adds (previously empty) are not treated as
+changed evidence; any changed value still stops the overview.
+
+`feeder-3` (inspection) accepts exactly one whole-answer Markdown fence around
+the JSON; prose before or after still fails. The prompt still forbids fences,
+so the original strict score remains in every archive. `feeder-alarms-2` treats
+`SET(flag);`/`RESET(flag);` on the two fault flags as TRUE/FALSE assignments
+(EBOOL edge history is not graded) and still proves every INT partition.
+`ce-bench regrade --task alarms` re-proves saved `saved-section.xml` artifacts
+offline, retaining the original build/save/declaration evidence. All offline
+runs in `results/` were regraded with both rubrics on 2026-11-27; repair
+failures (`int_to_real(0)`) remain correctly rejected.
 
 The mapping prompt requests complete signal coverage and separates hardware
 ownership from application use. Regrading saved replies makes no provider or

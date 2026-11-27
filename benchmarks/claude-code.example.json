@@ -1,0 +1,52 @@
+{
+  "provider": {
+    "name": "claude-code"
+  },
+  "model": {
+    "id": "claude-haiku-4-5-20251001",
+    "identity": "pinned"
+  },
+  "cpu": {
+    "part_number": "BMX P34 2020",
+    "version": "02.70"
+  },
+  "ce_version": "16.4",
+  "fixture": "../tools/lang_refs/ST_2_Feeder.xml",
+  "workspace": ".local",
+  "results": "results",
+  "tool_timeout": 180,
+  "request_timeout": 180,
+  "workflow_timeout": 900,
+  "max_turns": 30,
+  "max_tool_calls": 70,
+  "conditions": {
+    "A": {
+      "command": "E:\\GitHub\\control-expert-mcp\\.venv\\Scripts\\python.exe",
+      "args": [
+        "-m",
+        "control_expert_mcp"
+      ],
+      "cwd": "E:\\GitHub\\control-expert-mcp",
+      "env": {
+        "CE_MCP_MANUALS_DIR": "E:\\GitHub\\control-expert-mcp\\manuals\\ce-16.4",
+        "CommonProgramFiles": "C:/Program Files (x86)/Common Files"
+      },
+      "documentation": false
+    },
+    "B": {
+      "command": "E:\\GitHub\\control-expert-mcp\\.venv\\Scripts\\python.exe",
+      "args": [
+        "-m",
+        "control_expert_mcp"
+      ],
+      "cwd": "E:\\GitHub\\control-expert-mcp",
+      "env": {
+        "CE_MCP_MANUALS_DIR": "E:\\GitHub\\control-expert-mcp\\manuals\\ce-16.4",
+        "CommonProgramFiles": "C:/Program Files (x86)/Common Files"
+      },
+      "documentation": true
+    }
+  },
+  "demo_project": "../samples/demo_ControlExpert_M580.STU",
+  "io_mapping_reference": "../samples/demo_ControlExpert_M580_io_mapping.md"
+}
