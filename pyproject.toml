@@ -1,6 +1,6 @@
 [project]
 name = "control-expert-mcp"
-version = "0.9.4"
+version = "0.9.5"
 description = "MCP server exposing EcoStruxure Control Expert (Unity Pro) to AI agents via the UDE COM automation API"
 readme = "README.md"
 requires-python = ">=3.11"
