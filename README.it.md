@@ -52,15 +52,27 @@ Configurare il client per avviare `control-expert-mcp` (ad esempio in Claude Des
 }
 ```
 
-Codex CLI: `codex mcp add control-expert --env CE_MCP_ENABLE_ONLINE=0 -- control-expert-mcp`
+### Claude Code e Codex: server + skill di workflow
 
-Plugin Claude Code (server MCP tramite `uvx` più una skill di workflow; richiede [uv](https://docs.astral.sh/uv/)):
+La [skill `control-expert`](plugin/skills/control-expert/SKILL.md) è una breve checklist operativa: ispezionare prima di modificare, ciclo di build, candidati per i simboli, verifica dei costrutti Modicon nei manuali e consenso per l'accesso live. Usa il formato standard `SKILL.md` e funziona con entrambi gli agenti.
+
+**Claude Code:** un unico plugin installa il server (tramite `uvx`, richiede [uv](https://docs.astral.sh/uv/)) e la skill:
 
 ```text
 /plugin install control-expert --marketplace PBrunot/control-expert-mcp
 ```
 
-Gli strumenti online restano disattivati finché non si abilita l'opzione del plugin "Expose online tools".
+Gli strumenti online restano disattivati finché non si abilita l'opzione del plugin "Expose online tools". Solo la skill, con una configurazione del server propria: copiare `plugin/skills/control-expert` in `~/.claude/skills/control-expert`.
+
+**Codex:** aggiungere il server, poi la skill:
+
+```text
+codex mcp add control-expert --env CE_MCP_ENABLE_ONLINE=0 -- control-expert-mcp
+```
+
+In Codex, chiedere: `$skill-installer install https://github.com/PBrunot/control-expert-mcp/tree/main/plugin/skills/control-expert`. In alternativa copiare `plugin/skills/control-expert` in `~/.agents/skills/control-expert` (tutti i progetti) o in `.agents/skills/control-expert` (un solo repository). Riavviare Codex se la skill non compare.
+
+ChatGPT web/desktop si collega solo a server MCP remoti HTTPS, quindi non può avviare questo server locale Windows; usare Codex.
 
 Se il comando non viene trovato, usare il percorso assoluto oppure l'interprete Python dell'installazione con gli argomenti `["-m", "control_expert_mcp"]`. Altri client: [configurazione dei client](docs/guide.md#mcp-client-configuration), in inglese, e [samples/](samples/).
 

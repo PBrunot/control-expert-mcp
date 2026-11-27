@@ -52,15 +52,27 @@ Configure the client to launch `control-expert-mcp` (for example in Claude Deskt
 }
 ```
 
-Codex CLI: `codex mcp add control-expert --env CE_MCP_ENABLE_ONLINE=0 -- control-expert-mcp`
+### Claude Code and Codex: server + workflow skill
 
-Claude Code plugin (MCP server via `uvx` plus a workflow skill; needs [uv](https://docs.astral.sh/uv/)):
+The [`control-expert` skill](plugin/skills/control-expert/SKILL.md) is a short workflow checklist: inspect before editing, the build loop, symbol candidates, verifying Modicon constructs in the manuals, and live-access consent. It uses the standard `SKILL.md` format and works in both agents.
+
+**Claude Code:** one plugin installs the server (via `uvx`, needs [uv](https://docs.astral.sh/uv/)) and the skill:
 
 ```text
 /plugin install control-expert --marketplace PBrunot/control-expert-mcp
 ```
 
-Online tools stay off unless you enable the plugin option "Expose online tools".
+Online tools stay off unless you enable the plugin option "Expose online tools". Skill only, with your own server config: copy `plugin/skills/control-expert` to `~/.claude/skills/control-expert`.
+
+**Codex:** add the server, then the skill:
+
+```text
+codex mcp add control-expert --env CE_MCP_ENABLE_ONLINE=0 -- control-expert-mcp
+```
+
+In Codex, ask: `$skill-installer install https://github.com/PBrunot/control-expert-mcp/tree/main/plugin/skills/control-expert`. Or copy `plugin/skills/control-expert` to `~/.agents/skills/control-expert` (all projects) or `.agents/skills/control-expert` (one repository). Restart Codex if the skill does not appear.
+
+ChatGPT web/desktop connects only to remote HTTPS MCP servers, so it cannot launch this local Windows server; use Codex.
 
 If the command is not found, use its absolute path, or the installing Python with arguments `["-m", "control_expert_mcp"]`. Other clients: [client configuration](docs/guide.md#mcp-client-configuration) and [samples/](samples/).
 

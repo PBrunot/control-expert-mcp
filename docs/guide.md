@@ -23,7 +23,7 @@ Examples use the PyPI command `control-expert-mcp`. Source installs: absolute `.
 | Claude Desktop | Add the block above to `%APPDATA%\Claude\claude_desktop_config.json` ([sample](../samples/claude_desktop_config.json)). |
 | Claude Code | Plugin (server + workflow skill, needs uv): `/plugin install control-expert --marketplace PBrunot/control-expert-mcp`. Manual: `claude mcp add control-expert -- control-expert-mcp`. |
 | VS Code / Copilot | `.vscode/mcp.json`, top-level key `servers`, add `"type": "stdio"` ([sample](../samples/vscode-mcp.json)). |
-| OpenAI Codex CLI | `codex mcp add control-expert --env CE_MCP_ENABLE_ONLINE=0 -- control-expert-mcp` (writes `%USERPROFILE%\.codex\config.toml`; loads [AGENTS.md](../AGENTS.md)). |
+| OpenAI Codex CLI | `codex mcp add control-expert --env CE_MCP_ENABLE_ONLINE=0 -- control-expert-mcp` (writes `%USERPROFILE%\.codex\config.toml`; loads [AGENTS.md](../AGENTS.md)). Skill: `$skill-installer install https://github.com/PBrunot/control-expert-mcp/tree/main/plugin/skills/control-expert`, or copy that folder to `~/.agents/skills/`. |
 | DeepSeek Harness (DSH) | In `%USERPROFILE%\.dsh\profiles\<profile>\cordis.patch.yml`, `insert` a row `id: mcp-control-expert`, `name: '@deepseek-ai/dsh-mcp-client'`, `config: {serverName: control-expert, transport: stdio, command: control-expert-mcp, args: [], env: {...}}`. DSH scrubs the environment, so list every needed `CE_MCP_*` variable in `env`. Check with `dsh --profile web --dump-config`. |
 
 Environment variables:
